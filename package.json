@@ -1,0 +1,16 @@
+{
+  "name": "timebox-os",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "迷っているタスクを、実行する時間へ。タイムボックス管理アプリ。",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "vite": "^6.3.5"
+  }
+}

@@ -1,0 +1,118 @@
+/* --- Timebox OS / 土台のスタイル ---------------------------------------
+   まえみち（maemichi.com）の main.css から、このアプリが必要とする分だけを
+   抜き出したもの。色とフォントの変数はサイト側と同じ値にしてあるので、
+   timebox.css は両方のリポジトリで同じものが使える。
+----------------------------------------------------------------------- */
+
+:root {
+    --bg-color: #58B2DC;      /* SORA */
+    --surface-color: #ffffff;
+    --accent-color: #0d0d0d;
+    --text-primary: #0d0d0d;
+    --text-secondary: #333333;
+    --font-en: 'Syne', sans-serif;
+    --font-jp: 'Noto Sans JP', sans-serif;
+    --transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: var(--font-jp);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition);
+}
+
+ul {
+    list-style: none;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* --- Header --- */
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 3000;
+    padding: 20px 0;
+    /* 固定ヘッダーが透過だと、下を通る本文と文字が重なる */
+    background: rgba(88, 178, 220, 0.92);
+    backdrop-filter: blur(10px);
+}
+
+header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.logo {
+    font-family: var(--font-en);
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    /* 折り返すとヘッダーが2段になり、下の見出しに重なる */
+    white-space: nowrap;
+}
+
+.site-nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-family: var(--font-en);
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+.site-nav a:hover {
+    opacity: 0.6;
+}
+
+/* --- Footer --- */
+footer {
+    padding: 48px 0 64px;
+    border-top: 1px solid rgba(13, 13, 13, 0.12);
+}
+
+.footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.footer-links {
+    display: flex;
+    gap: 20px;
+}
+
+.footer-links a:hover {
+    opacity: 0.6;
+}
+
+@media (max-width: 768px) {
+    .logo { font-size: 1.15rem; }
+    .site-nav { gap: 12px; font-size: 0.65rem; }
+}
