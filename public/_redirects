@@ -1,0 +1,3 @@
+# Cloudflare Pages routing
+# /app (末尾スラッシュなし) を、静的ファイルとして存在する /app/ へ正規化する。
+/app  /app/  301

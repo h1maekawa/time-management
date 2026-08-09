@@ -117,6 +117,69 @@ export function exportJson() {
 }
 
 /**
+ * JSONインポートが失敗したことを表すエラー。
+ * これを投げた時点では既存の保存データには一切触れていない
+ * （呼び出し側は catch した時点で save() を呼ばなければ安全）。
+ */
+export class ImportError extends Error {}
+
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function isValidTask(task) {
+  return isPlainObject(task) && typeof task.id === "string" && typeof task.title === "string";
+}
+
+function isValidTemplate(template) {
+  return isPlainObject(template) && Array.isArray(template.days) && template.days.length === 7;
+}
+
+/**
+ * バックアップの形を確認する。
+ * 将来 version が上がっても、ここだけ緩めれば古いバックアップを読み続けられる。
+ */
+function isValidBackupShape(raw) {
+  if (!isPlainObject(raw)) return false;
+  if (!Array.isArray(raw.tasks) || !raw.tasks.every(isValidTask)) return false;
+  if (raw.days !== undefined && !isPlainObject(raw.days)) return false;
+  if (raw.template !== undefined && !isValidTemplate(raw.template)) return false;
+  if (raw.history !== undefined && !Array.isArray(raw.history)) return false;
+  if (raw.settings !== undefined && !isPlainObject(raw.settings)) return false;
+  return true;
+}
+
+/**
+ * JSONバックアップを取り込み、正規化した state を返す（保存はしない）。
+ * 呼び出し側で内容を確認・確認ダイアログを出したうえで save() する想定。
+ *
+ * 失敗時は ImportError を投げるだけで、既存の保存データには触れない。
+ */
+export function importJson(text) {
+  let raw;
+  try {
+    raw = JSON.parse(text);
+  } catch {
+    throw new ImportError("JSONの形式が正しくありません。ファイルが壊れていないか確認してください。");
+  }
+
+  if (!isPlainObject(raw)) {
+    throw new ImportError("バックアップの内容が読み取れませんでした。");
+  }
+  if (typeof raw.version !== "number" || !Number.isFinite(raw.version) || raw.version < 1) {
+    throw new ImportError("バックアップのバージョン情報が見つかりません。Timebox OSから書き出したファイルを選んでください。");
+  }
+  if (raw.version > STORAGE_VERSION) {
+    throw new ImportError("このバックアップは新しいバージョンのTimebox OSで作られています。アプリを更新してから読み込んでください。");
+  }
+  if (!isValidBackupShape(raw)) {
+    throw new ImportError("バックアップの内容が壊れています。別のファイルを選ぶか、書き出しをやり直してください。");
+  }
+
+  return normalize(raw);
+}
+
+/**
  * 履歴の刈り込み。無料プランは直近7日だけ残す。
  * 消えて困る「これから使う日」は残し、過ぎた日だけを対象にする。
  */

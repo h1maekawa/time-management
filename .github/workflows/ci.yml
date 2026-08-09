@@ -1,8 +1,6 @@
 name: CI
 
-# サイト全体のテストとビルドはこちらで見る。
-# 記事の同期（sync-note-rss.yml）とは分けてあるので、
-# ここが赤くてもnoteの更新は止まらない。
+# Timebox OS のテストとビルドを見る。
 on:
   push:
     branches: [main]

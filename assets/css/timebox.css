@@ -754,9 +754,93 @@
 }
 
 /* --- Mobile --- */
-/* ヘッダーのロゴ・ナビの縮小は main.css 側（ハンバーガーを持たないページ向けの指定）が行う */
 @media (max-width: 768px) {
     .tb-hero { padding-top: 120px; }
     .tb-card { padding: 18px; }
     .tb-timeline-scroll { height: 420px; }
+}
+
+/* --- App shell (独立化にともなう /app 専用のヘッダー・フッター) -----------
+   ロゴ・ナビは main.css ではなく、このアプリ自身が持つ。
+   固定ヘッダーではなく通常フローに置くので、tb-hero のような上部余白は不要。
+------------------------------------------------------------------------- */
+.tb-appbar {
+    padding: 18px 0;
+    background: rgba(88, 178, 220, 0.92);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 3000;
+}
+
+.tb-appbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.tb-appbar-logo {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-family: var(--font-en);
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+}
+
+.tb-appbar-logo-sub {
+    font-family: var(--font-jp);
+    font-size: 0.6rem;
+    font-weight: 500;
+    color: var(--tb-muted);
+}
+
+.tb-appbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-family: var(--font-en);
+    font-weight: 700;
+    font-size: 0.75rem;
+}
+
+.tb-appbar-nav a:hover { opacity: 0.65; }
+
+@media (max-width: 560px) {
+    .tb-appbar-nav { display: none; }
+}
+
+.tb-appfooter {
+    padding: 32px 0 56px;
+    border-top: 1px solid rgba(13, 13, 13, 0.12);
+    font-size: 0.78rem;
+    color: var(--tb-muted);
+}
+
+.tb-appfooter-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.tb-appfooter-links {
+    display: flex;
+    gap: 18px;
+}
+
+.tb-appfooter-links a:hover { opacity: 0.65; }
+
+/* インポート用の隠しファイル入力（クリックはボタン経由でのみ発火させる） */
+.tb-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
 }
