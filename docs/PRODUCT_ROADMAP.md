@@ -2,16 +2,19 @@
 
 > 迷っているタスクを、実行する時間へ。
 
-タイムボックス管理アプリの単体リポジトリ。
-現時点で利用者へ出しているのは `https://maemichi.com/timebox.html`（`h1maekawa/maemichi.com`）で、
-こちらは `https://timebox.maemichi.com` などへ切り出すための置き場。
-アプリ側のコード（`assets/css/timebox.css` / `assets/js/timebox*.js` / `tests/`）は両者で同じもの。
+`h1maekawa/time-management` は Timebox OS を独立Productとして開発する
+リポジトリです。今後のTimebox OS機能開発は、このリポジトリを
+Source of Truthとします。
+
+将来の本番URL: `https://timebox.maemichi.com/`
+- `/` … Landing Page
+- `/app` … Timebox OSアプリ本体
 
 ---
 
-## 1. 現在地（Phase 1 / 無料公開版）
+## Phase 1 — Standalone（現在地・無料公開版）
 
-実装済み。ログイン不要・無料・データは端末のブラウザにのみ保存する。
+ログイン不要・無料・データは端末のブラウザにのみ保存する。
 
 | 機能 | 状態 |
 | --- | --- |
@@ -20,21 +23,27 @@
 | 所要時間・優先度・締切・仕事/生活・時間帯の編集 | ✅ |
 | 時間割の自動生成（決定論的） | ✅ |
 | 24時間タイムライン（現在時刻線・枠・空き時間・完了・固定） | ✅ |
-| 手動での時刻固定／固定解除（ドラッグ＋時刻入力） | ✅ |
+| 手動での時刻固定／固定解除（PC: ドラッグ、モバイル: 時刻入力） | ✅ |
 | 未完了の翌日への持ち越し（持ち越し回数の記録） | ✅ |
-| localStorage への保存（再読み込みで復元） | ✅ |
+| localStorage への保存（再読み込みで復元、schema version付き） | ✅ |
+| JSONバックアップ（保存・読み込み。ドメイン移行の手段） | ✅ |
 | ICS書き出し（Googleカレンダーへインポート） | ✅ |
+| 独立Landing Page + `/app` | ✅ |
+| Cloudflare Pages単独Deploy対応 | ✅ |
 
 ### ファイル構成
 
 ```
-index.html                       画面
-assets/css/base.css              土台（色・フォント・ヘッダー・フッター）
-assets/css/timebox.css           アプリ本体のスタイル（.tb- 接頭辞）
-assets/js/timebox-engine.js      時間割の計算（純粋関数・DOMに触らない）
-assets/js/timebox-storage.js     端末への保存
-assets/js/timebox.js             描画とユーザー操作
-tests/timebox-engine.test.js     エンジンのテスト（node --test）
+index.html                        Landing Page
+app/index.html                    Timebox OS アプリ本体
+assets/css/base.css                共通デザイントークン
+assets/css/landing.css             Landing Page専用スタイル
+assets/css/timebox.css             アプリのスタイル（.tb- 接頭辞）
+assets/js/timebox-engine.js        時間割の計算（純粋関数・DOMに触らない）
+assets/js/timebox-storage.js       端末への保存・JSONバックアップ
+assets/js/timebox.js               描画とユーザー操作
+tests/timebox-engine.test.js       エンジンのテスト（node --test）
+tests/timebox-storage.test.js      保存層・インポート検証のテスト
 ```
 
 ### 時間割の並び順
@@ -49,53 +58,91 @@ tests/timebox-engine.test.js     エンジンのテスト（node --test）
 計算はすべて決定論的に行う。同じ入力なら毎回同じ時間割になることを
 `tests/timebox-engine.test.js` で担保している。
 
+### maemichi.com版からの移行
+
+旧実装 `h1maekawa/maemichi.com` の `timebox.html` は、このリポジトリの
+Deployが完了するまで削除しない。ユーザーが端末に貯めたデータは
+Origin（ドメイン）が変わると自動では引き継がれないため、JSONバックアップの
+書き出し・読み込みで移行する。
+
+```
+maemichi.com/timebox.html
+  → 「バックアップを保存」で .json を書き出す
+  → timebox.maemichi.com/app/ を開く
+  → 「バックアップを読み込む」で同じ .json を読み込む
+```
+
+将来的には `maemichi.com/timebox.html` から `timebox.maemichi.com` へ
+誘導するCTA・リダイレクトを追加する（今回は未実施）。
+
 ---
 
-## 2. Phase 2 — ユーザー基盤
+## Phase 2 — Google Login / Google Calendar / Cloud Storage
 
 - Googleログイン（Cloudflare Pages Functions で OAuth）
-- D1（users / tasks / plans / calendar_events / task_history / subscriptions）
-- Googleカレンダーの読み込み → 会議・予約を固定時間として表示
+- Cloudflare D1（`users` / `tasks` / `plans` / `calendar_events` / `task_history` / `subscriptions`）
+- Googleカレンダーの読み込み → 会議・予約をBusy Blockとして表示
 - 残った空き時間へタスクを自動配置し、確認のうえカレンダーへ反映
-- 複数端末での同期
+- 複数端末での同期（Cloud Storageへ差し替え可能なStorage Layer）
 - プライバシーポリシー／利用規約／データ削除
 
-### 守るルール
+### アーキテクチャ
 
 ```
-既存のGoogle予定       ＝ 原則として変更しない
-Timebox OSが作った予定 ＝ 移動・更新・削除できる
+Google Login
+  ↓
+Google Calendar Read
+  ↓
+既存予定取得
+  ↓
+Busy Block化
+  ↓
+空き時間計算
+  ↓
+Timebox Engine
+  ↓
+User Confirmation
+  ↓
+Google Calendar Write
 ```
 
-他者との会議や外部予約をアプリ側が勝手に動かさない。
-Googleのリフレッシュトークンはブラウザへ保存せず、Pages Functions で暗号化して D1 に置く。
+### 安全ルール（最重要）
 
-必要なSecrets: `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` / `TOKEN_ENCRYPTION_KEY`
+```
+既存のGoogle予定       ＝ Timebox OSから原則変更禁止
+Timebox OSが作った予定 ＝ 更新・削除できる
+```
+
+他者との会議・予約・外部イベント・既存予定をアプリ側が勝手に削除・移動しない。
+Googleのリフレッシュトークンはブラウザへ保存せず、Pages Functions で暗号化して
+D1に置く。
+
+必要なSecrets（今回は未作成・未commit）: `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` / `TOKEN_ENCRYPTION_KEY`
 
 ---
 
-## 3. Phase 3 — Founderプラン（月額100円）
+## Phase 3 — Founderプラン
 
 初期ユーザー限定の創業メンバー価格であり、将来の標準価格とは分ける。
 
 | プラン | 価格 | 主な内容 |
 | --- | --- | --- |
-| 無料 | 0円 | タスク登録・仕分け・時間割・タイムライン・ローカル保存・ICS出力・直近7日の履歴 |
-| Founder | 100円/月 | Googleログイン・カレンダー直接同期・クラウド保存・複数端末・90日履歴・基本的なAI提案・繰り返しルール・価格の永久維持 |
-| Standard（将来） | 300〜500円/月 | 履歴無制限・高度なAI分析・自動化ルール・週次レポート・複数カレンダー |
-
-- Stripe Checkout / Billing / Webhook / カスタマーポータル
-- 100円は収益の中心ではなく、継続率と「有料でも使いたい人がいるか」を測るための価格
-- 無料版に課金モーダルを頻繁に出さない。有料機能を選んだときだけ違いを説明する
+| 無料 | 0円 | タスク登録・仕分け・時間割・タイムライン・ローカル保存・JSONバックアップ・ICS出力 |
+| Founder | 月額（予定） | Googleログイン・カレンダー直接同期・クラウド保存・複数端末・基本的なAI提案・価格の永久維持 |
+| Standard（将来） | 月額（予定） | 履歴無制限・高度なAI分析・自動化ルール・複数カレンダー |
 
 判定は `assets/js/timebox-engine.js` の `PLAN_FEATURES` / `hasFeature()` を通す。
-未知のプラン名は無料扱いになるため、課金状態が壊れても機能が漏れない。
+未知のプラン名・壊れたプラン値は **free として扱う**。課金状態が壊れても
+有料機能が誤って開放されない設計をPhase 1から維持している。
 
-必要なSecrets: `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET`
+Stripe Checkout / Billing / Webhook / カスタマーポータルは今回未実装。
+このロードマップにのみ計画として残す。
+
+必要なSecrets（今回は未作成・未commit）: `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET`
 
 ---
 
-## 4. Phase 4 — AIによる改善提案
+## Phase 4 — AIによる改善提案
 
 蓄積するデータ: 予定所要時間 / 実際の所要時間 / 予定開始時刻 / 実際の開始時刻 /
 完了・未完了 / 持ち越し回数 / 時刻変更回数 / 曜日 / 時間帯 / カテゴリ /
@@ -123,28 +170,26 @@ AIが勝手にしてはいけないこと: 外部予定の削除・移動、締�
 
 ---
 
-## 5. Phase 5 — Standardプラン
+## Phase 5 — Standardプラン
 
-自動化ルール／高度な分析／複数カレンダー／履歴無制限（月額300〜500円）。
+自動化ルール／高度な分析／複数カレンダー／履歴無制限。
 
 ---
 
-## 6. 開発と公開
+## 開発と公開
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173/
-npm test         # tests/timebox-engine.test.js
-npm run build    # dist/ へ出力
+npm run dev      # http://localhost:5173/ (Landing) と /app/ (アプリ)
+npm test         # tests/*.test.js
+npm run build    # dist/ へ出力（dist/index.html, dist/app/index.html）
 ```
 
-Cloudflare Pages へ置く場合は Production branch `main` / Build command `npm run build` / 出力 `dist`。
+Cloudflare Pages（Production branch: `main` / Build command: `npm run build` / 出力: `dist`）。
+本番Custom Domainは `timebox.maemichi.com` を想定（Cloudflare PagesのCustom Domain設定で追加）。
 
 ```
-agent/xxx ブランチ → Preview Deployment → 動作確認 → Pull Request → main へマージ → 本番公開
+feature/xxx ブランチ → Pull Request → CI（npm test / npm run build） → main へマージ → 本番公開
 ```
 
 `main` へ直接コミットしない。
-
-アプリ側を直したときは、まえみち版（`h1maekawa/maemichi.com` の `timebox.html`）にも
-同じ内容を反映すること。
