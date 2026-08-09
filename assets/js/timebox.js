@@ -424,6 +424,8 @@ function bindEvents() {
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") closeModals();
   });
+
+  el("tb-import-file")?.addEventListener("change", onImportFileSelected);
 }
 
 function onClick(event) {
@@ -466,6 +468,9 @@ function onClick(event) {
       break;
     case "export-json":
       download(`timebox-backup-${today}.json`, storage.exportJson(), "application/json");
+      break;
+    case "import-json":
+      el("tb-import-file")?.click();
       break;
     case "reset":
       resetAll();
@@ -734,6 +739,43 @@ function resetAll() {
   state = storage.save(state);
   activeTab = "today";
   notices = [{ kind: "info", text: "保存していたデータを消しました。" }];
+  rollover();
+  render();
+}
+
+/**
+ * JSONバックアップの読み込み。
+ * 失敗時は storage.importJson() が投げるだけで保存には触らないので、
+ * ここでも catch した場合は既存データをそのまま残す（安全な失敗）。
+ */
+async function onImportFileSelected(event) {
+  const input = event.target;
+  const file = input.files?.[0];
+  input.value = "";
+  if (!file) return;
+
+  let imported;
+  try {
+    const text = await file.text();
+    imported = storage.importJson(text);
+  } catch (error) {
+    notify(
+      "error",
+      error instanceof storage.ImportError
+        ? error.message
+        : "バックアップの読み込みに失敗しました。現在のデータは変更していません。"
+    );
+    return;
+  }
+
+  const ok = window.confirm(
+    "この端末に保存されているタスク・時間割・記録を、読み込んだバックアップで置き換えます。よろしいですか？"
+  );
+  if (!ok) return;
+
+  state = storage.save(imported);
+  activeTab = "today";
+  notices = [{ kind: "success", text: "バックアップを読み込みました。" }];
   rollover();
   render();
 }

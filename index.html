@@ -3,203 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timebox OS - 迷っているタスクを、実行する時間へ。</title>
-    <meta name="description" content="今日やることを書き出し、優先順位と使える時間から1日の予定を自動で組み立てるタイムボックス管理アプリ。無料で使えて、データは端末に保存されます。">
+    <title>Timebox OS | 迷っているタスクを、実行する時間へ。</title>
+    <meta name="description" content="今日やることを書き出すだけで、使える時間と優先順位から1日の予定を組み立てるタイムボックス管理アプリ。登録不要・無料・データは端末に保存されます。">
+    <link rel="canonical" href="https://timebox.maemichi.com/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Timebox OS | 迷っているタスクを、実行する時間へ。">
+    <meta property="og:description" content="今日やることを書き出すだけで、使える時間と優先順位から1日の予定を組み立てるタイムボックス管理アプリ。登録不要・無料・データは端末に保存されます。">
+    <meta property="og:url" content="https://timebox.maemichi.com/">
+    <meta name="twitter:card" content="summary">
+    <meta name="robots" content="index,follow">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/base.css">
-    <link rel="stylesheet" href="assets/css/timebox.css">
+    <link rel="stylesheet" href="assets/css/landing.css">
 </head>
-<body class="tb-page">
+<body>
+    <a class="skip-link" href="#lp-main">本文へ移動</a>
 
-    <header>
-        <div class="container">
-            <a href="./" class="logo">Timebox OS</a>
-            <nav class="site-nav">
-                <a href="https://maemichi.com/" target="_blank" rel="noopener noreferrer">MAEMICHI</a>
-                <a href="https://github.com/h1maekawa/time-management" target="_blank" rel="noopener noreferrer">GITHUB</a>
+    <header class="lp-header">
+        <div class="container lp-header-inner">
+            <a href="/" class="lp-logo">TIMEBOX OS <span class="lp-logo-sub">by maemichi</span></a>
+            <nav class="lp-nav" aria-label="サイト内リンク">
+                <div class="lp-nav-links">
+                    <a href="#problem">課題</a>
+                    <a href="#how">使い方</a>
+                    <a href="#features">できること</a>
+                    <a href="#roadmap">今後の予定</a>
+                </div>
+                <a href="/app/" class="lp-btn lp-btn-sm">無料で使う</a>
             </nav>
         </div>
     </header>
 
-    <main>
-        <!-- ─── ヒーロー ───────────────────────────────── -->
-        <section class="tb-hero">
+    <main id="lp-main">
+        <!-- ─── Hero ───────────────────────────────────── -->
+        <section class="lp-hero">
             <div class="container">
-                <p class="tb-eyebrow">TIMEBOX OS <span class="tb-badge">Public Beta</span></p>
-                <h1 class="tb-title">迷っているタスクを、<br>実行する時間へ。</h1>
-                <p class="tb-lead">
-                    今日やることを書き出すと、優先順位と使える時間から1日の予定を自動で組み立てます。<br>
-                    「何時から何分やるか」まで決まるので、朝に迷う時間がなくなります。
+                <p class="lp-eyebrow">TIMEBOX OS <span class="lp-badge">無料で使える</span></p>
+                <h1 class="lp-hero-title">迷っているタスクを、<br>実行する時間へ。</h1>
+                <p class="lp-hero-lead">
+                    今日やることを書き出すだけで、使える時間と優先順位から
+                    1日の予定を組み立てるタイムボックス管理アプリ。
                 </p>
-                <ul class="tb-hero-notes">
-                    <li>登録不要・無料</li>
-                    <li>データはこの端末にだけ保存されます</li>
-                    <li>Googleカレンダーへ書き出せます</li>
+                <div class="lp-hero-actions">
+                    <a href="/app/" class="lp-btn">無料で使う</a>
+                    <a href="#how" class="lp-btn lp-btn-ghost">使い方を見る</a>
+                </div>
+                <ul class="lp-hero-notes">
+                    <li>登録不要</li>
+                    <li>無料</li>
+                    <li>データは端末に保存</li>
                 </ul>
             </div>
         </section>
 
-        <!-- ─── アプリ本体 ─────────────────────────────── -->
-        <section class="tb-app">
+        <!-- ─── Problem ────────────────────────────────── -->
+        <section class="lp-section" id="problem">
             <div class="container">
-                <div class="tb-statusbar">
-                    <div>
-                        <p class="tb-statusbar-date" id="tb-date">—</p>
-                        <p class="tb-statusbar-now" id="tb-now">—</p>
-                    </div>
-                    <div class="tb-statusbar-kpis" id="tb-kpis"></div>
+                <div class="lp-section-head">
+                    <span class="lp-section-eyebrow">PROBLEM</span>
+                    <h2 class="lp-section-title">Todoは書けても、<br>「いつやるか」までは決まらない。</h2>
+                    <p class="lp-section-lead">
+                        タスク管理アプリはたくさんあります。でも、書き出したタスクを
+                        実際に「何時から何分やるか」まで落とし込むのは、結局いつも自分次第でした。
+                    </p>
                 </div>
-
-                <div id="tb-notices"></div>
-
-                <div class="tb-grid">
-                    <!-- 左：入力とタスク -->
-                    <div class="tb-col">
-                        <div class="tb-card">
-                            <h2 class="tb-card-title">今日やることを書き出す</h2>
-                            <p class="tb-card-hint">1行に1つ。動詞で書くと予定に落としやすくなります。</p>
-                            <textarea id="tb-input" rows="4" class="tb-textarea"
-                                placeholder="提案資料を修正する&#10;請求書を確認する&#10;本を30分読む&#10;ジムに行く"></textarea>
-                            <div class="tb-row-actions">
-                                <label class="tb-inline-field">
-                                    区分
-                                    <select id="tb-input-category" class="tb-select">
-                                        <option value="work">💼 仕事</option>
-                                        <option value="life">🏠 生活</option>
-                                    </select>
-                                </label>
-                                <label class="tb-inline-field">
-                                    所要
-                                    <input id="tb-input-minutes" class="tb-number" type="number" min="5" max="480" step="5" value="30">分
-                                </label>
-                                <button type="button" class="tb-btn tb-btn-primary" data-action="add-tasks">タスクを追加</button>
-                            </div>
-                        </div>
-
-                        <div class="tb-card">
-                            <div class="tb-card-head">
-                                <h2 class="tb-card-title">仕分ける</h2>
-                                <span class="tb-card-hint" id="tb-triage-hint"></span>
-                            </div>
-                            <div class="tb-tabs" id="tb-tabs" role="tablist"></div>
-                            <ul class="tb-tasks" id="tb-tasks"></ul>
-                        </div>
+                <div class="lp-problem-grid">
+                    <div class="lp-problem-card">
+                        <span class="lp-problem-mark">1</span>
+                        <p class="lp-problem-text">Todoはあるけど、何から始めるか毎回迷う</p>
                     </div>
-
-                    <!-- 右：枠とタイムライン -->
-                    <div class="tb-col tb-col-sticky">
-                        <div class="tb-card">
-                            <div class="tb-card-head">
-                                <h2 class="tb-card-title">今日の使い方</h2>
-                                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="open-windows">枠を編集</button>
-                            </div>
-                            <div class="tb-capacity" id="tb-capacity"></div>
-                            <div class="tb-row-actions">
-                                <button type="button" class="tb-btn tb-btn-primary" data-action="build">時間割をつくる</button>
-                                <button type="button" class="tb-btn tb-btn-ghost" data-action="build-from-now">今から詰め直す</button>
-                            </div>
-                        </div>
-
-                        <div class="tb-card">
-                            <div class="tb-card-head">
-                                <h2 class="tb-card-title">1日のタイムライン</h2>
-                                <span class="tb-card-hint">タスクをここへドラッグすると時刻を固定できます</span>
-                            </div>
-                            <div class="tb-timeline-scroll" id="tb-timeline-scroll">
-                                <div class="tb-timeline" id="tb-timeline"></div>
-                            </div>
-                            <div id="tb-overflow"></div>
-                        </div>
-
-                        <div class="tb-card">
-                            <h2 class="tb-card-title">カレンダーへ入れる</h2>
-                            <div class="tb-export">
-                                <button type="button" class="tb-btn tb-btn-primary" data-action="export-ics">Googleカレンダーへ追加（.ics）</button>
-                                <button type="button" class="tb-btn tb-btn-locked" data-action="locked" data-feature="googleCalendarSync">
-                                    Googleカレンダーと直接同期
-                                    <span class="tb-lock">近日</span>
-                                </button>
-                                <button type="button" class="tb-btn tb-btn-locked" data-action="locked" data-feature="cloudBackup">
-                                    クラウド保存・複数端末で使う
-                                    <span class="tb-lock">近日</span>
-                                </button>
-                            </div>
-                            <p class="tb-card-hint">
-                                書き出した .ics ファイルを Googleカレンダーの「他のカレンダーを追加 → インポート」から取り込めます。
-                            </p>
-                        </div>
-
-                        <div class="tb-card tb-card-quiet">
-                            <h2 class="tb-card-title">データの扱い</h2>
-                            <p class="tb-card-hint" id="tb-storage-state"></p>
-                            <div class="tb-row-actions">
-                                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="export-json">バックアップを保存</button>
-                                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="reset">すべて消す</button>
-                            </div>
-                        </div>
+                    <div class="lp-problem-card">
+                        <span class="lp-problem-mark">2</span>
+                        <p class="lp-problem-text">タスク管理はできても、開始時間が決まらない</p>
+                    </div>
+                    <div class="lp-problem-card">
+                        <span class="lp-problem-mark">3</span>
+                        <p class="lp-problem-text">今日やることが多すぎて、把握しきれない</p>
+                    </div>
+                    <div class="lp-problem-card">
+                        <span class="lp-problem-mark">4</span>
+                        <p class="lp-problem-text">優先順位を考えているだけで、時間が過ぎていく</p>
+                    </div>
+                    <div class="lp-problem-card">
+                        <span class="lp-problem-mark">5</span>
+                        <p class="lp-problem-text">Googleカレンダーとタスク管理が別々になっている</p>
+                    </div>
+                    <div class="lp-problem-card">
+                        <span class="lp-problem-mark">6</span>
+                        <p class="lp-problem-text">「やること」が、結局「やる時間」になっていない</p>
                     </div>
                 </div>
             </div>
         </section>
+
+        <!-- ─── Solution / How it works ───────────────────── -->
+        <section class="lp-section lp-section-quiet" id="how">
+            <div class="container">
+                <div class="lp-section-head">
+                    <span class="lp-section-eyebrow">HOW IT WORKS</span>
+                    <h2 class="lp-section-title">5つのステップで、<br>今日の時間割ができる。</h2>
+                </div>
+                <div class="lp-steps">
+                    <div class="lp-step">
+                        <p class="lp-step-number">01</p>
+                        <p class="lp-step-title">今日やることを書く</p>
+                    </div>
+                    <div class="lp-step">
+                        <p class="lp-step-number">02</p>
+                        <p class="lp-step-title">優先度と所要時間を決める</p>
+                    </div>
+                    <div class="lp-step">
+                        <p class="lp-step-number">03</p>
+                        <p class="lp-step-title">今日使える時間を決める</p>
+                    </div>
+                    <div class="lp-step">
+                        <p class="lp-step-number">04</p>
+                        <p class="lp-step-title">Timebox OSが時間割を生成</p>
+                    </div>
+                    <div class="lp-step">
+                        <p class="lp-step-number">05</p>
+                        <p class="lp-step-title">決めた時間に実行する</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── Current Features ──────────────────────────── -->
+        <section class="lp-section" id="features">
+            <div class="container">
+                <div class="lp-section-head">
+                    <span class="lp-section-eyebrow">NOW AVAILABLE</span>
+                    <h2 class="lp-section-title">今すぐ使える機能</h2>
+                    <p class="lp-section-lead">登録なしで、今日から全部使えます。</p>
+                </div>
+                <ul class="lp-feature-grid">
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>複数行タスク登録</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>仕事 / 生活分類</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>優先順位</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>所要時間</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>締切</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>タスク仕分け</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>自動時間割生成</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>24時間タイムライン</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>Drag &amp; Drop（PC）</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>手動時間固定</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>固定解除</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>今から詰め直す</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>翌日持ち越し</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>端末への自動保存</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>JSONバックアップ（保存・読み込み）</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>ICS書き出し（Googleカレンダー取り込み用）</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ─── Future ─────────────────────────────────────── -->
+        <section class="lp-section lp-section-quiet" id="roadmap">
+            <div class="container">
+                <div class="lp-section-head">
+                    <span class="lp-section-eyebrow">COMING SOON</span>
+                    <h2 class="lp-section-title">これから追加する機能</h2>
+                    <p class="lp-section-lead">
+                        以下はまだ実装していません。現在はICS書き出しでGoogleカレンダーへ取り込めますが、
+                        直接同期はまだ動いていません。準備ができ次第、このページでお知らせします。
+                    </p>
+                </div>
+                <ul class="lp-future-grid">
+                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>Googleログイン</li>
+                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>Googleカレンダー直接連携</li>
+                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>Googleカレンダー予定読み込み</li>
+                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>クラウド保存</li>
+                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>複数端末同期</li>
+                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>AIによる改善提案</li>
+                </ul>
+                <p class="lp-future-note">
+                    詳しいロードマップは
+                    <a href="https://github.com/h1maekawa/time-management/blob/main/docs/PRODUCT_ROADMAP.md" target="_blank" rel="noopener noreferrer" style="text-decoration: underline;">docs/PRODUCT_ROADMAP.md</a>
+                    にまとめています。
+                </p>
+            </div>
+        </section>
+
+        <!-- ─── Final CTA ──────────────────────────────────── -->
+        <section class="lp-final-cta">
+            <div class="container">
+                <h2 class="lp-final-cta-title">やることを、<br>やる時間へ。</h2>
+                <a href="/app/" class="lp-btn">Timebox OSを無料で使う</a>
+            </div>
+        </section>
     </main>
 
-    <!-- ─── 枠の編集 ─────────────────────────────────── -->
-    <div class="tb-modal" id="tb-window-modal" hidden>
-        <div class="tb-modal-backdrop" data-action="close-modal"></div>
-        <div class="tb-modal-panel" role="dialog" aria-modal="true" aria-labelledby="tb-window-modal-title">
-            <div class="tb-modal-head">
-                <h2 id="tb-window-modal-title">今日の時間枠</h2>
-                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="close-modal">閉じる</button>
+    <footer class="lp-footer">
+        <div class="container lp-footer-inner">
+            <div class="lp-footer-brand">
+                <span class="lp-footer-logo">TIMEBOX OS</span>
+                <span class="lp-footer-sub">by maemichi</span>
             </div>
-            <p class="tb-card-hint">
-                「ここは仕事」「ここは自分の時間」を決めると、タスクは合う枠の中にだけ入ります。
-            </p>
-            <ul class="tb-windows" id="tb-windows"></ul>
-            <div class="tb-row-actions">
-                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="add-window" data-category="work">💼 仕事の枠を足す</button>
-                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="add-window" data-category="life">🏠 生活の枠を足す</button>
-            </div>
-            <div class="tb-modal-foot">
-                <label class="tb-inline-field">
-                    <input type="checkbox" id="tb-window-default"> この曜日の初期設定として覚える
-                </label>
-                <button type="button" class="tb-btn tb-btn-primary" data-action="save-windows">保存して組み直す</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ─── 有料機能の説明 ───────────────────────────── -->
-    <div class="tb-modal" id="tb-plan-modal" hidden>
-        <div class="tb-modal-backdrop" data-action="close-modal"></div>
-        <div class="tb-modal-panel" role="dialog" aria-modal="true" aria-labelledby="tb-plan-modal-title">
-            <div class="tb-modal-head">
-                <h2 id="tb-plan-modal-title">この機能は準備中です</h2>
-                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="close-modal">閉じる</button>
-            </div>
-            <p class="tb-card-hint" id="tb-plan-modal-body"></p>
-            <ul class="tb-plan-list">
-                <li><strong>いま使える（無料）</strong>：タスク登録・仕分け・時間割の自動生成・24時間タイムライン・持ち越し・端末への保存・.icsの書き出し</li>
-                <li><strong>準備中</strong>：Googleカレンダーとの直接同期・クラウド保存・複数端末での共有・実績からの改善提案</li>
-            </ul>
-            <p class="tb-card-hint">
-                無料の範囲だけで今日の予定は組めます。準備中の機能ができたら、このページでお知らせします。
-            </p>
-        </div>
-    </div>
-
-    <footer>
-        <div class="container footer-inner">
-            <p>Timebox OS — 迷っているタスクを、実行する時間へ。</p>
-            <div class="footer-links">
-                <a href="https://maemichi.com/" target="_blank" rel="noopener noreferrer">まえみち</a>
-                <a href="https://note.com/maemichi" target="_blank" rel="noopener noreferrer">note</a>
+            <div class="lp-footer-links">
+                <a href="/app/">アプリを開く</a>
                 <a href="https://github.com/h1maekawa/time-management" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="https://maemichi.com/" target="_blank" rel="noopener noreferrer">maemichi.com</a>
             </div>
         </div>
     </footer>
-
-    <script src="assets/js/timebox.js" type="module"></script>
 </body>
 </html>
