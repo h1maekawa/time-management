@@ -1,9 +1,9 @@
 {
-  "name": "timebox-os",
+  "name": "dayloop",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
-  "description": "迷っているタスクを、実行する時間へ。タイムボックス管理アプリ。",
+  "description": "全部書く。AIが整理。今日が決まる。AIで今日を組み立てる1日設計アプリ DAYLOOP。",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

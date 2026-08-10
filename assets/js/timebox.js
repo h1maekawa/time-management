@@ -1,5 +1,5 @@
 /**
- * Timebox OS — 画面。
+ * DAYLOOP — 画面（内部機能名: Timebox）。
  *
  * 役割分担:
  *   timebox-engine.js  … 時間割の計算（純粋関数・テスト対象）
@@ -1244,7 +1244,7 @@ function renderCalendarSection() {
     <div class="tb-settings-section">
       <h3>Calendar</h3>
       <p class="tb-card-hint"><strong>今すぐ使える:</strong> ICS書き出し（Googleカレンダーの「他のカレンダーを追加 → インポート」から取り込めます）。</p>
-      <p class="tb-card-hint"><strong>準備中:</strong> Googleカレンダーとの直接同期。既存のGoogle予定をTimebox OSが勝手に変更・削除することはありません。</p>
+      <p class="tb-card-hint"><strong>準備中:</strong> Googleカレンダーとの直接同期。既存のGoogle予定をDAYLOOPが勝手に変更・削除することはありません。</p>
     </div>`;
 }
 

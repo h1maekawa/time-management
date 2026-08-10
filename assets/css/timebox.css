@@ -1,5 +1,5 @@
-/* --- Timebox OS ---------------------------------------------------------
-   main.css の変数（空色の背景・黒のアクセント）をそのまま使い、
+/* --- DAYLOOP アプリ（内部機能名: Timebox） --------------------------------
+   base.cssの変数（薄いラベンダーの背景・Deep Indigoのアクセント）をそのまま使い、
    アプリ部分だけ白いカードで組む。クラスはすべて .tb- 接頭辞で衝突を避ける。
 ------------------------------------------------------------------------- */
 
@@ -769,7 +769,8 @@
 ------------------------------------------------------------------------- */
 .tb-appbar {
     padding: 18px 0;
-    background: rgba(88, 178, 220, 0.92);
+    background: rgba(238, 235, 252, 0.92);
+    border-bottom: 1px solid rgba(36, 18, 89, 0.1);
     backdrop-filter: blur(10px);
     position: sticky;
     top: 0;
@@ -785,7 +786,7 @@
 
 .tb-appbar-logo {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 8px;
     font-family: var(--font-en);
     font-size: 1.15rem;
