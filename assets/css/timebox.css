@@ -758,6 +758,9 @@
     .tb-hero { padding-top: 120px; }
     .tb-card { padding: 18px; }
     .tb-timeline-scroll { height: 420px; }
+    .tb-modal-panel-wide { width: 100%; padding: 20px; }
+    .tb-review-list { max-height: 60vh; }
+    .tb-entry-tabs { flex-direction: column; }
 }
 
 /* --- App shell (独立化にともなう /app 専用のヘッダー・フッター) -----------
@@ -843,4 +846,173 @@
     overflow: hidden;
     clip: rect(0 0 0 0);
     white-space: nowrap;
+}
+
+.tb-appbar-settings {
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: transparent;
+    border: 1px solid rgba(13, 13, 13, 0.3);
+    color: var(--accent-color);
+    border-radius: 100px;
+    padding: 6px 14px;
+    cursor: pointer;
+}
+
+.tb-appbar-settings:hover { opacity: 0.7; }
+
+/* --- 保存先ステータスの小さなバッジ（Todayから設定へ飛べる） --- */
+.tb-sync-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    font-family: inherit;
+    font-size: 0.68rem;
+    font-weight: 700;
+    background: rgba(47, 133, 90, 0.1);
+    color: var(--tb-life);
+    border: 1px solid rgba(47, 133, 90, 0.3);
+    border-radius: 100px;
+    padding: 3px 10px;
+    cursor: pointer;
+}
+
+.tb-sync-chip:empty { display: none; }
+.tb-sync-chip.is-pending {
+    background: rgba(183, 121, 31, 0.1);
+    color: var(--tb-warn);
+    border-color: rgba(183, 121, 31, 0.3);
+}
+.tb-sync-chip.is-error {
+    background: rgba(197, 48, 48, 0.1);
+    color: var(--tb-danger);
+    border-color: rgba(197, 48, 48, 0.3);
+}
+
+/* --- Brain Dump / Manual Entry タブ --- */
+.tb-entry-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.tb-entry-tab {
+    flex: 1 1 0;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 10px 14px;
+    border-radius: 100px;
+    border: 1px solid var(--tb-line-strong);
+    background: transparent;
+    color: var(--tb-muted);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.tb-entry-tab[aria-selected="true"] {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+}
+
+/* --- Review（AI提案の確認）--- */
+.tb-modal-panel-wide {
+    width: min(760px, 100%);
+}
+
+.tb-review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 14px 0;
+    max-height: 50vh;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.tb-review-card {
+    border: 1px solid var(--tb-line);
+    border-radius: 14px;
+    padding: 14px;
+    background: #fff;
+}
+
+.tb-review-card.is-excluded {
+    opacity: 0.45;
+}
+
+.tb-review-card-head {
+    margin-bottom: 8px;
+}
+
+.tb-review-title {
+    width: 100%;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+/* --- 設定モーダル --- */
+.tb-settings-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 14px 0;
+}
+
+.tb-settings-nav-item {
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border: 1px solid var(--tb-line);
+    background: transparent;
+    color: var(--tb-muted);
+    border-radius: 100px;
+    padding: 7px 14px;
+    cursor: pointer;
+}
+
+.tb-settings-nav-item[aria-selected="true"] {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+}
+
+.tb-settings-section h3 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.tb-settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tb-provider-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.tb-provider-card {
+    border: 1px solid var(--tb-line);
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.tb-provider-card.is-active {
+    border-color: var(--accent-color);
+    background: rgba(13, 13, 13, 0.03);
+}
+
+.tb-provider-config {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    margin: 10px 0;
 }

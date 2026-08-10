@@ -27,6 +27,7 @@
             <nav class="tb-appbar-nav" aria-label="サイト内リンク">
                 <a href="/#features">できること</a>
                 <a href="/#roadmap">今後の予定</a>
+                <button type="button" class="tb-appbar-settings" data-action="open-settings">設定</button>
             </nav>
         </div>
     </header>
@@ -38,6 +39,7 @@
                     <div>
                         <p class="tb-statusbar-date" id="tb-date">—</p>
                         <p class="tb-statusbar-now" id="tb-now">—</p>
+                        <button type="button" class="tb-sync-chip" id="tb-sync-chip" data-action="open-settings"></button>
                     </div>
                     <div class="tb-statusbar-kpis" id="tb-kpis"></div>
                 </div>
@@ -48,24 +50,47 @@
                     <!-- 左：入力とタスク -->
                     <div class="tb-col">
                         <div class="tb-card">
-                            <h2 class="tb-card-title">今日やることを書き出す</h2>
-                            <p class="tb-card-hint">1行に1つ。動詞で書くと予定に落としやすくなります。</p>
-                            <label class="visually-hidden" for="tb-input">今日やることを1行に1つ入力</label>
-                            <textarea id="tb-input" rows="4" class="tb-textarea"
-                                placeholder="提案資料を修正する&#10;請求書を確認する&#10;本を30分読む&#10;ジムに行く"></textarea>
-                            <div class="tb-row-actions">
-                                <label class="tb-inline-field">
-                                    区分
-                                    <select id="tb-input-category" class="tb-select">
-                                        <option value="work">💼 仕事</option>
-                                        <option value="life">🏠 生活</option>
-                                    </select>
-                                </label>
-                                <label class="tb-inline-field">
-                                    所要
-                                    <input id="tb-input-minutes" class="tb-number" type="number" min="5" max="480" step="5" value="30">分
-                                </label>
-                                <button type="button" class="tb-btn tb-btn-primary" data-action="add-tasks">タスクを追加</button>
+                            <div class="tb-entry-tabs" role="tablist" aria-label="タスクの入力方法">
+                                <button type="button" class="tb-entry-tab" role="tab" id="tb-entry-tab-brain-dump"
+                                    data-action="entry-mode" data-mode="brain-dump" aria-selected="true">AIと整理する</button>
+                                <button type="button" class="tb-entry-tab" role="tab" id="tb-entry-tab-manual"
+                                    data-action="entry-mode" data-mode="manual" aria-selected="false">自分で追加する</button>
+                            </div>
+
+                            <!-- A: AI Brain Dump -->
+                            <div id="tb-entry-brain-dump">
+                                <h2 class="tb-card-title">頭の中を全部書く</h2>
+                                <p class="tb-card-hint">殴り書きでOKです。優先度や所要時間は、あとでAIと一緒に決めます。</p>
+                                <label class="visually-hidden" for="tb-braindump-input">Brain Dumpの入力</label>
+                                <textarea id="tb-braindump-input" rows="6" class="tb-textarea"
+                                    placeholder="FS週次資料作らないと&#10;明日の商談準備&#10;田中さん返信&#10;noteも書きたい&#10;LPも直したい"></textarea>
+                                <div class="tb-row-actions">
+                                    <button type="button" class="tb-btn tb-btn-primary" data-action="brain-dump-analyze">AIに整理してもらう</button>
+                                </div>
+                                <p class="tb-card-hint" id="tb-braindump-ai-state" role="status" aria-live="polite"></p>
+                            </div>
+
+                            <!-- B: Manual Entry -->
+                            <div id="tb-entry-manual" hidden>
+                                <h2 class="tb-card-title">自分でタスクを追加する</h2>
+                                <p class="tb-card-hint">1行に1つ。動詞で書くと予定に落としやすくなります。</p>
+                                <label class="visually-hidden" for="tb-input">今日やることを1行に1つ入力</label>
+                                <textarea id="tb-input" rows="4" class="tb-textarea"
+                                    placeholder="提案資料を修正する&#10;請求書を確認する&#10;本を30分読む&#10;ジムに行く"></textarea>
+                                <div class="tb-row-actions">
+                                    <label class="tb-inline-field">
+                                        区分
+                                        <select id="tb-input-category" class="tb-select">
+                                            <option value="work">💼 仕事</option>
+                                            <option value="life">🏠 生活</option>
+                                        </select>
+                                    </label>
+                                    <label class="tb-inline-field">
+                                        所要
+                                        <input id="tb-input-minutes" class="tb-number" type="number" min="5" max="480" step="5" value="30">分
+                                    </label>
+                                    <button type="button" class="tb-btn tb-btn-primary" data-action="add-tasks">タスクを追加</button>
+                                </div>
                             </div>
                         </div>
 
@@ -182,6 +207,39 @@
             <p class="tb-card-hint">
                 無料の範囲だけで今日の予定は組めます。準備中の機能ができたら、このページでお知らせします。
             </p>
+        </div>
+    </div>
+
+    <!-- ─── AI提案のレビュー ─────────────────────────── -->
+    <div class="tb-modal" id="tb-review-modal" hidden>
+        <div class="tb-modal-backdrop" data-action="close-modal"></div>
+        <div class="tb-modal-panel tb-modal-panel-wide" role="dialog" aria-modal="true" aria-labelledby="tb-review-modal-title">
+            <div class="tb-modal-head">
+                <h2 id="tb-review-modal-title">タスク候補を確認する</h2>
+                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="close-modal">閉じる</button>
+            </div>
+            <p class="tb-card-hint">
+                内容を直してから取り込めます。実際の時間割への配置はTimebox Engineが行うため、ここでは時刻は決めません。
+            </p>
+            <div id="tb-review-meta"></div>
+            <ul class="tb-review-list" id="tb-review-list"></ul>
+            <div class="tb-modal-foot">
+                <button type="button" class="tb-btn tb-btn-ghost" data-action="close-modal">キャンセル</button>
+                <button type="button" class="tb-btn tb-btn-primary" data-action="review-confirm">確定してタスクに追加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── 設定 ─────────────────────────────────────── -->
+    <div class="tb-modal" id="tb-settings-modal" hidden>
+        <div class="tb-modal-backdrop" data-action="close-modal"></div>
+        <div class="tb-modal-panel tb-modal-panel-wide" role="dialog" aria-modal="true" aria-labelledby="tb-settings-modal-title">
+            <div class="tb-modal-head">
+                <h2 id="tb-settings-modal-title">設定</h2>
+                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="close-modal">閉じる</button>
+            </div>
+            <nav class="tb-settings-nav" aria-label="設定のセクション" id="tb-settings-nav"></nav>
+            <div id="tb-settings-body"></div>
         </div>
     </div>
 
