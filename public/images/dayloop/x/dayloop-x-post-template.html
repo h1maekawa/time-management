@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<!--
+  DAYLOOP X Post Template — 1枚で価値が伝わることを最優先にした最小構成。
+  ?variant=landscape|square, ?main=..., ?sub=... で差し替え可能。
+  実書き出し推奨サイズ: landscape 1200x675 / square 1080x1080
+  （このテンプレート自体は表示確認用に縮小サイズで組んである）。
+-->
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700;900&family=Syne:wght@700;800&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { overflow:hidden; }
+  body {
+    font-family:'Noto Sans JP',sans-serif; background:#ffffff; position:relative;
+    display:flex; flex-direction:column; justify-content:center;
+    overflow:hidden;
+  }
+  body.landscape { width:1200px; height:675px; padding:0 90px; }
+  body.square { width:700px; height:700px; padding:0 64px; }
+  h1, .sub { max-width:100%; overflow-wrap:break-word; }
+  .dots {
+    position:absolute; width:360px; height:360px; top:-100px; right:-110px;
+    background-image:
+      radial-gradient(circle, rgba(61,90,254,0.5) 2px, transparent 2.4px),
+      radial-gradient(circle, rgba(20,184,166,0.42) 2px, transparent 2.4px),
+      radial-gradient(circle, rgba(110,231,183,0.36) 2px, transparent 2.4px);
+    background-size:24px 24px;
+    background-position:0 0, 12px 12px, 24px 0;
+    -webkit-mask-image: radial-gradient(circle at center, #000 0%, transparent 72%);
+  }
+  .logo { position:absolute; bottom:40px; left:64px; display:flex; align-items:center; gap:10px; }
+  .logo-word { font-family:'Syne',sans-serif; font-weight:800; font-size:18px; color:#150C33; }
+  h1 { font-size:56px; line-height:1.5; font-weight:900; color:#150C33; letter-spacing:-0.01em; white-space:pre-line; }
+  h1 .accent { background:linear-gradient(120deg,#3D5AFE,#14B8A6); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { margin-top:22px; font-size:24px; font-weight:700; color:#3D5AFE; white-space:pre-line; }
+</style>
+</head>
+<body class="landscape">
+  <div class="dots"></div>
+  <h1 id="main">時間がない。
+
+だから、<span class="accent">考える時間を減らす。</span></h1>
+  <p class="sub" id="sub"></p>
+  <div class="logo">
+    <svg width="28" height="28" viewBox="0 0 32 32">
+      <defs><linearGradient id="g" x1="5" y1="5" x2="27" y2="27" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#3D5AFE"/><stop offset="1" stop-color="#14B8A6"/>
+      </linearGradient></defs>
+      <rect width="32" height="32" rx="9" fill="#0F2A4A"/>
+      <path d="M22.9 20.1A7.6 7.6 0 1 1 20.9 9.3" fill="none" stroke="url(#g)" stroke-width="3" stroke-linecap="round"/>
+      <path d="M20.9 9.3 24.6 9.8 21.9 12.8Z" fill="url(#g)"/>
+      <line x1="16" y1="16" x2="16" y2="12" stroke="url(#g)" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="16" y1="16" x2="19.4" y2="16" stroke="url(#g)" stroke-width="1.6" stroke-linecap="round"/>
+      <circle cx="16" cy="16" r="1.3" fill="url(#g)"/>
+      <circle cx="16" cy="6.6" r="1.1" fill="url(#g)"/>
+    </svg>
+    <span class="logo-word">DAYLOOP</span>
+  </div>
+  <script>
+    var p = new URLSearchParams(location.search);
+    var variant = p.get('variant') || 'landscape';
+    document.body.className = variant;
+    var main = p.get('main');
+    var sub = p.get('sub');
+    if (main) document.getElementById('main').innerHTML = main.replace(/\n/g,'<br>');
+    if (sub) document.getElementById('sub').textContent = sub;
+  </script>
+</body>
+</html>
