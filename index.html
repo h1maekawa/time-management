@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timebox OS | 迷っているタスクを、実行する時間へ。</title>
-    <meta name="description" content="今日やることを書き出すだけで、使える時間と優先順位から1日の予定を組み立てるタイムボックス管理アプリ。登録不要・無料・データは端末に保存されます。">
+    <title>Timebox OS | 頭の中を、実行できる1日に。</title>
+    <meta name="description" content="今日やることを全部書くだけ。AIが整理し、何から始めるかを一緒に考え、今日の時間へ落とし込むタイムボックス管理アプリ。ローカル保存・Obsidian保存対応、登録不要・無料。">
     <link rel="canonical" href="https://timebox.maemichi.com/">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Timebox OS | 迷っているタスクを、実行する時間へ。">
-    <meta property="og:description" content="今日やることを書き出すだけで、使える時間と優先順位から1日の予定を組み立てるタイムボックス管理アプリ。登録不要・無料・データは端末に保存されます。">
+    <meta property="og:title" content="Timebox OS | 頭の中を、実行できる1日に。">
+    <meta property="og:description" content="今日やることを全部書くだけ。AIが整理し、何から始めるかを一緒に考え、今日の時間へ落とし込むタイムボックス管理アプリ。">
     <meta property="og:url" content="https://timebox.maemichi.com/">
     <meta name="twitter:card" content="summary">
     <meta name="robots" content="index,follow">
@@ -27,12 +27,12 @@
             <a href="/" class="lp-logo">TIMEBOX OS <span class="lp-logo-sub">by maemichi</span></a>
             <nav class="lp-nav" aria-label="サイト内リンク">
                 <div class="lp-nav-links">
-                    <a href="#problem">課題</a>
                     <a href="#how">使い方</a>
-                    <a href="#features">できること</a>
-                    <a href="#roadmap">今後の予定</a>
+                    <a href="#skill">Skill</a>
+                    <a href="#storage">保存先</a>
+                    <a href="#pricing">料金</a>
                 </div>
-                <a href="/app/" class="lp-btn lp-btn-sm">無料で使う</a>
+                <a href="/app/" class="lp-btn lp-btn-sm">無料ではじめる</a>
             </nav>
         </div>
     </header>
@@ -41,21 +41,36 @@
         <!-- ─── Hero ───────────────────────────────────── -->
         <section class="lp-hero">
             <div class="container">
-                <p class="lp-eyebrow">TIMEBOX OS <span class="lp-badge">無料で使える</span></p>
-                <h1 class="lp-hero-title">迷っているタスクを、<br>実行する時間へ。</h1>
+                <p class="lp-eyebrow">TIMEBOX OS</p>
+                <h1 class="lp-hero-title">頭の中を、<br>実行できる1日に。</h1>
                 <p class="lp-hero-lead">
-                    今日やることを書き出すだけで、使える時間と優先順位から
-                    1日の予定を組み立てるタイムボックス管理アプリ。
+                    やることを全部書くだけ。<br>
+                    AIが整理し、何から始めるかを一緒に考え、<br>
+                    今日の時間へ落とし込みます。
                 </p>
                 <div class="lp-hero-actions">
-                    <a href="/app/" class="lp-btn">無料で使う</a>
-                    <a href="#how" class="lp-btn lp-btn-ghost">使い方を見る</a>
+                    <a href="/app/" class="lp-btn">無料ではじめる</a>
                 </div>
                 <ul class="lp-hero-notes">
                     <li>登録不要</li>
-                    <li>無料</li>
-                    <li>データは端末に保存</li>
+                    <li>ローカル保存 / Obsidian保存対応</li>
                 </ul>
+
+                <div class="lp-hero-mock-wrap">
+                    <div class="lp-mock lp-mock-hero" aria-hidden="true">
+                        <div class="lp-mock-lines">
+                            <div class="lp-mock-line" style="width:88%"></div>
+                            <div class="lp-mock-line" style="width:64%"></div>
+                            <div class="lp-mock-line" style="width:76%"></div>
+                            <div class="lp-mock-line" style="width:52%"></div>
+                        </div>
+                        <div class="lp-mock-timeline-mini">
+                            <div class="lp-mock-block is-work">09:00 資料確認</div>
+                            <div class="lp-mock-block is-work is-narrow">10:10 商談準備</div>
+                            <div class="lp-mock-block is-life">18:00 自分の時間</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -65,10 +80,6 @@
                 <div class="lp-section-head">
                     <span class="lp-section-eyebrow">PROBLEM</span>
                     <h2 class="lp-section-title">Todoは書けても、<br>「いつやるか」までは決まらない。</h2>
-                    <p class="lp-section-lead">
-                        タスク管理アプリはたくさんあります。でも、書き出したタスクを
-                        実際に「何時から何分やるか」まで落とし込むのは、結局いつも自分次第でした。
-                    </p>
                 </div>
                 <div class="lp-problem-grid">
                     <div class="lp-problem-card">
@@ -99,99 +110,226 @@
             </div>
         </section>
 
-        <!-- ─── Solution / How it works ───────────────────── -->
+        <!-- ─── 2: 考えなくていい。まず、全部書く。 ─────── -->
         <section class="lp-section lp-section-quiet" id="how">
-            <div class="container">
+            <div class="container lp-section-body">
                 <div class="lp-section-head">
-                    <span class="lp-section-eyebrow">HOW IT WORKS</span>
-                    <h2 class="lp-section-title">5つのステップで、<br>今日の時間割ができる。</h2>
+                    <span class="lp-section-eyebrow">STEP 1</span>
+                    <h2 class="lp-section-title">考えなくていい。<br>まず、全部書く。</h2>
+                    <p class="lp-section-lead">
+                        整理しようとしなくて大丈夫です。優先度も所要時間もあとで決めます。
+                        頭に浮かんだことを、そのまま書き出してください。
+                    </p>
                 </div>
-                <div class="lp-steps">
-                    <div class="lp-step">
-                        <p class="lp-step-number">01</p>
-                        <p class="lp-step-title">今日やることを書く</p>
-                    </div>
-                    <div class="lp-step">
-                        <p class="lp-step-number">02</p>
-                        <p class="lp-step-title">優先度と所要時間を決める</p>
-                    </div>
-                    <div class="lp-step">
-                        <p class="lp-step-number">03</p>
-                        <p class="lp-step-title">今日使える時間を決める</p>
-                    </div>
-                    <div class="lp-step">
-                        <p class="lp-step-number">04</p>
-                        <p class="lp-step-title">Timebox OSが時間割を生成</p>
-                    </div>
-                    <div class="lp-step">
-                        <p class="lp-step-number">05</p>
-                        <p class="lp-step-title">決めた時間に実行する</p>
+                <div class="lp-mock" aria-hidden="true">
+                    <div class="lp-mock-chrome"><span class="lp-mock-dot"></span><span class="lp-mock-dot"></span><span class="lp-mock-dot"></span></div>
+                    <p class="lp-mock-braindump-text">FS週次資料作らないと
+明日の商談準備
+田中さん返信
+noteも書きたい
+LPも直したい</p>
+                    <span class="lp-mock-cta-ghost">AIに整理してもらう</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── 3: AIが「何からやるか」まで整理する ─────── -->
+        <section class="lp-section" id="ai">
+            <div class="container lp-section-body is-reverse">
+                <div class="lp-section-head">
+                    <span class="lp-section-eyebrow">STEP 2</span>
+                    <h2 class="lp-section-title">AIが、<br>「何からやるか」まで整理する。</h2>
+                    <p class="lp-section-lead">
+                        殴り書きを、タスク・優先度候補・所要時間候補・最初の一歩へ分解します。
+                        実際にいつ配置するかはAIに任せきりにせず、決定論的なTimebox Engineが担当します。
+                    </p>
+                </div>
+                <div class="lp-mock" aria-hidden="true">
+                    <div class="lp-mock-before-after">
+                        <div>
+                            <p class="lp-mock-col-label">BEFORE</p>
+                            <p class="lp-mock-braindump-text" style="font-size:0.8rem;">明日の商談準備</p>
+                        </div>
+                        <span class="lp-mock-arrow">→</span>
+                        <div>
+                            <p class="lp-mock-col-label">AFTER</p>
+                            <div class="lp-mock-task-card">
+                                商談準備
+                                <div class="lp-mock-task-meta">
+                                    <span class="lp-mock-chip">💼 仕事</span>
+                                    <span class="lp-mock-chip">★★★★☆</span>
+                                    <span class="lp-mock-chip">45分</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ─── Current Features ──────────────────────────── -->
-        <section class="lp-section" id="features">
-            <div class="container">
+        <!-- ─── 4: 「いつやるか」まで決める ──────────────── -->
+        <section class="lp-section lp-section-quiet" id="timeline">
+            <div class="container lp-section-body">
                 <div class="lp-section-head">
+                    <span class="lp-section-eyebrow">STEP 3</span>
+                    <h2 class="lp-section-title">そして、<br>「いつやるか」まで決める。</h2>
+                    <p class="lp-section-lead">
+                        優先度・締切・持ち越し回数から、24時間タイムラインへ自動で配置します。
+                        同じ入力なら毎回同じ結果になる、決定論的なスケジューリングです。
+                    </p>
+                </div>
+                <div class="lp-mock" aria-hidden="true">
+                    <div class="lp-mock-timeline">
+                        <div class="lp-mock-timeline-row"><span>09:00</span><div class="lp-mock-timeline-bar" style="background:#2b6cb0;"></div></div>
+                        <div class="lp-mock-timeline-row"><span>10:10</span><div class="lp-mock-timeline-bar" style="background:#2b6cb0;opacity:.7;"></div></div>
+                        <div class="lp-mock-now"></div>
+                        <div class="lp-mock-timeline-row"><span>13:00</span><div class="lp-mock-timeline-bar" style="background:#2b6cb0;opacity:.5;"></div></div>
+                        <div class="lp-mock-timeline-row"><span>18:00</span><div class="lp-mock-timeline-bar" style="background:#2f855a;"></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── 5: 使うほど、あなたの仕事を理解する ─────── -->
+        <section class="lp-section" id="history">
+            <div class="container lp-section-body is-reverse">
+                <div class="lp-section-head">
+                    <span class="lp-section-eyebrow">EXECUTION HISTORY</span>
+                    <h2 class="lp-section-title">使うほど、<br>あなたの仕事を理解する。</h2>
+                    <p class="lp-section-lead">
+                        予定と実績の差、時間帯の傾向を記録します。Skill・Automation候補の土台になる履歴です。
+                    </p>
+                </div>
+                <div class="lp-mock" aria-hidden="true">
+                    <div class="lp-mock-history-row"><span>商談準備</span><span>予定30分 → 実績48分</span></div>
+                    <div class="lp-mock-history-row"><span>週次資料</span><span>予定60分 → 実績55分</span></div>
+                    <div class="lp-mock-history-row"><span>メール返信</span><span>予定15分 → 実績20分</span></div>
+                    <p class="lp-mock-insight">商談準備は平均+18分。初期値を45分にしますか？</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── 6: 繰り返す仕事を、自分だけのSkillへ ─────── -->
+        <section class="lp-section lp-section-quiet" id="skill">
+            <div class="container lp-section-body">
+                <div class="lp-section-head">
+                    <span class="lp-section-eyebrow">SKILL</span>
+                    <h2 class="lp-section-title">繰り返す仕事を、<br>自分だけのSkillへ。</h2>
+                    <p class="lp-section-lead">
+                        似た手順を繰り返しているタスクは、Skill候補として見つかります。
+                        承認するまでは何も自動化されません。
+                    </p>
+                </div>
+                <div class="lp-mock" aria-hidden="true">
+                    <div class="lp-mock-skill-head">
+                        <strong>FS商談準備</strong>
+                        <span class="lp-mock-confidence">確度82%</span>
+                    </div>
+                    <ol class="lp-mock-skill-steps">
+                        <li>GBP確認</li>
+                        <li>HP確認</li>
+                        <li>SNS確認</li>
+                        <li>刺しポイント作成</li>
+                    </ol>
+                    <span class="lp-mock-cta-ghost">Skillとして保存</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── 7: 保存先を、自分で選べる ────────────────── -->
+        <section class="lp-section" id="storage">
+            <div class="container lp-section-body is-reverse">
+                <div class="lp-section-head">
+                    <span class="lp-section-eyebrow">STORAGE</span>
+                    <h2 class="lp-section-title">保存先を、<br>自分で選べる。</h2>
+                    <p class="lp-section-lead">
+                        データはこの端末に保存されます。Obsidianを主な保存先として選び、
+                        Brain DumpからSkillまでMarkdownで残すこともできます。
+                    </p>
+                </div>
+                <div class="lp-mock" aria-hidden="true">
+                    <div class="lp-mock-storage-grid">
+                        <div class="lp-mock-storage-item">この端末</div>
+                        <div class="lp-mock-storage-item is-selected">Obsidian</div>
+                        <div class="lp-mock-storage-item">Google Sheets<br>(GAS)</div>
+                        <div class="lp-mock-storage-item is-soon">Google Drive</div>
+                        <div class="lp-mock-storage-item is-soon">Timebox Cloud<br>近日</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── Current / Future features ─────────────────── -->
+        <section class="lp-section lp-section-quiet" id="features">
+            <div class="container">
+                <div class="lp-section-head is-centered">
                     <span class="lp-section-eyebrow">NOW AVAILABLE</span>
                     <h2 class="lp-section-title">今すぐ使える機能</h2>
-                    <p class="lp-section-lead">登録なしで、今日から全部使えます。</p>
                 </div>
                 <ul class="lp-feature-grid">
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>複数行タスク登録</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>仕事 / 生活分類</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>優先順位</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>所要時間</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>締切</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>タスク仕分け</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>自動時間割生成</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>24時間タイムライン</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>Drag &amp; Drop（PC）</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>手動時間固定</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>固定解除</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>今から詰め直す</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>翌日持ち越し</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>端末への自動保存</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>Brain Dump入力（AI整理 / 未接続時は行ごとに候補化）</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>手動タスク追加（複数行 / 仕事・生活 / 優先度 / 所要時間）</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>タスク仕分け・自動時間割生成</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>24時間タイムライン・Drag &amp; Drop</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>手動時間固定・今から詰め直す・持ち越し</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>ローカル保存 + Obsidian保存</li>
                     <li class="lp-feature-item"><span class="lp-feature-check">✓</span>JSONバックアップ（保存・読み込み）</li>
                     <li class="lp-feature-item"><span class="lp-feature-check">✓</span>ICS書き出し（Googleカレンダー取り込み用）</li>
+                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>実行履歴・Skill候補の土台</li>
                 </ul>
-            </div>
-        </section>
 
-        <!-- ─── Future ─────────────────────────────────────── -->
-        <section class="lp-section lp-section-quiet" id="roadmap">
-            <div class="container">
-                <div class="lp-section-head">
+                <div class="lp-section-head is-centered" style="margin-top:64px;">
                     <span class="lp-section-eyebrow">COMING SOON</span>
                     <h2 class="lp-section-title">これから追加する機能</h2>
-                    <p class="lp-section-lead">
-                        以下はまだ実装していません。現在はICS書き出しでGoogleカレンダーへ取り込めますが、
-                        直接同期はまだ動いていません。準備ができ次第、このページでお知らせします。
-                    </p>
+                    <p class="lp-section-lead">まだ実装していません。準備ができ次第、このページでお知らせします。</p>
                 </div>
                 <ul class="lp-future-grid">
                     <li class="lp-future-item"><span class="lp-future-tag">近日</span>Googleログイン</li>
                     <li class="lp-future-item"><span class="lp-future-tag">近日</span>Googleカレンダー直接連携</li>
-                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>Googleカレンダー予定読み込み</li>
-                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>クラウド保存</li>
+                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>Google Drive / Timebox Cloud保存</li>
                     <li class="lp-future-item"><span class="lp-future-tag">近日</span>複数端末同期</li>
-                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>AIによる改善提案</li>
+                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>AIによる高度な改善提案</li>
+                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>Skill / Automationの自動承認フロー</li>
                 </ul>
-                <p class="lp-future-note">
-                    詳しいロードマップは
-                    <a href="https://github.com/h1maekawa/time-management/blob/main/docs/PRODUCT_ROADMAP.md" target="_blank" rel="noopener noreferrer" style="text-decoration: underline;">docs/PRODUCT_ROADMAP.md</a>
-                    にまとめています。
-                </p>
+            </div>
+        </section>
+
+        <!-- ─── Pricing ────────────────────────────────────── -->
+        <section class="lp-section" id="pricing">
+            <div class="container">
+                <div class="lp-section-head is-centered">
+                    <span class="lp-section-eyebrow">PRICING</span>
+                    <h2 class="lp-section-title">料金（簡易）</h2>
+                </div>
+                <div class="lp-pricing-grid">
+                    <div class="lp-pricing-card">
+                        <p class="lp-pricing-name">Free</p>
+                        <p class="lp-pricing-price">¥0</p>
+                        <ul class="lp-pricing-list">
+                            <li>Obsidian個人利用</li>
+                            <li>JSON Backup</li>
+                            <li>ICS書き出し</li>
+                        </ul>
+                    </div>
+                    <div class="lp-pricing-card is-future">
+                        <p class="lp-pricing-name">Pro / Founder</p>
+                        <p class="lp-pricing-price">Coming Soon</p>
+                        <ul class="lp-pricing-list">
+                            <li>AI高度分析</li>
+                            <li>Google Calendar連携</li>
+                            <li>Cloud Sync</li>
+                            <li>Skill / Automation</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- ─── Final CTA ──────────────────────────────────── -->
         <section class="lp-final-cta">
             <div class="container">
-                <h2 class="lp-final-cta-title">やることを、<br>やる時間へ。</h2>
-                <a href="/app/" class="lp-btn">Timebox OSを無料で使う</a>
+                <h2 class="lp-final-cta-title">今日やることを、<br>考えるところから始めよう。</h2>
+                <a href="/app/" class="lp-btn">Timebox OSを使う</a>
             </div>
         </section>
     </main>

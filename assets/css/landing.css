@@ -1,5 +1,8 @@
 /* --- Timebox OS / Landing Page -------------------------------------------
    独自ブランドとしてのLPスタイル。maemichi.comのheader/footerは流用しない。
+   参考サイト（1-365.me）から借りているのは「余白多め・静か・Product中心」という
+   雰囲気だけで、レイアウトやアセットの複製はしていない。UIモックはすべて
+   HTML/CSSで独自に組んだもの（screenshotではない）。
    クラスは .lp- 接頭辞でアプリ側（.tb-）と衝突させない。
 ------------------------------------------------------------------------- */
 
@@ -25,8 +28,8 @@
     top: 0;
     width: 100%;
     z-index: 3000;
-    padding: 18px 0;
-    background: rgba(88, 178, 220, 0.92);
+    padding: 20px 0;
+    background: rgba(88, 178, 220, 0.9);
     backdrop-filter: blur(10px);
 }
 
@@ -42,7 +45,7 @@
     align-items: baseline;
     gap: 8px;
     font-family: var(--font-en);
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     font-weight: 800;
     letter-spacing: -0.01em;
     white-space: nowrap;
@@ -53,7 +56,6 @@
     font-size: 0.62rem;
     font-weight: 500;
     color: var(--text-secondary);
-    letter-spacing: 0.04em;
 }
 
 .lp-nav {
@@ -64,24 +66,20 @@
 
 .lp-nav-links {
     display: flex;
-    gap: 24px;
+    gap: 26px;
     font-family: var(--font-en);
     font-weight: 700;
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     letter-spacing: 0.02em;
 }
 
-.lp-nav-links a:hover {
-    opacity: 0.65;
-}
+.lp-nav-links a:hover { opacity: 0.65; }
 
 @media (max-width: 640px) {
-    .lp-nav-links {
-        display: none;
-    }
+    .lp-nav-links { display: none; }
 }
 
-/* --- Buttons (shared visual language with the app's .tb-btn) --- */
+/* --- Buttons --- */
 .lp-btn {
     display: inline-flex;
     align-items: center;
@@ -91,7 +89,7 @@
     font-size: 0.85rem;
     font-weight: 700;
     border-radius: 100px;
-    padding: 13px 28px;
+    padding: 14px 30px;
     border: 2px solid var(--accent-color);
     background: var(--accent-color);
     color: #fff;
@@ -100,58 +98,34 @@
     white-space: nowrap;
 }
 
-.lp-btn:hover {
-    opacity: 0.82;
-    transform: translateY(-1px);
-}
+.lp-btn:hover { opacity: 0.82; transform: translateY(-1px); }
+.lp-btn-sm { padding: 9px 20px; font-size: 0.78rem; }
+.lp-btn-ghost { background: transparent; color: var(--accent-color); }
 
-.lp-btn-sm {
-    padding: 9px 20px;
-    font-size: 0.78rem;
-}
-
-.lp-btn-ghost {
-    background: transparent;
-    color: var(--accent-color);
-}
-
-/* --- Hero --- */
+/* --- Hero --- 余白を大きめに取り、コピーの改行そのものを「間」として見せる */
 .lp-hero {
-    padding: 168px 0 96px;
+    padding: 200px 0 120px;
 }
 
 .lp-eyebrow {
     font-family: var(--font-en);
     font-weight: 800;
-    letter-spacing: 0.2em;
-    font-size: 0.8rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.lp-badge {
-    font-family: var(--font-jp);
-    font-size: 0.68rem;
-    font-weight: 700;
-    background: var(--accent-color);
-    color: var(--bg-color);
-    padding: 3px 10px;
-    border-radius: 100px;
+    letter-spacing: 0.22em;
+    font-size: 0.78rem;
 }
 
 .lp-hero-title {
-    font-size: clamp(2.2rem, 6vw, 3.8rem);
-    line-height: 1.25;
-    margin: 20px 0 22px;
+    font-size: clamp(2.3rem, 6.4vw, 4rem);
+    line-height: 1.35;
+    margin: 24px 0 26px;
     letter-spacing: -0.02em;
-    max-width: 18em;
+    max-width: 16em;
 }
 
 .lp-hero-lead {
-    font-size: 1.05rem;
-    line-height: 1.9;
-    max-width: 42em;
+    font-size: 1.02rem;
+    line-height: 2;
+    max-width: 38em;
     color: var(--text-primary);
 }
 
@@ -160,18 +134,18 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 16px;
-    margin-top: 32px;
+    margin-top: 36px;
 }
 
 .lp-hero-notes {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-top: 28px;
+    margin-top: 32px;
 }
 
 .lp-hero-notes li {
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     font-weight: 500;
     background: rgba(255, 255, 255, 0.55);
     border: 1px solid rgba(13, 13, 13, 0.12);
@@ -179,61 +153,367 @@
     padding: 6px 14px;
 }
 
-/* --- Section shell --- */
+.lp-hero-mock-wrap {
+    margin-top: 72px;
+}
+
+/* --- Section shell。余白多め・静かなトーンを基調に --- */
 .lp-section {
-    padding: 88px 0;
+    padding: 120px 0;
 }
 
 .lp-section-quiet {
-    background: rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.25);
 }
 
 .lp-section-head {
-    max-width: 42em;
-    margin-bottom: 44px;
+    max-width: 34em;
+    margin-bottom: 48px;
+}
+
+.lp-section-head.is-centered {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
 }
 
 .lp-section-eyebrow {
     font-family: var(--font-en);
     font-weight: 800;
-    letter-spacing: 0.14em;
-    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    font-size: 0.7rem;
     color: var(--text-secondary);
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     display: block;
 }
 
 .lp-section-title {
-    font-size: clamp(1.6rem, 3.6vw, 2.4rem);
-    line-height: 1.4;
+    font-size: clamp(1.6rem, 3.6vw, 2.3rem);
+    line-height: 1.55;
     letter-spacing: -0.01em;
 }
 
 .lp-section-lead {
-    margin-top: 14px;
+    margin-top: 16px;
     font-size: 0.95rem;
-    line-height: 1.9;
+    line-height: 1.95;
     color: var(--text-primary);
 }
 
-/* --- Problem --- */
+.lp-section-body {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 56px;
+    align-items: center;
+}
+
+.lp-section-body.is-reverse {
+    grid-template-columns: 1.1fr 0.9fr;
+}
+
+.lp-section-body.is-reverse .lp-section-head { order: 2; }
+.lp-section-body.is-reverse .lp-mock { order: 1; }
+
+@media (max-width: 900px) {
+    .lp-section-body,
+    .lp-section-body.is-reverse {
+        grid-template-columns: 1fr;
+    }
+    .lp-section-body.is-reverse .lp-section-head { order: 1; }
+    .lp-section-body.is-reverse .lp-mock { order: 2; }
+}
+
+/* ===========================================================
+   UIモック（すべてHTML/CSSで組んだ独自コンポーネント。実画面の縮小コピーではない）
+   =========================================================== */
+
+.lp-mock {
+    background: var(--surface-color);
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 24px 60px rgba(13, 13, 13, 0.1);
+}
+
+.lp-mock-chrome {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 18px;
+}
+
+.lp-mock-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(13, 13, 13, 0.15);
+}
+
+/* --- Hero mock: Brain Dump（左）→ Timeline（右）を小さく並べる --- */
+.lp-mock-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+    .lp-mock-hero { grid-template-columns: 1fr; }
+}
+
+.lp-mock-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.lp-mock-line {
+    height: 10px;
+    border-radius: 100px;
+    background: rgba(13, 13, 13, 0.1);
+}
+
+.lp-mock-timeline-mini {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.lp-mock-block {
+    height: 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.lp-mock-block.is-work { background: #2b6cb0; width: 80%; }
+.lp-mock-block.is-life { background: #2f855a; width: 55%; }
+.lp-mock-block.is-work.is-narrow { width: 45%; }
+
+/* --- Brain Dump mock（大きめ） --- */
+.lp-mock-braindump-text {
+    font-size: 0.92rem;
+    line-height: 2.1;
+    color: var(--text-primary);
+    white-space: pre-line;
+}
+
+.lp-mock-cta-ghost {
+    margin-top: 18px;
+    display: inline-flex;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    border: 1.5px dashed rgba(13, 13, 13, 0.3);
+    border-radius: 100px;
+    padding: 8px 18px;
+}
+
+/* --- Before / After mock --- */
+.lp-mock-before-after {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 16px;
+    align-items: center;
+}
+
+@media (max-width: 560px) {
+    .lp-mock-before-after { grid-template-columns: 1fr; }
+    .lp-mock-arrow { transform: rotate(90deg); }
+}
+
+.lp-mock-arrow {
+    font-size: 1.3rem;
+    color: rgba(13, 13, 13, 0.3);
+}
+
+.lp-mock-col-label {
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.lp-mock-task-card {
+    border: 1px solid rgba(13, 13, 13, 0.1);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    font-size: 0.78rem;
+}
+
+.lp-mock-task-meta {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 0.64rem;
+    color: var(--text-secondary);
+}
+
+.lp-mock-chip {
+    background: rgba(13, 13, 13, 0.06);
+    border-radius: 100px;
+    padding: 2px 8px;
+}
+
+/* --- Timeline mock（縦） --- */
+.lp-mock-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.lp-mock-timeline-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+.lp-mock-timeline-bar {
+    flex: 1;
+    height: 26px;
+    border-radius: 8px;
+}
+
+.lp-mock-now {
+    height: 2px;
+    background: #c53030;
+    border-radius: 2px;
+    position: relative;
+    margin: 4px 0;
+}
+
+.lp-mock-now::before {
+    content: "now";
+    position: absolute;
+    left: 0;
+    top: -14px;
+    font-size: 0.6rem;
+    color: #c53030;
+    font-weight: 700;
+}
+
+/* --- Execution History mock --- */
+.lp-mock-history-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(13, 13, 13, 0.08);
+    font-size: 0.8rem;
+}
+
+.lp-mock-history-row:last-child { border-bottom: none; }
+
+.lp-mock-insight {
+    margin-top: 14px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    background: rgba(13, 13, 13, 0.05);
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+
+/* --- Skill suggestion mock --- */
+.lp-mock-skill-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+}
+
+.lp-mock-confidence {
+    font-size: 0.66rem;
+    font-weight: 700;
+    background: rgba(47, 133, 90, 0.12);
+    color: var(--tb-life, #2f855a);
+    border-radius: 100px;
+    padding: 3px 10px;
+}
+
+.lp-mock-skill-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.8rem;
+    counter-reset: step;
+}
+
+.lp-mock-skill-steps li {
+    counter-increment: step;
+    padding-left: 26px;
+    position: relative;
+}
+
+.lp-mock-skill-steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(13, 13, 13, 0.08);
+    font-size: 0.62rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- Storage selection mock --- */
+.lp-mock-storage-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+@media (max-width: 560px) {
+    .lp-mock-storage-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.lp-mock-storage-item {
+    border: 1.5px solid rgba(13, 13, 13, 0.12);
+    border-radius: 12px;
+    padding: 12px 10px;
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.lp-mock-storage-item.is-selected {
+    border-color: var(--accent-color);
+    background: rgba(13, 13, 13, 0.04);
+}
+
+.lp-mock-storage-item.is-soon {
+    opacity: 0.5;
+    border-style: dashed;
+}
+
+/* --- Problem（そのまま余白を活かした2カラム） --- */
 .lp-problem-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 14px;
 }
 
 @media (max-width: 720px) {
-    .lp-problem-grid {
-        grid-template-columns: 1fr;
-    }
+    .lp-problem-grid { grid-template-columns: 1fr; }
 }
 
 .lp-problem-card {
     background: var(--surface-color);
-    border-radius: var(--radius-lg);
-    padding: 22px 24px;
-    box-shadow: 0 12px 30px rgba(13, 13, 13, 0.08);
+    border-radius: 18px;
+    padding: 20px 22px;
+    box-shadow: 0 10px 26px rgba(13, 13, 13, 0.06);
     display: flex;
     gap: 14px;
     align-items: flex-start;
@@ -241,109 +521,43 @@
 
 .lp-problem-mark {
     flex: 0 0 auto;
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    background: rgba(197, 48, 48, 0.1);
-    color: #c53030;
+    background: rgba(13, 13, 13, 0.06);
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 800;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
 }
 
 .lp-problem-text {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     line-height: 1.8;
 }
 
-/* --- Solution / How it works --- */
-.lp-steps {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 14px;
-}
-
-@media (max-width: 992px) {
-    .lp-steps {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 520px) {
-    .lp-steps {
-        grid-template-columns: 1fr;
-    }
-}
-
-.lp-step {
-    background: var(--surface-color);
-    border-radius: var(--radius-lg);
-    padding: 22px 20px;
-    box-shadow: 0 12px 30px rgba(13, 13, 13, 0.08);
-    position: relative;
-}
-
-.lp-step-number {
-    font-family: var(--font-en);
-    font-weight: 800;
-    font-size: 1.6rem;
-    color: rgba(13, 13, 13, 0.18);
-    margin-bottom: 10px;
-}
-
-.lp-step-title {
-    font-weight: 700;
-    font-size: 0.95rem;
-    line-height: 1.6;
-}
-
-.lp-step-arrow {
-    display: none;
-}
-
-@media (min-width: 993px) {
-    .lp-step:not(:last-child)::after {
-        content: "→";
-        position: absolute;
-        right: -20px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-weight: 800;
-        color: rgba(13, 13, 13, 0.3);
-    }
-}
-
-/* --- Feature grid --- */
+/* --- Feature grid（現在利用可能） --- */
 .lp-feature-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
 }
 
-@media (max-width: 860px) {
-    .lp-feature-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 520px) {
-    .lp-feature-grid {
-        grid-template-columns: 1fr;
-    }
-}
+@media (max-width: 860px) { .lp-feature-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .lp-feature-grid { grid-template-columns: 1fr; } }
 
 .lp-feature-item {
     display: flex;
     align-items: flex-start;
     gap: 10px;
     background: var(--surface-color);
-    border-radius: var(--radius-md);
+    border-radius: 14px;
     padding: 14px 16px;
     font-size: 0.85rem;
     line-height: 1.6;
-    box-shadow: 0 6px 18px rgba(13, 13, 13, 0.06);
+    box-shadow: 0 6px 18px rgba(13, 13, 13, 0.05);
 }
 
 .lp-feature-check {
@@ -360,31 +574,22 @@
     margin-top: 1px;
 }
 
-/* --- Future / roadmap list --- */
+/* --- Future / roadmap --- */
 .lp-future-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
 }
 
-@media (max-width: 860px) {
-    .lp-future-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 520px) {
-    .lp-future-grid {
-        grid-template-columns: 1fr;
-    }
-}
+@media (max-width: 860px) { .lp-future-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .lp-future-grid { grid-template-columns: 1fr; } }
 
 .lp-future-item {
     display: flex;
     align-items: flex-start;
     gap: 10px;
     border: 1px dashed rgba(13, 13, 13, 0.25);
-    border-radius: var(--radius-md);
+    border-radius: 14px;
     padding: 14px 16px;
     font-size: 0.85rem;
     line-height: 1.6;
@@ -402,28 +607,78 @@
     white-space: nowrap;
 }
 
-.lp-future-note {
-    margin-top: 20px;
-    font-size: 0.8rem;
+/* --- Pricing --- */
+.lp-pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+@media (max-width: 720px) {
+    .lp-pricing-grid { grid-template-columns: 1fr; }
+}
+
+.lp-pricing-card {
+    background: var(--surface-color);
+    border-radius: 22px;
+    padding: 30px 28px;
+    box-shadow: 0 16px 40px rgba(13, 13, 13, 0.08);
+}
+
+.lp-pricing-card.is-future {
+    background: transparent;
+    border: 1.5px dashed rgba(13, 13, 13, 0.25);
+    box-shadow: none;
+}
+
+.lp-pricing-name {
+    font-family: var(--font-en);
+    font-weight: 800;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+}
+
+.lp-pricing-price {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 18px;
+}
+
+.lp-pricing-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 0.85rem;
+}
+
+.lp-pricing-list li {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.lp-pricing-list li::before {
+    content: "—";
     color: var(--text-secondary);
-    line-height: 1.8;
 }
 
 /* --- Final CTA --- */
 .lp-final-cta {
     text-align: center;
-    padding: 100px 0 120px;
+    padding: 120px 0 140px;
 }
 
 .lp-final-cta-title {
     font-size: clamp(1.8rem, 4.5vw, 2.6rem);
-    line-height: 1.4;
-    margin-bottom: 28px;
+    line-height: 1.55;
+    margin-bottom: 32px;
 }
 
 /* --- Footer --- */
 .lp-footer {
-    padding: 40px 0 56px;
+    padding: 48px 0 64px;
     border-top: 1px solid rgba(13, 13, 13, 0.12);
 }
 
@@ -459,18 +714,10 @@
     color: var(--text-secondary);
 }
 
-.lp-footer-links a:hover {
-    opacity: 0.65;
-}
+.lp-footer-links a:hover { opacity: 0.65; }
 
 @media (max-width: 768px) {
-    .lp-hero {
-        padding: 132px 0 64px;
-    }
-    .lp-section {
-        padding: 64px 0;
-    }
-    .lp-final-cta {
-        padding: 72px 0 88px;
-    }
+    .lp-hero { padding: 140px 0 72px; }
+    .lp-section { padding: 76px 0; }
+    .lp-final-cta { padding: 80px 0 96px; }
 }
