@@ -1,14 +1,15 @@
-# Timebox OS — プロダクトロードマップ
+# DAYLOOP — プロダクトロードマップ
 
-> 迷っているタスクを、実行する時間へ。
+> 全部書く。AIが整理。今日が決まる。
 
-`h1maekawa/time-management` は Timebox OS を独立Productとして開発する
-リポジトリです。今後のTimebox OS機能開発は、このリポジトリを
-Source of Truthとします。
+`h1maekawa/time-management` は DAYLOOP を独立Productとして開発する
+リポジトリです。今後のDAYLOOP機能開発は、このリポジトリを
+Source of Truthとします。（旧サービス名 `Timebox OS`。「Timebox」は現在、
+DAYLOOP内で時間割へ配置する内部機能名として使用しています）
 
 将来の本番URL: `https://timebox.maemichi.com/`
 - `/` … Landing Page
-- `/app` … Timebox OSアプリ本体
+- `/app` … DAYLOOPアプリ本体
 
 ---
 
@@ -35,7 +36,7 @@ Source of Truthとします。
 
 ```
 index.html                        Landing Page
-app/index.html                    Timebox OS アプリ本体
+app/index.html                    DAYLOOP アプリ本体
 assets/css/base.css                共通デザイントークン
 assets/css/landing.css             Landing Page専用スタイル
 assets/css/timebox.css             アプリのスタイル（.tb- 接頭辞）
@@ -109,8 +110,8 @@ Google Calendar Write
 ### 安全ルール（最重要）
 
 ```
-既存のGoogle予定       ＝ Timebox OSから原則変更禁止
-Timebox OSが作った予定 ＝ 更新・削除できる
+既存のGoogle予定     ＝ DAYLOOPから原則変更禁止
+DAYLOOPが作った予定  ＝ 更新・削除できる
 ```
 
 他者との会議・予約・外部イベント・既存予定をアプリ側が勝手に削除・移動しない。

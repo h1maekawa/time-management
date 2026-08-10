@@ -1,34 +1,45 @@
-# Timebox OS
+# DAYLOOP
 
-> 迷っているタスクを、実行する時間へ。
+> 全部書く。AIが整理。今日が決まる。
 
-Todoを単純に管理するのではなく、「何をやるか」を「何時から何分やるか」まで
-落とし込むための、Time Blocking / Timebox管理アプリです。
+やることを頭の中のまま書くだけ。AIが整理して優先順位を決め、
+今日の時間割までつくる **1日設計アプリ** です。
+
+Todoリストを増やすアプリではなく、「今日、何を、いつやるか」まで決めます。
+時間割（Timebox）へタスクを落とし込む機能はDAYLOOP内部の1機能として残っており、
+その計算エンジンは `timebox-engine.js` という名前のまま提供しています
+（旧サービス名 `Timebox OS` → 現在は `DAYLOOP` 内の「Timebox」機能）。
 
 - 登録不要・無料
+- AIを使わなくても利用可能（Brain Dumpの行ごとの候補化にフォールバック）
 - データは利用者の端末（ブラウザの `localStorage`）にだけ保存し、サーバーへは送りません
+- Obsidian（Vault内Markdown）保存にも対応
 - 作った時間割は `.ics` で書き出してGoogleカレンダーへ取り込めます
 
-このリポジトリ（`h1maekawa/time-management`）は Timebox OS を独立Productとして
-開発するための場所です。今後のTimebox OS機能開発は、ここを Source of Truth とします。
+このリポジトリ（`h1maekawa/time-management`）は DAYLOOP を独立Productとして
+開発するための場所です。今後のDAYLOOP機能開発は、ここを Source of Truth とします。
 
 ## Product Concept
 
 | 項目 | 内容 |
 | --- | --- |
-| Product名 | Timebox OS |
-| メインコピー | 迷っているタスクを、実行する時間へ。 |
-| 役割 | Todo管理ではなく、タスクを実行時間へ落とし込むTime Blockingアプリ |
-| 主ブランド | Timebox OS（`maemichi` は `by maemichi` 程度のSecondary Branding） |
-| 将来URL | `https://timebox.maemichi.com/` |
+| Product名 | DAYLOOP |
+| Primary Catch Copy | 全部書く。AIが整理。今日が決まる。 |
+| サービス説明 | やることを頭の中のまま書くだけ。AIが整理して、優先順位を決め、今日の時間割までつくる1日設計アプリ。 |
+| Product Category | AI Daily Planning App（AI 1日設計アプリ）。Todo / Task Manager / Calendarだけでは説明しない |
+| 内部機能名 | Brain Dump / AI Organize / Timebox / Focus / History / Memory / Skills |
+| 主ブランド | DAYLOOP（`maemichi` は `by maemichi` 程度のSecondary Branding） |
+| 将来URL | `https://timebox.maemichi.com/`（Custom Domain設定はリポジトリ変更なしで切替可能） |
 
 ## Current Features
 
+- Brain Dump入力（AIが整理 / Backend未設定時は行ごとに候補化してフォールバック）
 - 複数行タスク登録 / 仕事・生活分類 / 優先順位 / 所要時間 / 締切
 - タスク仕分け（今日やる・予定に入れる・回答待ち・いつかやる・やらない）
 - 自動時間割生成（決定論的なスケジューリング） / 24時間タイムライン
 - Drag & Drop（PC） / 手動時間固定・固定解除（モバイルは時刻入力欄から） / 今から詰め直す
-- 翌日持ち越し / localStorage保存 / JSONバックアップ（保存・読み込み） / ICS書き出し
+- 翌日持ち越し / localStorage保存 / Obsidian保存 / JSONバックアップ（保存・読み込み） / ICS書き出し
+- 実行履歴・Skill候補の土台
 
 Googleカレンダーとの**直接同期はまだ実装していません**（Phase 2で設計のみ準備、下記参照）。
 
@@ -36,8 +47,8 @@ Googleカレンダーとの**直接同期はまだ実装していません**（P
 
 | パス | 内容 |
 | --- | --- |
-| `/` | Landing Page |
-| `/app` `/app/` | Timebox OS アプリ本体 |
+| `/` | Landing Page（DAYLOOP Product Story） |
+| `/app` `/app/` | DAYLOOPアプリ本体 |
 
 ## Local Development
 
@@ -57,8 +68,10 @@ Node 20以上を推奨（開発・CIともにNode 22で動作確認済み）。
 npm test
 ```
 
-`node --test` で `tests/timebox-engine.test.js`（スケジューリングエンジン）と
-`tests/timebox-storage.test.js`（保存層・JSONインポートの検証）を実行します。
+`node --test` で `tests/timebox-engine.test.js`（スケジューリングエンジン）、
+`tests/timebox-storage.test.js`（保存層・JSONインポートの検証）、
+`tests/storage-providers.test.js`（Storage Provider）、
+`tests/ai-lib.test.js`（AI Brain Dump解析ロジック）を実行します。
 
 ## Build
 
@@ -70,7 +83,7 @@ Viteでビルドし、`dist/` に以下を出力します。
 
 ```
 dist/index.html         Landing Page
-dist/app/index.html     Timebox OS アプリ本体
+dist/app/index.html     DAYLOOPアプリ本体
 dist/assets/...         CSS / JS（ハッシュ付き）
 dist/favicon.svg
 dist/_redirects         /app → /app/ の301リダイレクト（Cloudflare Pages用）
@@ -79,18 +92,21 @@ dist/_redirects         /app → /app/ の301リダイレクト（Cloudflare Pag
 ## Directory
 
 ```
-index.html                     Landing Page
-app/index.html                 Timebox OS アプリ本体
-assets/css/base.css            共通デザイントークン（色・フォント・リセット）
+index.html                     Landing Page（DAYLOOP Product Story LP）
+app/index.html                 DAYLOOPアプリ本体
+assets/css/base.css            共通デザイントークン（DAYLOOP Brand Color・フォント・リセット）
 assets/css/landing.css         Landing Page専用スタイル
-assets/css/timebox.css         アプリ本体のスタイル（.tb- 接頭辞）
+assets/css/timebox.css         アプリ本体のスタイル（.tb- 接頭辞、内部機能名Timebox由来）
 assets/js/timebox-engine.js    時間割の計算（純粋関数・DOMに触らない）
 assets/js/timebox-storage.js   端末への保存・JSONエクスポート/インポート
 assets/js/timebox.js           描画とユーザー操作
+assets/js/storage-providers/   Local / Obsidian / Google Sheets(GAS) / Google Drive の保存先実装
 tests/timebox-engine.test.js   エンジンのテスト
 tests/timebox-storage.test.js  保存層のテスト
+tests/storage-providers.test.js Storage Providerのテスト
+tests/ai-lib.test.js           AI Brain Dump解析ロジックのテスト
 public/_redirects              Cloudflare Pagesのルーティング設定
-public/favicon.svg             ファビコン
+public/favicon.svg             ファビコン（DAYLOOP Symbol Mark）
 docs/PRODUCT_ROADMAP.md        プロダクトロードマップ（Phase 1〜5）
 vite.config.js                 マルチページビルド設定（index.html / app/index.html）
 ```
@@ -98,12 +114,27 @@ vite.config.js                 マルチページビルド設定（index.html / 
 計算はすべて `timebox-engine.js` に純粋関数として隔離してあります。DOMも
 localStorageも触らないので `node --test` からそのまま検証でき、時刻計算を
 AIに任せていないため同じ入力なら毎回同じ時間割になります（deterministic scheduling）。
+AIが担当するのはBrain Dumpの整理（タスク化・優先度候補・所要時間候補）だけで、
+「いつ・何分やるか」を最終的に決めるのは常にこの決定論的エンジンです
+（LP上の「提案するのはAI。決めるのはあなた。」はこの設計を指しています）。
 
-## Storage
+## Storage / Branding互換性ポリシー（重要）
 
-Phase 1では `localStorage` をSource of Truthとします。保存形式は
-`{ version, tasks, days, template, history, settings }` で、`version` を
-持たせているため将来のスキーマ変更にもマイグレーションで対応できます。
+ブランドを `Timebox OS` → `DAYLOOP` へ変更するにあたり、**表示名だけを変更し、
+内部の保存互換性は一切変更していません**。既存ユーザーのデータを壊さないためです。
+
+| 項目 | 状態 |
+| --- | --- |
+| `localStorage` key（`timebox-os/v1`） | 変更なし |
+| Storage schema version / JSON Backup schema | 変更なし |
+| Obsidian保存先フォルダ（`Timebox/`, `Timebox/Captures` など） | 変更なし |
+| Obsidian Vault Directory PickerのID（`timebox-os-vault`） | 変更なし |
+| IndexedDBのハンドル保存名（`timebox-os-obsidian`） | 変更なし |
+| Task schema / API route（`/api/ai/analyze-brain-dump`） | 変更なし |
+
+変更したのはUI上の表示文言（タイトル・見出し・ボタン・エラーメッセージ・ICSの
+`PRODID`など）のみです。将来的にストレージパスやキーを `dayloop/...` へ移行する
+場合は、既存データを引き継ぐMigration戦略を別途設計してから行います（今回は未実施）。
 
 ## JSON Export / Import
 
@@ -130,10 +161,12 @@ Googleカレンダーとの**直接同期**は準備中です（下記Phase 2参
 
 ## Privacy
 
-Phase 1では、ユーザーデータは利用者の端末のブラウザ内にのみ保存されます。
-サーバーへは何も送信しません。Landing Pageでも「登録不要・無料・データは端末に
-保存」と明記しており、まだ実装していないクラウド保存・Google直接同期が
-動いているような表現はしていません。
+Phase 1では、ユーザーデータは利用者の端末のブラウザ内（またはユーザーが選んだ
+Obsidian Vault）にのみ保存されます。サーバーへは何も送信しません
+（AI整理を使う場合、Brain Dumpのテキストのみ解析目的でAPIへ送信されます）。
+Landing Pageでも「登録不要・無料・データは自分の場所へ」と明記しており、
+まだ実装していないクラウド保存・Google直接同期が動いているような表現は
+していません。
 
 ## Cloudflare Pages
 
@@ -164,7 +197,7 @@ Google Login → Google Calendar Read → 既存予定取得 → Busy Block化
   → 空き時間計算 → Timebox Engine → User Confirmation → Google Calendar Write
 ```
 
-安全ルール: **既存のGoogle予定はTimebox OSから原則変更しない**。Timebox OSが
+安全ルール: **既存のGoogle予定はDAYLOOPから原則変更しない**。DAYLOOPが
 作った予定だけを更新・削除できるようにする。
 
 ## Future Cloud Architecture

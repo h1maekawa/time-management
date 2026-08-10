@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timebox OS アプリ | 迷っているタスクを、実行する時間へ。</title>
-    <meta name="description" content="今日やることを書き出し、優先順位と使える時間から1日の予定を自動で組み立てるタイムボックス管理アプリ。無料で使えて、データは端末に保存されます。">
+    <title>DAYLOOP アプリ | 全部書く。AIが整理。今日が決まる。</title>
+    <meta name="description" content="今日やることを書き出し、AIが整理して優先順位と使える時間から1日の時間割を自動で組み立てるアプリ、DAYLOOP。無料で使えて、データは端末やObsidianに保存されます。">
     <link rel="canonical" href="https://timebox.maemichi.com/app/">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Timebox OS アプリ | 迷っているタスクを、実行する時間へ。">
-    <meta property="og:description" content="今日やることを書き出し、優先順位と使える時間から1日の予定を自動で組み立てるタイムボックス管理アプリ。">
+    <meta property="og:site_name" content="DAYLOOP">
+    <meta property="og:title" content="DAYLOOP アプリ | 全部書く。AIが整理。今日が決まる。">
+    <meta property="og:description" content="今日やることを書き出し、AIが整理して優先順位と使える時間から1日の時間割を自動で組み立てるアプリ。">
     <meta property="og:url" content="https://timebox.maemichi.com/app/">
     <meta name="robots" content="index,follow">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -23,7 +24,21 @@
 
     <header class="tb-appbar">
         <div class="container tb-appbar-inner">
-            <a href="/" class="tb-appbar-logo">TIMEBOX OS <span class="tb-appbar-logo-sub">by maemichi</span></a>
+            <a href="/" class="tb-appbar-logo">
+                <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="tb-mark-grad" x1="5" y1="5" x2="27" y2="27" gradientUnits="userSpaceOnUse">
+                            <stop offset="0" stop-color="#5B7CFF"/>
+                            <stop offset="1" stop-color="#9B6BFF"/>
+                        </linearGradient>
+                    </defs>
+                    <rect width="32" height="32" rx="9" fill="#150B36"/>
+                    <path d="M22.9 20.1A7.6 7.6 0 1 1 20.9 9.3" fill="none" stroke="url(#tb-mark-grad)" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M20.9 9.3 24.6 9.8 21.9 12.8Z" fill="url(#tb-mark-grad)"/>
+                    <circle cx="16" cy="16" r="2.1" fill="url(#tb-mark-grad)"/>
+                </svg>
+                DAYLOOP <span class="tb-appbar-logo-sub">AI Daily Planner / by maemichi</span>
+            </a>
             <nav class="tb-appbar-nav" aria-label="サイト内リンク">
                 <a href="/#features">できること</a>
                 <a href="/#roadmap">今後の予定</a>
@@ -245,7 +260,7 @@
 
     <footer class="tb-appfooter">
         <div class="container tb-appfooter-inner">
-            <p>Timebox OS — データはこの端末にだけ保存されます。</p>
+            <p>DAYLOOP — データはこの端末（または選んだ保存先）にだけ保存されます。</p>
             <div class="tb-appfooter-links">
                 <a href="/">トップへ</a>
                 <a href="https://github.com/h1maekawa/time-management" target="_blank" rel="noopener noreferrer">GitHub</a>

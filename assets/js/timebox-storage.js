@@ -1,5 +1,5 @@
 /**
- * Timebox OS — 保存層。
+ * DAYLOOP — 保存層（内部機能名: Timebox）。
  *
  * 初期版は端末のlocalStorageだけで完結する（サーバーへ何も送らない）。
  * 将来クラウド保存へ移すときに困らないよう、
@@ -271,10 +271,10 @@ export function importJson(text) {
     throw new ImportError("バックアップの内容が読み取れませんでした。");
   }
   if (typeof raw.version !== "number" || !Number.isFinite(raw.version) || raw.version < 1) {
-    throw new ImportError("バックアップのバージョン情報が見つかりません。Timebox OSから書き出したファイルを選んでください。");
+    throw new ImportError("バックアップのバージョン情報が見つかりません。DAYLOOPから書き出したファイルを選んでください。");
   }
   if (raw.version > STORAGE_VERSION) {
-    throw new ImportError("このバックアップは新しいバージョンのTimebox OSで作られています。アプリを更新してから読み込んでください。");
+    throw new ImportError("このバックアップは新しいバージョンのDAYLOOPで作られています。アプリを更新してから読み込んでください。");
   }
   if (!isValidBackupShape(raw)) {
     throw new ImportError("バックアップの内容が壊れています。別のファイルを選ぶか、書き出しをやり直してください。");

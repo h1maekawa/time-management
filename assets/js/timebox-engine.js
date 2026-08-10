@@ -1,5 +1,5 @@
 /**
- * Timebox OS — 時間割エンジン。
+ * DAYLOOP — 時間割エンジン（内部機能名: Timebox）。
  *
  * ここにはブラウザ固有の処理を書かない（DOM・localStorageを触らない）。
  * 純粋な関数だけにしておくことで `node --test` からそのまま検証できる。
@@ -539,7 +539,7 @@ export function buildIcs(plan, options = {}) {
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//maemichi//Timebox OS//JA",
+    "PRODID:-//maemichi//DAYLOOP//JA",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
   ];
@@ -555,7 +555,7 @@ export function buildIcs(plan, options = {}) {
       `SUMMARY:${escapeIcs(cat ? `${cat.icon} ${block.title}` : block.title)}`,
       `DESCRIPTION:${escapeIcs(
         [
-          "Timebox OS で組んだ時間割",
+          "DAYLOOPで組んだ時間割",
           cat ? `区分: ${cat.label}` : "",
           `優先度: ${"★".repeat(block.priority)}`,
         ]

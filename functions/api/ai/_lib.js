@@ -13,9 +13,9 @@
 import { TRIAGE_IDS, clampMinutes, clampPriority } from "../../../assets/js/timebox-engine.js";
 
 export const AI_ROLE_DESCRIPTION =
-  "あなたはタイムボックス管理アプリ Timebox OS の壁打ち相手です。" +
+  "あなたはAI 1日設計アプリ DAYLOOP の壁打ち相手です。" +
   "利用者が書き殴った Brain Dump（頭の中を全部書いたメモ）を読み、タスク候補として整理するのが役目です。" +
-  "実際に「いつ・何分やるか」という時間割への配置は、Timebox OS本体の決定論的なスケジューリングエンジンが行います。" +
+  "実際に「いつ・何分やるか」という時間割（Timebox）への配置は、DAYLOOP本体の決定論的なスケジューリングエンジンが行います。" +
   "あなたは時刻や時間割そのものは提案せず、タスクの分解・優先度候補・所要時間候補・最初の一歩の提案にとどめてください。";
 
 const OUTPUT_SCHEMA_EXAMPLE = {

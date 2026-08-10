@@ -1,15 +1,36 @@
-/* --- Timebox OS / 共通デザイントークン ----------------------------------
+/* --- DAYLOOP / 共通デザイントークン --------------------------------------
    Landing Page と /app の両方が読み込む土台。
    色・フォント・リセットだけをここに置き、ヘッダーやセクション固有の見た目は
    landing.css / timebox.css 側に持たせる（ページごとに異なるレイアウトのため）。
+
+   Brand Color: Deep Indigo / Electric Blue / Blue Violet。
+   /app は明るい面（--bg-color 等）、LPの世界観セクションは landing.css 内の
+   --dl-bg-* / --dl-on-dark* を使う（参考LPの配色そのものはコピーしていない）。
 ------------------------------------------------------------------------- */
 
 :root {
-    --bg-color: #58B2DC;
+    /* App / 明るい面（読みやすさ優先） */
+    --bg-color: #EEEBFC;
     --surface-color: #ffffff;
-    --accent-color: #0d0d0d;
-    --text-primary: #0d0d0d;
-    --text-secondary: #333333;
+    --accent-color: #241259;
+    --text-primary: #150C33;
+    --text-secondary: #55507A;
+
+    /* DAYLOOP Brand Color */
+    --dl-indigo: #241259;
+    --dl-blue: #3D5AFE;
+    --dl-violet: #8B5CF6;
+    --dl-violet-soft: #B79CFF;
+
+    /* LP / 没入感のある暗い面 */
+    --dl-bg-deep: #0A0620;
+    --dl-bg-mid: #170F3D;
+    --dl-bg-soft: #241259;
+    --dl-on-dark: #F5F2FF;
+    --dl-on-dark-muted: rgba(245, 242, 255, 0.72);
+    --dl-on-dark-faint: rgba(245, 242, 255, 0.46);
+    --dl-line-dark: rgba(245, 242, 255, 0.14);
+
     --font-en: 'Syne', sans-serif;
     --font-jp: 'Noto Sans JP', sans-serif;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
