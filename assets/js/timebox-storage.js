@@ -11,8 +11,10 @@
 
 import { defaultWeeklyTemplate, todayLocal } from "./timebox-engine.js";
 
+// KEY はブラウザ内の名前空間の名前であり、スキーマバージョンとは独立している。
+// スキーマバージョンは中身の `version` フィールド（STORAGE_VERSION）で管理する。
 const KEY = "timebox-os/v1";
-export const STORAGE_VERSION = 1;
+export const STORAGE_VERSION = 2;
 
 /** localStorageが使えない環境（プライベートモード等）ではメモリ上で動かす */
 let memoryFallback = null;
@@ -43,9 +45,50 @@ export function emptyState() {
     template: defaultWeeklyTemplate(),
     /** 完了記録。所要時間の学習（Phase 4）で使う */
     history: [],
+    /** Brain Dump（殴り書き）の下書き。Task確定後も原文はここに残す */
+    captures: [],
+    /** Capture単位のAI提案。Task確定前の状態で、Task Storeとは別に持つ */
+    aiAnalyses: [],
+    /** Taskの実行記録（予定と実績）。Task本体とは別に積み上げる履歴 */
+    executions: [],
+    /** 繰り返しの手順から見つかった「型」の候補 */
+    skills: [],
+    /** 自動化してもよさそうなことの候補。承認するまでは何もしない */
+    automationCandidates: [],
     settings: {
       plan: "free",
       lastOpenedDate: todayLocal(),
+      /** データ保存先: local / obsidian / google-sheets-gas / google-drive / cloud */
+      storageProviderId: "local",
+      /** プロバイダごとの設定・同期状態。キーはproviderId */
+      storageProviders: {},
+    },
+  };
+}
+
+/**
+ * Version 1 → 2 マイグレーション。
+ * v1にはcaptures/aiAnalyses/executions/skills/automationCandidatesが無かったので
+ * 空配列で補い、既存タスクには origin: "manual" を補う
+ * （AI Brain Dump生まれのタスクと区別するため）。
+ * 既存の tasks/days/template/history/settings の中身は一切消さない・書き換えない。
+ */
+function migrateV1toV2(raw) {
+  return {
+    ...raw,
+    version: 2,
+    tasks: Array.isArray(raw.tasks)
+      ? raw.tasks.map((task) => ({ ...task, origin: task.origin ?? "manual" }))
+      : [],
+    captures: Array.isArray(raw.captures) ? raw.captures : [],
+    aiAnalyses: Array.isArray(raw.aiAnalyses) ? raw.aiAnalyses : [],
+    executions: Array.isArray(raw.executions) ? raw.executions : [],
+    skills: Array.isArray(raw.skills) ? raw.skills : [],
+    automationCandidates: Array.isArray(raw.automationCandidates) ? raw.automationCandidates : [],
+    settings: {
+      ...raw.settings,
+      storageProviderId: raw.settings?.storageProviderId ?? "local",
+      storageProviders: raw.settings?.storageProviders ?? {},
     },
   };
 }
@@ -54,16 +97,72 @@ export function emptyState() {
 function normalize(raw) {
   const base = emptyState();
   if (!raw || typeof raw !== "object") return base;
+
+  const working = (Number(raw.version) || 1) < 2 ? migrateV1toV2(raw) : raw;
+
   return {
     ...base,
-    ...raw,
+    ...working,
     version: STORAGE_VERSION,
-    tasks: Array.isArray(raw.tasks) ? raw.tasks : base.tasks,
-    days: raw.days && typeof raw.days === "object" ? raw.days : base.days,
-    template: raw.template?.days?.length === 7 ? raw.template : base.template,
-    history: Array.isArray(raw.history) ? raw.history : base.history,
-    settings: { ...base.settings, ...(raw.settings ?? {}) },
+    tasks: Array.isArray(working.tasks) ? working.tasks : base.tasks,
+    days: working.days && typeof working.days === "object" ? working.days : base.days,
+    template: working.template?.days?.length === 7 ? working.template : base.template,
+    history: Array.isArray(working.history) ? working.history : base.history,
+    captures: Array.isArray(working.captures) ? working.captures : base.captures,
+    aiAnalyses: Array.isArray(working.aiAnalyses) ? working.aiAnalyses : base.aiAnalyses,
+    executions: Array.isArray(working.executions) ? working.executions : base.executions,
+    skills: Array.isArray(working.skills) ? working.skills : base.skills,
+    automationCandidates: Array.isArray(working.automationCandidates)
+      ? working.automationCandidates
+      : base.automationCandidates,
+    settings: {
+      ...base.settings,
+      ...(working.settings ?? {}),
+      storageProviders: {
+        ...base.settings.storageProviders,
+        ...(working.settings?.storageProviders ?? {}),
+      },
+    },
   };
+}
+
+/** 配列の中から id が一致する要素を差し替える。無ければ末尾に足す（upsert） */
+function upsertById(list, item) {
+  const index = list.findIndex((existing) => existing.id === item.id);
+  if (index === -1) return [...list, item];
+  const next = [...list];
+  next[index] = item;
+  return next;
+}
+
+/** Brain Dumpの下書きを保存・更新する */
+export function saveCapture(capture) {
+  const state = load();
+  return save({ ...state, captures: upsertById(state.captures, capture) });
+}
+
+/** Capture単位のAI提案を保存・更新する（Confirm前後どちらでも呼べる） */
+export function saveAiAnalysis(analysis) {
+  const state = load();
+  return save({ ...state, aiAnalyses: upsertById(state.aiAnalyses, analysis) });
+}
+
+/** 実行記録を1件積み上げる（履歴なので上書きせず常に追加） */
+export function appendExecution(execution) {
+  const state = load();
+  return save({ ...state, executions: [...state.executions, execution] });
+}
+
+/** Skill候補を保存・更新する */
+export function saveSkill(skill) {
+  const state = load();
+  return save({ ...state, skills: upsertById(state.skills, skill) });
+}
+
+/** Automation Candidateを保存・更新する */
+export function saveAutomationCandidate(candidate) {
+  const state = load();
+  return save({ ...state, automationCandidates: upsertById(state.automationCandidates, candidate) });
 }
 
 export function load() {
@@ -146,6 +245,11 @@ function isValidBackupShape(raw) {
   if (raw.template !== undefined && !isValidTemplate(raw.template)) return false;
   if (raw.history !== undefined && !Array.isArray(raw.history)) return false;
   if (raw.settings !== undefined && !isPlainObject(raw.settings)) return false;
+  if (raw.captures !== undefined && !Array.isArray(raw.captures)) return false;
+  if (raw.aiAnalyses !== undefined && !Array.isArray(raw.aiAnalyses)) return false;
+  if (raw.executions !== undefined && !Array.isArray(raw.executions)) return false;
+  if (raw.skills !== undefined && !Array.isArray(raw.skills)) return false;
+  if (raw.automationCandidates !== undefined && !Array.isArray(raw.automationCandidates)) return false;
   return true;
 }
 
@@ -176,6 +280,15 @@ export function importJson(text) {
     throw new ImportError("バックアップの内容が壊れています。別のファイルを選ぶか、書き出しをやり直してください。");
   }
 
+  return normalize(raw);
+}
+
+/**
+ * normalize() を外部（storage-providers/）から使うための公開ラッパー。
+ * Obsidianなど他のProviderが読み込んだ生データをTask Storeと同じ形へ揃えるのに使う。
+ * 中身が壊れていても例外を投げず、emptyState() 相当へフォールバックする。
+ */
+export function normalizeState(raw) {
   return normalize(raw);
 }
 
