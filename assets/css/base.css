@@ -3,9 +3,14 @@
    色・フォント・リセットだけをここに置き、ヘッダーやセクション固有の見た目は
    landing.css / timebox.css 側に持たせる（ページごとに異なるレイアウトのため）。
 
-   Brand Color: Deep Indigo / Electric Blue / Blue Violet。
+   Brand Color: 白基調 + 落ち着いた青 + 青緑（Teal） + ミントグリーン + Deep Indigo/Navy。
+   「時間がない。だから、考える時間を減らす。」に合わせ、Calm / Friendly / Focused な
+   Blue → Green のグラデーションを基調にする（旧: Blue → Violet から移行）。
    /app は明るい面（--bg-color 等）、LPの世界観セクションは landing.css 内の
    --dl-bg-* / --dl-on-dark* を使う（参考LPの配色そのものはコピーしていない）。
+
+   互換のため --dl-violet / --dl-violet-soft の変数名は維持し、値だけを
+   Teal / Mint へ更新している（landing.css 側の参照はそのまま生きる）。
 ------------------------------------------------------------------------- */
 
 :root {
@@ -18,9 +23,14 @@
 
     /* DAYLOOP Brand Color */
     --dl-indigo: #241259;
+    --dl-navy: #0F2A4A;
     --dl-blue: #3D5AFE;
-    --dl-violet: #8B5CF6;
-    --dl-violet-soft: #B79CFF;
+    /* 青緑（Teal）。旧: Blue Violet #8B5CF6 */
+    --dl-violet: #14B8A6;
+    /* ミントグリーン。旧: Violet Soft #B79CFF */
+    --dl-violet-soft: #6EE7B7;
+    --dl-teal: var(--dl-violet);
+    --dl-mint: var(--dl-violet-soft);
 
     /* LP / 没入感のある暗い面 */
     --dl-bg-deep: #0A0620;
