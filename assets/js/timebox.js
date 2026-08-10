@@ -23,6 +23,10 @@ import {
   categoryOf,
   clampMinutes,
   clampPriority,
+  createAiAnalysis,
+  createCapture,
+  createExecution,
+  createTask,
   formatDuration,
   freeSlots,
   hasFeature,
@@ -37,6 +41,8 @@ import {
 } from "./timebox-engine.js";
 
 import * as storage from "./timebox-storage.js";
+import * as aiClient from "./ai-client.js";
+import { getProvider, listProviders } from "./storage-providers/registry.js";
 
 /** タイムラインの1時間あたりの高さ(px) */
 const HOUR_HEIGHT = 44;
@@ -51,6 +57,20 @@ let dragTaskId = null;
 let notices = [];
 /** 枠の編集中バッファ。保存を押すまで本体へ反映しない */
 let windowDraft = null;
+
+/** Today画面の入力タブ: "brain-dump"（AIと整理する） | "manual"（自分で追加する） */
+let entryMode = "brain-dump";
+/** AI提案のレビュー中バッファ。Confirmを押すまでTask Storeへは入らない */
+let reviewDraft = null;
+/** 設定モーダルで開いているセクション */
+let settingsSection = "storage";
+/** 保存先切り替え中の確認待ち状態（{ targetId, targetConfig }） */
+let providerSwitchDraft = null;
+/** local以外のProviderへの同期状況: null(未使用) | pending | synced | offline | error */
+let syncStatus = null;
+let syncMessage = "";
+/** 同期呼び出しを順番に実行するためのキュー（並行書き込みで競合させない） */
+let syncChain = Promise.resolve();
 
 // ─── 起動 ──────────────────────────────────────────────────
 
@@ -119,6 +139,7 @@ function todayTasks() {
 function commit() {
   state = storage.save(state);
   render();
+  syncStateToActiveProvider();
 }
 
 // ─── 描画 ──────────────────────────────────────────────────
@@ -145,7 +166,38 @@ function render() {
   renderTimeline(current.windows ?? [], blocks);
   renderOverflow(tasks, blocks);
   renderStorageState();
+  renderEntryMode();
+  renderSyncChip();
   syncButtons(tasks, blocks);
+}
+
+/** 入力タブ（AIと整理する/自分で追加する）の見た目を切り替える。DOMは作り直さない */
+function renderEntryMode() {
+  const brainDumpPanel = el("tb-entry-brain-dump");
+  const manualPanel = el("tb-entry-manual");
+  if (!brainDumpPanel || !manualPanel) return;
+  brainDumpPanel.hidden = entryMode !== "brain-dump";
+  manualPanel.hidden = entryMode !== "manual";
+  el("tb-entry-tab-brain-dump")?.setAttribute("aria-selected", String(entryMode === "brain-dump"));
+  el("tb-entry-tab-manual")?.setAttribute("aria-selected", String(entryMode === "manual"));
+}
+
+const SYNC_STATUS_LABEL = { pending: "同期中…", synced: "同期済み", offline: "オフライン", error: "同期エラー" };
+
+/** 保存先ステータスの小さなバッジ。Todayからいつでも保存先を確認・設定へ行ける */
+function renderSyncChip() {
+  const chip = el("tb-sync-chip");
+  if (!chip) return;
+  const provider = activeProvider();
+  if (provider.id === "local") {
+    chip.textContent = "保存先: この端末";
+    chip.classList.remove("is-pending", "is-error");
+    return;
+  }
+  const label = SYNC_STATUS_LABEL[syncStatus] ?? "未同期";
+  chip.textContent = `保存先: ${provider.label}（${label}）`;
+  chip.classList.toggle("is-pending", syncStatus === "pending");
+  chip.classList.toggle("is-error", syncStatus === "error" || syncStatus === "offline");
 }
 
 /** 保存したブロックへ、最新のタスク状態（完了・削除）を重ねる */
@@ -375,9 +427,15 @@ function renderOverflow(tasks, blocks) {
 }
 
 function renderStorageState() {
-  el("tb-storage-state").textContent = storage.isPersistent()
-    ? "データはこの端末のブラウザにだけ保存されます。サーバーへは送信していません。"
+  const base = storage.isPersistent()
+    ? "データはこの端末のブラウザに保存されます。"
     : "このブラウザでは保存が使えません（プライベートモードなど）。タブを閉じると内容が消えます。";
+  const provider = activeProvider();
+  const extra =
+    provider.id === "local"
+      ? "サーバーへは送信していません。"
+      : `加えて「${provider.label}」へも保存されます（保存先は設定から変更できます）。`;
+  el("tb-storage-state").textContent = `${base} ${extra}`;
 }
 
 function syncButtons(tasks, blocks) {
@@ -436,6 +494,48 @@ function onClick(event) {
   switch (action) {
     case "add-tasks":
       addTasks();
+      break;
+    case "entry-mode":
+      entryMode = target.dataset.mode;
+      renderEntryMode();
+      break;
+    case "brain-dump-analyze":
+      analyzeBrainDumpInput();
+      break;
+    case "review-toggle":
+      updateReviewCandidate(id, () => ({ included: target.checked }));
+      target.closest(".tb-review-card")?.classList.toggle("is-excluded", !target.checked);
+      break;
+    case "review-confirm":
+      confirmReview();
+      break;
+    case "open-settings":
+      openSettings();
+      break;
+    case "settings-section":
+      settingsSection = target.dataset.section;
+      renderSettingsModal();
+      break;
+    case "provider-select":
+      beginProviderSwitch(target.dataset.provider);
+      break;
+    case "obsidian-connect":
+      beginObsidianConnect();
+      break;
+    case "gas-connect":
+      beginGasConnect();
+      break;
+    case "provider-switch-copy":
+      finalizeProviderSwitch(true);
+      break;
+    case "provider-switch-empty":
+      finalizeProviderSwitch(false);
+      break;
+    case "provider-switch-cancel":
+      cancelProviderSwitch();
+      break;
+    case "provider-disconnect":
+      disconnectProvider(target.dataset.provider);
       break;
     case "tab":
       activeTab = target.dataset.tab;
@@ -505,6 +605,15 @@ function onChange(event) {
   const { action, id } = target.dataset;
 
   switch (action) {
+    case "review-field": {
+      const field = target.dataset.field;
+      let value = target.value;
+      if (field === "estimatedMinutes") value = clampMinutes(value);
+      if (field === "priority") value = clampPriority(value);
+      if (field === "deadline") value = value || null;
+      updateReviewCandidate(id, () => ({ [field]: value }));
+      break;
+    }
     case "minutes":
       patchTask(id, () => ({ minutes: clampMinutes(target.value) }));
       break;
@@ -574,6 +683,31 @@ function toggleDone(id) {
     : state.history.filter((h) => !(h.taskId === task.id && h.date === today));
 
   state.history = history;
+
+  if (done) {
+    // 実行記録: 開始時刻の計測UIはまだ無いため、実績時間は所要時間で近似する
+    // （Skill/Automation候補を育てるための最低限の記録として。将来ここへ実測を足せる）
+    const block = decorateBlocks(day().blocks ?? [], todayTasks()).find((b) => b.taskId === id);
+    const execution = createExecution({
+      taskId: task.id,
+      date: today,
+      plannedStart: block?.start ?? null,
+      plannedEnd: block?.end ?? null,
+      plannedMinutes: task.minutes,
+      actualStart: block?.start ?? null,
+      actualEnd: nowHHMM(),
+      actualMinutes: task.minutes,
+      completed: true,
+      carryCount: task.carryCount ?? 0,
+    });
+    state.executions = [...state.executions, execution];
+
+    const provider = activeProvider();
+    if (provider.id !== "local") {
+      queueSync(() => provider.appendExecution(execution, activeProviderConfig()));
+    }
+  }
+
   patchTask(id, () => ({ done }));
 }
 
@@ -691,6 +825,10 @@ function saveWindows() {
 function closeModals() {
   el("tb-window-modal").hidden = true;
   el("tb-plan-modal").hidden = true;
+  el("tb-review-modal").hidden = true;
+  el("tb-settings-modal").hidden = true;
+  reviewDraft = null;
+  providerSwitchDraft = null;
 }
 
 function openPlanModal(feature) {
@@ -778,6 +916,539 @@ async function onImportFileSelected(event) {
   notices = [{ kind: "success", text: "バックアップを読み込みました。" }];
   rollover();
   render();
+}
+
+// ─── AI Brain Dump → Review → Confirm ───────────────────────
+//
+// ここは「タスク候補を整理する」までがAIの役目で、確定した瞬間に
+// createTask() を通って既存のTask Storeへ入る（origin: "ai-brain-dump"）。
+// 実際の時間割配置はここでは一切行わず、従来どおり rebuild()（Timebox Engine）が担う。
+
+async function analyzeBrainDumpInput() {
+  const input = el("tb-braindump-input");
+  const text = input.value.trim();
+  if (!text) {
+    notify("warn", "Brain Dumpの内容が空です。頭の中を書き出してから試してください。");
+    return;
+  }
+
+  const capture = createCapture({ text });
+  state.captures = [...state.captures, capture];
+  state = storage.save(state);
+  syncCaptureToActiveProvider(capture, null);
+
+  const stateEl = el("tb-braindump-ai-state");
+  if (stateEl) stateEl.textContent = "AIが整理しています…";
+
+  let suggestions;
+  let model = null;
+  try {
+    suggestions = await aiClient.analyzeBrainDump(text, { date: today });
+    model = "claude";
+  } catch (error) {
+    // AI未接続時のfallback: 既存のparseTaskLines（1行=1タスク）でそのまま候補化する。
+    // Manual Entryと同じ壊れないロジックを使うため、ここでも決定論的に動く。
+    const fallbackTasks = parseTaskLines(text).map((t) => ({
+      title: t.title,
+      project: null,
+      firstAction: null,
+      priority: t.priority,
+      estimatedMinutes: t.minutes,
+      category: t.category,
+      deadline: null,
+      subtasks: [],
+      dependencies: [],
+      reason: "AI未接続のため、入力行をそのままタスク候補にしています。",
+      triage: "today",
+    }));
+    suggestions = {
+      goal: null,
+      summary: null,
+      questions: [],
+      tasks: fallbackTasks,
+      unavailableReason: error instanceof aiClient.AiUnavailableError ? error.message : "AI機能の呼び出しに失敗しました。",
+    };
+  }
+
+  const analysis = createAiAnalysis({ captureId: capture.id, suggestions, model });
+  state.aiAnalyses = [...state.aiAnalyses, analysis];
+  state.captures = state.captures.map((c) => (c.id === capture.id ? { ...c, status: "analyzed" } : c));
+  state = storage.save(state);
+
+  const updatedCapture = state.captures.find((c) => c.id === capture.id);
+  syncCaptureToActiveProvider(updatedCapture, analysis);
+
+  if (stateEl) stateEl.textContent = "";
+  openReview(updatedCapture, analysis);
+}
+
+function openReview(capture, analysis) {
+  reviewDraft = {
+    capture,
+    analysis,
+    candidates: (analysis.suggestions.tasks ?? []).map((t, i) => ({
+      ...t,
+      included: true,
+      _id: `cand-${i}-${Date.now().toString(36)}`,
+    })),
+  };
+  el("tb-review-modal").hidden = false;
+  renderReview();
+}
+
+function renderReview() {
+  if (!reviewDraft) return;
+  const { analysis, candidates } = reviewDraft;
+  const s = analysis.suggestions ?? {};
+
+  const metaParts = [];
+  if (s.unavailableReason) {
+    metaParts.push(
+      `<div class="tb-notice tb-notice-warn"><span>AI機能が未設定のため、入力した内容をそのままタスク候補にしています。内容を確認・編集してから取り込んでください。</span></div>`
+    );
+  }
+  if (s.goal) metaParts.push(`<p class="tb-card-hint"><strong>ゴール:</strong> ${esc(s.goal)}</p>`);
+  if (s.summary) metaParts.push(`<p class="tb-card-hint">${esc(s.summary)}</p>`);
+  if ((s.questions ?? []).length) {
+    metaParts.push(
+      `<div class="tb-card-hint"><strong>AIからの質問:</strong><ul>${s.questions
+        .map((q) => `<li>${esc(q)}</li>`)
+        .join("")}</ul></div>`
+    );
+  }
+  el("tb-review-meta").innerHTML = metaParts.join("");
+
+  el("tb-review-list").innerHTML =
+    candidates.length > 0
+      ? candidates.map(reviewCandidateRow).join("")
+      : `<li class="tb-empty">候補が見つかりませんでした。Brain Dumpの内容を見直してください。</li>`;
+}
+
+function reviewCandidateRow(c) {
+  const categoryOptions = CATEGORIES.map(
+    (cat) => `<option value="${cat.id}" ${cat.id === c.category ? "selected" : ""}>${cat.icon} ${esc(cat.label)}</option>`
+  ).join("");
+  const triageOptions = TRIAGE.map(
+    (t) => `<option value="${t.id}" ${t.id === c.triage ? "selected" : ""}>${esc(t.label)}</option>`
+  ).join("");
+  const extra = [
+    c.firstAction ? `最初の一歩: ${esc(c.firstAction)}` : "",
+    (c.subtasks ?? []).length ? `内訳: ${c.subtasks.map(esc).join(" / ")}` : "",
+    c.reason ? `理由: ${esc(c.reason)}` : "",
+  ]
+    .filter(Boolean)
+    .join(" ／ ");
+
+  return `<li class="tb-review-card" data-id="${c._id}">
+    <div class="tb-review-card-head">
+      <label class="tb-inline-field">
+        <input type="checkbox" data-action="review-toggle" data-id="${c._id}" ${c.included ? "checked" : ""}> 取り込む
+      </label>
+    </div>
+    <label class="visually-hidden" for="review-title-${c._id}">タスク名</label>
+    <input id="review-title-${c._id}" class="tb-text tb-review-title" type="text" value="${esc(c.title)}"
+      data-action="review-field" data-id="${c._id}" data-field="title">
+    ${extra ? `<p class="tb-card-hint">${extra}</p>` : ""}
+    <div class="tb-task-meta">
+      <label class="tb-inline-field">区分
+        <select data-action="review-field" data-id="${c._id}" data-field="category">${categoryOptions}</select>
+      </label>
+      <label class="tb-inline-field">所要
+        <input class="tb-number" type="number" min="5" max="480" step="5" value="${c.estimatedMinutes}"
+          data-action="review-field" data-id="${c._id}" data-field="estimatedMinutes">分
+      </label>
+      <label class="tb-inline-field">優先度
+        <input class="tb-number" type="number" min="1" max="5" value="${c.priority}"
+          data-action="review-field" data-id="${c._id}" data-field="priority">
+      </label>
+      <label class="tb-inline-field">締切
+        <input class="tb-date" type="date" value="${esc(c.deadline ?? "")}"
+          data-action="review-field" data-id="${c._id}" data-field="deadline">
+      </label>
+      <label class="tb-inline-field">仕分け
+        <select data-action="review-field" data-id="${c._id}" data-field="triage">${triageOptions}</select>
+      </label>
+    </div>
+  </li>`;
+}
+
+function updateReviewCandidate(id, patcher) {
+  if (!reviewDraft) return;
+  reviewDraft.candidates = reviewDraft.candidates.map((c) => (c._id === id ? { ...c, ...patcher(c) } : c));
+}
+
+function confirmReview() {
+  if (!reviewDraft) return;
+  const included = reviewDraft.candidates.filter((c) => c.included && String(c.title ?? "").trim());
+  if (included.length === 0) {
+    notify("warn", "取り込むタスクが選ばれていません。チェックを入れるか、キャンセルしてください。");
+    return;
+  }
+
+  const newTasks = included.map((c) =>
+    createTask({
+      title: c.title,
+      minutes: c.estimatedMinutes,
+      priority: c.priority,
+      category: c.category,
+      deadline: c.deadline || null,
+      triage: c.triage,
+      plannedDate: c.triage === "today" || c.triage === "scheduled" ? today : null,
+      origin: "ai-brain-dump",
+    })
+  );
+
+  state.tasks = [...state.tasks, ...newTasks];
+  state.aiAnalyses = state.aiAnalyses.map((a) =>
+    a.id === reviewDraft.analysis.id ? { ...a, acceptedAt: new Date().toISOString() } : a
+  );
+  state.captures = state.captures.map((c) =>
+    c.id === reviewDraft.capture.id ? { ...c, status: "converted" } : c
+  );
+
+  const finalCapture = state.captures.find((c) => c.id === reviewDraft.capture.id);
+  const finalAnalysis = state.aiAnalyses.find((a) => a.id === reviewDraft.analysis.id);
+
+  if (el("tb-braindump-input")) el("tb-braindump-input").value = "";
+  activeTab = "today";
+  notices = [{ kind: "success", text: `${newTasks.length}件をタスクに追加しました。` }];
+  closeModals();
+  commit();
+  syncCaptureToActiveProvider(finalCapture, finalAnalysis);
+}
+
+// ─── Storage Provider 同期 ───────────────────────────────────
+//
+// local（localStorage）は常にsaveされ続ける実行時のSource of Truth。
+// 他のProviderを選んでいる場合は、commit()のたびに"追加で"同期を試みるだけで、
+// localへの保存や画面の動作はProviderの状態に一切左右されない。
+
+function activeProvider() {
+  return getProvider(state.settings?.storageProviderId ?? "local");
+}
+
+function activeProviderConfig() {
+  const id = state.settings?.storageProviderId ?? "local";
+  return state.settings?.storageProviders?.[id] ?? {};
+}
+
+function queueSync(task) {
+  syncChain = syncChain.then(task).catch(() => {});
+  return syncChain;
+}
+
+function setSyncStatus(status, message = "") {
+  syncStatus = status;
+  syncMessage = message;
+  renderSyncChip();
+}
+
+function syncStateToActiveProvider() {
+  const provider = activeProvider();
+  if (provider.id === "local") {
+    syncStatus = null;
+    return;
+  }
+  const config = activeProviderConfig();
+  setSyncStatus("pending");
+  queueSync(async () => {
+    try {
+      const result = await provider.saveState(state, config);
+      setSyncStatus(result?.ok === false ? "error" : "synced", result?.error ?? "");
+    } catch {
+      setSyncStatus("error", "同期に失敗しました。");
+    }
+  });
+}
+
+function syncCaptureToActiveProvider(capture, analysis) {
+  const provider = activeProvider();
+  if (provider.id === "local") return;
+  const config = activeProviderConfig();
+  setSyncStatus("pending");
+  queueSync(async () => {
+    try {
+      const result = await provider.saveCapture(capture, config, analysis);
+      setSyncStatus(result?.ok === false ? "error" : "synced", result?.error ?? "");
+    } catch {
+      setSyncStatus("error", "同期に失敗しました。");
+    }
+  });
+}
+
+// ─── 設定 / Data Storage 切り替え ────────────────────────────
+
+function openSettings() {
+  el("tb-settings-modal").hidden = false;
+  renderSettingsModal();
+}
+
+const SETTINGS_SECTIONS = [
+  { id: "account", label: "Account" },
+  { id: "ai", label: "AI" },
+  { id: "storage", label: "Data Storage" },
+  { id: "calendar", label: "Calendar" },
+  { id: "backup", label: "Backup" },
+  { id: "privacy", label: "Privacy" },
+];
+
+function renderSettingsModal() {
+  el("tb-settings-nav").innerHTML = SETTINGS_SECTIONS.map(
+    (s) =>
+      `<button type="button" class="tb-settings-nav-item" data-action="settings-section" data-section="${s.id}"
+        aria-selected="${s.id === settingsSection}">${s.label}</button>`
+  ).join("");
+
+  const body = el("tb-settings-body");
+  if (settingsSection === "storage") {
+    body.innerHTML = renderDataStorageSection();
+  } else if (settingsSection === "ai") {
+    body.innerHTML = renderAiSection();
+  } else if (settingsSection === "calendar") {
+    body.innerHTML = renderCalendarSection();
+  } else if (settingsSection === "backup") {
+    body.innerHTML = renderBackupSection();
+  } else if (settingsSection === "privacy") {
+    body.innerHTML = renderPrivacySection();
+  } else {
+    body.innerHTML = renderAccountSection();
+  }
+}
+
+function renderAccountSection() {
+  return `
+    <div class="tb-settings-section">
+      <h3>Account</h3>
+      <p class="tb-card-hint">現在はゲスト利用です。ログイン機能は準備中です（Phase 2でGoogleログインを予定）。</p>
+      <p class="tb-card-hint">現在のプラン: <strong>${esc(state.settings.plan ?? "free")}</strong></p>
+    </div>`;
+}
+
+function renderAiSection() {
+  return `
+    <div class="tb-settings-section">
+      <h3>AI</h3>
+      <p class="tb-card-hint">
+        AIは「頭の中を全部書く」入力（Brain Dump）を、タスク候補として整理するために使います。
+        実際の時間割配置はAIではなく、Timebox Engineが決定論的に行います。
+      </p>
+      <p class="tb-card-hint">
+        バックエンドが未設定の場合、Brain Dumpは自動的に「入力した行をそのままタスク候補にする」
+        方式へ切り替わります。Manual Entryはこの状態でも通常どおり使えます。
+      </p>
+    </div>`;
+}
+
+function renderCalendarSection() {
+  return `
+    <div class="tb-settings-section">
+      <h3>Calendar</h3>
+      <p class="tb-card-hint"><strong>今すぐ使える:</strong> ICS書き出し（Googleカレンダーの「他のカレンダーを追加 → インポート」から取り込めます）。</p>
+      <p class="tb-card-hint"><strong>準備中:</strong> Googleカレンダーとの直接同期。既存のGoogle予定をTimebox OSが勝手に変更・削除することはありません。</p>
+    </div>`;
+}
+
+function renderBackupSection() {
+  return `
+    <div class="tb-settings-section">
+      <h3>Backup</h3>
+      <p class="tb-card-hint">保存先に関わらず、JSON Export / Import はいつでも使えます。ドメインや端末を変えるときの移行手段です。</p>
+      <div class="tb-row-actions">
+        <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="export-json">バックアップを保存</button>
+        <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="import-json">バックアップを読み込む</button>
+      </div>
+    </div>`;
+}
+
+function renderPrivacySection() {
+  const provider = activeProvider();
+  const location =
+    provider.id === "local"
+      ? "この端末（ブラウザのlocalStorage）"
+      : `この端末（キャッシュ） + ${provider.label}`;
+  return `
+    <div class="tb-settings-section">
+      <h3>Privacy</h3>
+      <p class="tb-card-hint">現在の保存先: <strong>${esc(location)}</strong></p>
+      <p class="tb-card-hint">Phase 1では、利用者が選んだ保存先以外にデータを送信しません。AI Brain Dumpの解析はテキストをAPIへ送りますが、保存はしません。</p>
+    </div>`;
+}
+
+function renderDataStorageSection() {
+  const currentId = state.settings?.storageProviderId ?? "local";
+  const provider = activeProvider();
+
+  const cards = listProviders()
+    .map((p) => renderProviderCard(p, p.id === currentId))
+    .join("");
+
+  const switchPanel = providerSwitchDraft ? renderProviderSwitchPanel() : "";
+
+  return `
+    <div class="tb-settings-section">
+      <h3>Data Storage</h3>
+      <p class="tb-card-hint">
+        現在の保存先: <strong>${esc(provider.label)}</strong>
+        ${syncStatus ? ` / 状態: ${esc(SYNC_STATUS_LABEL[syncStatus] ?? syncStatus)}` : ""}
+      </p>
+      ${switchPanel}
+      <ul class="tb-provider-list">${cards}</ul>
+    </div>`;
+}
+
+function renderProviderCard(provider, isActive) {
+  const config = state.settings?.storageProviders?.[provider.id] ?? {};
+
+  let controls = "";
+  if (provider.id === "local") {
+    controls = isActive
+      ? `<span class="tb-chip tb-chip-pinned">現在の保存先</span>`
+      : `<button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="provider-select" data-provider="local">この端末にする</button>`;
+  } else if (provider.id === "obsidian") {
+    controls = `
+      <div class="tb-provider-config">
+        <label class="tb-inline-field">Captures <input class="tb-text" type="text" id="tb-settings-obsidian-captures" value="${esc(config.paths?.captures ?? "Timebox/Captures")}"></label>
+        <label class="tb-inline-field">Daily <input class="tb-text" type="text" id="tb-settings-obsidian-daily" value="${esc(config.paths?.daily ?? "Timebox/Daily")}"></label>
+        <label class="tb-inline-field">Skills <input class="tb-text" type="text" id="tb-settings-obsidian-skills" value="${esc(config.paths?.skills ?? "Timebox/Skills")}"></label>
+        <label class="tb-inline-field">Automation <input class="tb-text" type="text" id="tb-settings-obsidian-automation" value="${esc(config.paths?.automation ?? "Timebox/Automation")}"></label>
+      </div>
+      <div class="tb-row-actions">
+        <button type="button" class="tb-btn tb-btn-primary tb-btn-sm" data-action="obsidian-connect">Vaultフォルダを選ぶ</button>
+        ${isActive ? `<span class="tb-chip tb-chip-pinned">現在の保存先</span>` : ""}
+        ${isActive ? `<button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="provider-disconnect" data-provider="obsidian">切断</button>` : ""}
+      </div>
+      <p class="tb-card-hint">HTTPS環境 + Chromium系ブラウザ向け。未対応ブラウザでは obsidian://new によるフォールバックを案内します。</p>`;
+  } else if (provider.id === "google-sheets-gas") {
+    controls = `
+      <div class="tb-provider-config">
+        <label class="tb-inline-field">Web App URL <input class="tb-text" type="text" id="tb-settings-gas-url" value="${esc(config.webAppUrl ?? "")}" placeholder="https://script.google.com/macros/s/xxxx/exec"></label>
+        <label class="tb-inline-field">Spreadsheet ID <input class="tb-text" type="text" id="tb-settings-gas-sheet-id" value="${esc(config.spreadsheetId ?? "")}"></label>
+      </div>
+      <div class="tb-row-actions">
+        <button type="button" class="tb-btn tb-btn-primary tb-btn-sm" data-action="gas-connect">接続する</button>
+        ${isActive ? `<span class="tb-chip tb-chip-pinned">現在の保存先</span>` : ""}
+        ${isActive ? `<button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="provider-disconnect" data-provider="google-sheets-gas">切断</button>` : ""}
+      </div>`;
+  } else {
+    controls = `<span class="tb-lock">近日対応</span>`;
+  }
+
+  return `<li class="tb-provider-card ${isActive ? "is-active" : ""}">
+    <p class="tb-card-title" style="margin-bottom:4px;">${esc(provider.label)}</p>
+    ${controls}
+  </li>`;
+}
+
+function renderProviderSwitchPanel() {
+  const target = getProvider(providerSwitchDraft.targetId);
+  return `<div class="tb-notice tb-notice-info">
+    <span>
+      現在のデータを ${esc(target.label)} へコピーしますか？<br>
+      <span class="tb-row-actions">
+        <button type="button" class="tb-btn tb-btn-primary tb-btn-sm" data-action="provider-switch-copy">コピーして切り替える</button>
+        <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="provider-switch-empty">空の状態で切り替える</button>
+        <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="provider-switch-cancel">キャンセル</button>
+      </span>
+    </span>
+  </div>`;
+}
+
+async function beginProviderSwitch(targetId) {
+  if (targetId === "local") {
+    state.settings = { ...state.settings, storageProviderId: "local" };
+    providerSwitchDraft = null;
+    commit();
+    notify("success", "保存先をこの端末に切り替えました。");
+    renderSettingsModal();
+    return;
+  }
+  // obsidian / google-sheets-gas は専用の接続フロー（フォルダ選択・URL入力）を先に通す
+  notify("warn", "先に保存先の接続設定を行ってください。");
+}
+
+async function beginObsidianConnect() {
+  const provider = getProvider("obsidian");
+  const existing = state.settings?.storageProviders?.obsidian ?? {};
+  const config = {
+    ...existing,
+    paths: {
+      captures: el("tb-settings-obsidian-captures")?.value || "Timebox/Captures",
+      daily: el("tb-settings-obsidian-daily")?.value || "Timebox/Daily",
+      skills: el("tb-settings-obsidian-skills")?.value || "Timebox/Skills",
+      automation: el("tb-settings-obsidian-automation")?.value || "Timebox/Automation",
+      settings: existing.paths?.settings || "Timebox/Settings",
+      root: existing.paths?.root || "Timebox",
+    },
+  };
+
+  try {
+    const configured = await provider.configure(config);
+    providerSwitchDraft = { targetId: "obsidian", targetConfig: configured };
+    renderSettingsModal();
+  } catch (error) {
+    notify("error", error?.message || "Obsidianフォルダへの接続に失敗しました。");
+  }
+}
+
+async function beginGasConnect() {
+  const provider = getProvider("google-sheets-gas");
+  const config = {
+    webAppUrl: el("tb-settings-gas-url")?.value?.trim() ?? "",
+    spreadsheetId: el("tb-settings-gas-sheet-id")?.value?.trim() ?? "",
+  };
+
+  try {
+    const configured = await provider.configure(config);
+    providerSwitchDraft = { targetId: "google-sheets-gas", targetConfig: configured };
+    renderSettingsModal();
+  } catch (error) {
+    notify("error", error?.message || "Google Sheetsへの接続に失敗しました。");
+  }
+}
+
+async function finalizeProviderSwitch(copy) {
+  if (!providerSwitchDraft) return;
+  const { targetId, targetConfig } = providerSwitchDraft;
+  const provider = getProvider(targetId);
+
+  if (copy) {
+    try {
+      const result = await provider.saveState(state, targetConfig);
+      if (result?.ok === false) throw new Error(result.error || "コピーに失敗しました。");
+    } catch (error) {
+      // 失敗した移行は既存データにもProvider設定にも一切触れず、ここで打ち切る（安全な失敗）
+      notify("error", `コピーに失敗したため切り替えを中止しました: ${error?.message ?? "unknown error"}`);
+      providerSwitchDraft = null;
+      renderSettingsModal();
+      return;
+    }
+  }
+
+  state.settings = {
+    ...state.settings,
+    storageProviderId: targetId,
+    storageProviders: { ...state.settings.storageProviders, [targetId]: targetConfig },
+  };
+  providerSwitchDraft = null;
+  commit();
+  notify("success", `保存先を${provider.label}に切り替えました。`);
+  renderSettingsModal();
+}
+
+function cancelProviderSwitch() {
+  providerSwitchDraft = null;
+  renderSettingsModal();
+}
+
+async function disconnectProvider(providerId) {
+  const provider = getProvider(providerId);
+  await provider.disconnect(activeProviderConfig());
+  if ((state.settings?.storageProviderId ?? "local") === providerId) {
+    state.settings = { ...state.settings, storageProviderId: "local" };
+    commit();
+  }
+  notify("info", `${provider.label}との接続を解除しました。`);
+  renderSettingsModal();
 }
 
 init();

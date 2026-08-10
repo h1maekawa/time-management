@@ -227,9 +227,14 @@ export function createTask(input = {}) {
     carriedFrom: input.carriedFrom ?? null,
     /** 手動で固定した開始時刻 "HH:MM"。ある間は自動配置より優先される */
     pinnedStart: input.pinnedStart ?? null,
+    /** どこから生まれたタスクか。あとから「AI生成か手動か」を追跡するため */
+    origin: TASK_ORIGINS.includes(input.origin) ? input.origin : "manual",
     createdAt: input.createdAt ?? new Date().toISOString(),
   };
 }
+
+/** タスクの発生元 */
+export const TASK_ORIGINS = ["manual", "ai-brain-dump", "import", "routine", "skill"];
 
 export function clampMinutes(value) {
   const n = Math.round(Number(value) || 0);
@@ -563,4 +568,124 @@ export function buildIcs(plan, options = {}) {
 
   lines.push("END:VCALENDAR");
   return lines.map(foldLine).join("\r\n");
+}
+
+// ─── Capture / AI Analysis / Execution / Skill / Automation Candidate ─────
+// タスクと同じく、ここはDOM・保存に触らない純粋なデータ生成だけを担う。
+// 実際の永続化は timebox-storage.js と storage-providers/ が行う。
+// スケジューリング本体（buildSchedule）はこれらの影響を受けない：
+// AIが提案するのはタスク"候補"までで、時間割への配置は必ずbuildScheduleを通る。
+
+function clampConfidence(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.min(1, n));
+}
+
+/** Brain Dump（殴り書き）の下書き状態 */
+export const CAPTURE_STATUSES = ["draft", "analyzed", "converted", "archived"];
+
+let captureSeq = 0;
+
+export function createCapture(input = {}) {
+  captureSeq += 1;
+  return {
+    id: input.id ?? `c${Date.now().toString(36)}${captureSeq.toString(36)}`,
+    /** 殴り書きの生テキスト。原文はここに残し、タスク化しても消さない */
+    text: String(input.text ?? ""),
+    createdAt: input.createdAt ?? new Date().toISOString(),
+    status: CAPTURE_STATUSES.includes(input.status) ? input.status : "draft",
+  };
+}
+
+let analysisSeq = 0;
+
+/**
+ * Capture 1件に対するAI（またはAI未接続時のfallback）の提案一式。
+ * Task確定前の状態であり、これ自体はTask Storeに混ざらない。
+ */
+export function createAiAnalysis(input = {}) {
+  analysisSeq += 1;
+  return {
+    id: input.id ?? `a${Date.now().toString(36)}${analysisSeq.toString(36)}`,
+    captureId: input.captureId ?? null,
+    /** { goal, tasks: [{ title, firstAction, priority, estimatedMinutes, category,
+     *    deadline, subtasks, dependencies, reason, triage }], questions, summary } */
+    suggestions: input.suggestions ?? { goal: null, tasks: [], questions: [], summary: null },
+    createdAt: input.createdAt ?? new Date().toISOString(),
+    /** 使ったモデル名。fallback（AI未接続）のときは null */
+    model: input.model ?? null,
+    /** Review画面でConfirmした時刻。nullならまだレビュー中 */
+    acceptedAt: input.acceptedAt ?? null,
+  };
+}
+
+let executionSeq = 0;
+
+/** Taskの実行記録。Task本体とは別に持ち、予定と実績のズレを後から見られるようにする */
+export function createExecution(input = {}) {
+  executionSeq += 1;
+  return {
+    id: input.id ?? `e${Date.now().toString(36)}${executionSeq.toString(36)}`,
+    taskId: input.taskId ?? null,
+    date: input.date ?? todayLocal(),
+    plannedStart: input.plannedStart ?? null,
+    plannedEnd: input.plannedEnd ?? null,
+    plannedMinutes: input.plannedMinutes ?? null,
+    actualStart: input.actualStart ?? null,
+    actualEnd: input.actualEnd ?? null,
+    actualMinutes: input.actualMinutes ?? null,
+    completed: Boolean(input.completed),
+    rescheduleCount: Number(input.rescheduleCount ?? 0),
+    carryCount: Number(input.carryCount ?? 0),
+    createdAt: input.createdAt ?? new Date().toISOString(),
+  };
+}
+
+export const SKILL_STATUSES = ["suggested", "approved", "archived"];
+
+let skillSeq = 0;
+
+/** 繰り返しの手順が見えてきたときの「型」の候補 */
+export function createSkill(input = {}) {
+  skillSeq += 1;
+  return {
+    id: input.id ?? `sk${Date.now().toString(36)}${skillSeq.toString(36)}`,
+    name: String(input.name ?? "").trim(),
+    description: input.description ?? "",
+    steps: Array.isArray(input.steps) ? input.steps : [],
+    /** この型の根拠になった過去タスクのid */
+    sourceTaskIds: Array.isArray(input.sourceTaskIds) ? input.sourceTaskIds : [],
+    confidence: clampConfidence(input.confidence),
+    status: SKILL_STATUSES.includes(input.status) ? input.status : "suggested",
+    createdAt: input.createdAt ?? new Date().toISOString(),
+  };
+}
+
+export const AUTOMATION_CANDIDATE_TYPES = [
+  "routine",
+  "template",
+  "skill",
+  "batch",
+  "estimate-adjustment",
+  "time-preference",
+];
+
+export const AUTOMATION_CANDIDATE_STATUSES = ["suggested", "approved", "archived"];
+
+let automationSeq = 0;
+
+/** 「自動化してもよさそうなこと」の候補。承認するまでは何も自動実行しない */
+export function createAutomationCandidate(input = {}) {
+  automationSeq += 1;
+  return {
+    id: input.id ?? `au${Date.now().toString(36)}${automationSeq.toString(36)}`,
+    type: AUTOMATION_CANDIDATE_TYPES.includes(input.type) ? input.type : "routine",
+    title: String(input.title ?? "").trim(),
+    reason: input.reason ?? "",
+    evidence: input.evidence ?? "",
+    confidence: clampConfidence(input.confidence),
+    status: AUTOMATION_CANDIDATE_STATUSES.includes(input.status) ? input.status : "suggested",
+    createdAt: input.createdAt ?? new Date().toISOString(),
+  };
 }
