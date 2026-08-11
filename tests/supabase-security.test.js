@@ -20,6 +20,7 @@ const REQUIRED_TABLES = [
   "devices",
   "integrations",
   "subscriptions",
+  "push_subscriptions",
 ];
 
 function readMigrations() {
@@ -52,7 +53,7 @@ test("security: 全User-owned TableでRLSが有効化されている", () => {
 
 test("security: tasks等のUser-owned Tableは auth.uid() = user_id をSELECT/INSERT/UPDATE/DELETEすべてに要求する", () => {
   const sql = readMigrations();
-  for (const table of ["tasks", "day_plans", "captures", "ai_analyses", "executions", "skills", "automation_candidates", "devices", "integrations", "user_preferences"]) {
+  for (const table of ["tasks", "day_plans", "captures", "ai_analyses", "executions", "skills", "automation_candidates", "devices", "integrations", "user_preferences", "push_subscriptions"]) {
     for (const op of ["select", "insert", "update", "delete"]) {
       const pattern = new RegExp(`create policy "${table}_${op}_own" on public\\.${table}`, "i");
       assert.match(sql, pattern, `${table} に ${op} 用ポリシーが存在すること`);
@@ -79,6 +80,16 @@ test("security: user_id列にRLS/Sync用のindexが張られている", () => {
   assert.match(sql, /create index if not exists idx_tasks_user_updated_at on public\.tasks \(user_id, updated_at\)/);
   assert.match(sql, /create index if not exists idx_tasks_user_deleted_at on public\.tasks \(user_id, deleted_at\)/);
   assert.match(sql, /create index if not exists idx_tasks_user_planned_date on public\.tasks \(user_id, planned_date\)/);
+});
+
+test("security: push_subscriptionsは(user_id, device_id)でuniqueになっている（同一端末の重複購読行を作らない）", () => {
+  const sql = readMigrations();
+  assert.match(sql, /unique \(user_id, device_id\)/);
+});
+
+test("security: manifest.webmanifest / service worker がpublic配下に存在する（§72 PWA）", () => {
+  assert.ok(fs.existsSync(path.join(root, "public", "manifest.webmanifest")));
+  assert.ok(fs.existsSync(path.join(root, "public", "sw.js")));
 });
 
 // ─── no service role in frontend（§11/§52） ───────────────────
