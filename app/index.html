@@ -36,6 +36,7 @@
                 <a href="/#features">できること</a>
                 <a href="/#roadmap">今後の予定</a>
                 <button type="button" class="tb-appbar-settings" data-action="open-settings">設定</button>
+                <div class="tb-account" id="tb-account"></div>
             </nav>
         </div>
     </header>
@@ -145,9 +146,8 @@
                                     Googleカレンダーと直接同期
                                     <span class="tb-lock">近日</span>
                                 </button>
-                                <button type="button" class="tb-btn tb-btn-locked" data-action="locked" data-feature="cloudBackup">
-                                    クラウド保存・複数端末で使う
-                                    <span class="tb-lock">近日</span>
+                                <button type="button" class="tb-btn tb-btn-ghost" data-action="open-cloud-settings">
+                                    DAYLOOP Cloud・複数端末で使う
                                 </button>
                             </div>
                             <p class="tb-card-hint">
@@ -209,8 +209,8 @@
             </div>
             <p class="tb-card-hint" id="tb-plan-modal-body"></p>
             <ul class="tb-plan-list">
-                <li><strong>いま使える（無料）</strong>：タスク登録・仕分け・時間割の自動生成・24時間タイムライン・持ち越し・端末への保存・JSONバックアップ・.icsの書き出し</li>
-                <li><strong>準備中</strong>：Googleカレンダーとの直接同期・クラウド保存・複数端末での共有・実績からの改善提案</li>
+                <li><strong>いま使える（無料）</strong>：タスク登録・仕分け・時間割の自動生成・24時間タイムライン・持ち越し・端末への保存・DAYLOOP Cloudでの複数端末利用・JSONバックアップ・.icsの書き出し</li>
+                <li><strong>準備中</strong>：Googleカレンダーとの直接同期・実績からの改善提案</li>
             </ul>
             <p class="tb-card-hint">
                 無料の範囲だけで今日の予定は組めます。準備中の機能ができたら、このページでお知らせします。
@@ -248,6 +248,29 @@
             </div>
             <nav class="tb-settings-nav" aria-label="設定のセクション" id="tb-settings-nav"></nav>
             <div id="tb-settings-body"></div>
+        </div>
+    </div>
+
+    <!-- ─── ログイン（Email OTP） ────────────────────── -->
+    <div class="tb-modal" id="tb-login-modal" hidden>
+        <div class="tb-modal-backdrop" data-action="close-login-modal"></div>
+        <div class="tb-modal-panel tb-modal-panel-narrow" role="dialog" aria-modal="true" aria-labelledby="tb-login-modal-title">
+            <div class="tb-modal-head">
+                <h2 id="tb-login-modal-title">DAYLOOP</h2>
+                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="close-login-modal" aria-label="閉じる">閉じる</button>
+            </div>
+            <div id="tb-login-body"></div>
+        </div>
+    </div>
+
+    <!-- ─── Guest→Account 引き継ぎ / Local+Cloud 統合 ─── -->
+    <div class="tb-modal" id="tb-migration-modal" hidden>
+        <div class="tb-modal-backdrop"></div>
+        <div class="tb-modal-panel tb-modal-panel-narrow" role="dialog" aria-modal="true" aria-labelledby="tb-migration-modal-title">
+            <div class="tb-modal-head">
+                <h2 id="tb-migration-modal-title">データの引き継ぎ</h2>
+            </div>
+            <div id="tb-migration-body"></div>
         </div>
     </div>
 

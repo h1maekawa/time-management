@@ -8,7 +8,12 @@ import { getProvider, listProviders, PROVIDER_IDS, isKnownProviderId } from "../
 import { validateGasConfig } from "../assets/js/storage-providers/google-sheets-gas-provider.js";
 import { createObsidianProvider } from "../assets/js/storage-providers/obsidian/provider.js";
 import { NotImplementedError as DriveNotImplementedError } from "../assets/js/storage-providers/google-drive-provider.js";
-import { NotImplementedError as CloudNotImplementedError } from "../assets/js/storage-providers/cloud-provider.js";
+import {
+  createCloudProvider,
+  setActiveUser as setCloudActiveUser,
+  CloudNotConfiguredError,
+  LoginRequiredError,
+} from "../assets/js/storage-providers/cloud-provider.js";
 import {
   sanitizeObsidianFilename,
   captureFilename,
@@ -100,18 +105,60 @@ test("google-sheets-gas provider: isConfigured は validateGasConfig と一致�
 
 // ─── Google Drive / Cloud provider skeletons ───────────────
 
-test("google-drive / cloud provider: isConfigured は常にfalse、configure()はNotImplementedErrorを投げる", async () => {
+test("google-drive provider: isConfigured は常にfalse、configure()はNotImplementedErrorを投げる", async () => {
   const drive = getProvider("google-drive");
-  const cloud = getProvider("cloud");
-
   assert.equal(drive.isConfigured(), false);
-  assert.equal(cloud.isConfigured(), false);
-
   await assert.rejects(() => drive.configure(), DriveNotImplementedError);
-  await assert.rejects(() => cloud.configure(), CloudNotImplementedError);
-
   const driveHealth = await drive.healthCheck();
   assert.equal(driveHealth.ok, false);
+});
+
+// ─── DAYLOOP Cloud provider（Supabase実装。Node環境にはVITE_env変数が無いため、
+//     「Cloud機能は未設定です」経路と、ログイン状態管理のロジックだけをNetwork無しで検証する）
+
+test("cloud provider: Supabase未設定のNode環境ではisConfigured=false、configure()はCloudNotConfiguredErrorを投げる", async () => {
+  const cloud = getProvider("cloud");
+  setCloudActiveUser(null);
+  assert.equal(cloud.id, "cloud");
+  assert.equal(cloud.label, "DAYLOOP Cloud");
+  assert.equal(cloud.isConfigured(), false);
+  await assert.rejects(() => cloud.configure(), CloudNotConfiguredError);
+});
+
+test("cloud provider: 未設定時はloadState=null、saveState/appendExecution等はerror:not_configuredを返し例外を投げない", async () => {
+  const cloud = getProvider("cloud");
+  setCloudActiveUser(null);
+
+  assert.equal(await cloud.loadState({}), null);
+  assert.deepEqual(await cloud.saveState({ tasks: [] }, {}), { ok: false, error: "not_configured" });
+  assert.deepEqual(await cloud.appendExecution(createExecution({ taskId: "t1" }), {}), {
+    ok: false,
+    error: "login_required",
+  });
+
+  const health = await cloud.healthCheck();
+  assert.equal(health.ok, false);
+  assert.match(health.message, /未設定/);
+});
+
+test("cloud provider: setActiveUser/getActiveUser でログイン状態を保持する（auth-serviceのonAuthStateChangeから呼ばれる想定）", async () => {
+  const { setActiveUser, getActiveUser } = await import("../assets/js/storage-providers/cloud-provider.js");
+  setActiveUser("user-123");
+  assert.equal(getActiveUser(), "user-123");
+  setActiveUser(null);
+  assert.equal(getActiveUser(), null);
+});
+
+test("cloud provider: LoginRequiredError / CloudNotConfiguredError はErrorのサブクラス", () => {
+  assert.ok(new LoginRequiredError("x") instanceof Error);
+  assert.ok(new CloudNotConfiguredError("x") instanceof Error);
+});
+
+test("createCloudProvider(): registryのシングルトンと同じ形のProviderを独立して作れる", () => {
+  const cloud = createCloudProvider();
+  assert.equal(cloud.id, "cloud");
+  assert.equal(typeof cloud.saveState, "function");
+  assert.equal(typeof cloud.loadState, "function");
 });
 
 // ─── Obsidian markdown（純粋ロジック） ─────────────────────
