@@ -43,6 +43,8 @@ import {
 import * as storage from "./timebox-storage.js";
 import * as aiClient from "./ai-client.js";
 import { getProvider, listProviders } from "./storage-providers/registry.js";
+import { createAccountController } from "./supabase/account-controller.js";
+import { sanitizeDigits } from "./supabase/otp-input.js";
 
 /** タイムラインの1時間あたりの高さ(px) */
 const HOUR_HEIGHT = 44;
@@ -72,12 +74,33 @@ let syncMessage = "";
 /** 同期呼び出しを順番に実行するためのキュー（並行書き込みで競合させない） */
 let syncChain = Promise.resolve();
 
+/** Auth / Guest→Account Migration / Account Delete を扱うコントローラ（§14-21, 33-38） */
+const account = createAccountController({
+  onChange: () => {
+    // ログイン確立・ログアウト直後などはnamespaceが切り替わっているため、
+    // 表示中のstateも読み直してから再描画する。
+    state = storage.load();
+    render();
+  },
+});
+
 // ─── 起動 ──────────────────────────────────────────────────
 
 function init() {
   rollover();
   bindEvents();
   render();
+  account.init();
+
+  window.addEventListener("online", () => {
+    if (activeProvider().id === "cloud") {
+      notify("info", "オンラインに戻りました。同期します。");
+      syncStateToActiveProvider();
+    }
+  });
+  window.addEventListener("offline", () => {
+    if (activeProvider().id === "cloud") setSyncStatus("offline");
+  });
 
   // 現在時刻の線と「今やること」を1分ごとに更新する
   setInterval(() => {
@@ -169,6 +192,10 @@ function render() {
   renderEntryMode();
   renderSyncChip();
   syncButtons(tasks, blocks);
+  renderAccountUI();
+  renderLoginModal();
+  renderMigrationModal();
+  if (el("tb-settings-modal") && !el("tb-settings-modal").hidden) renderSettingsModal();
 }
 
 /** 入力タブ（AIと整理する/自分で追加する）の見た目を切り替える。DOMは作り直さない */
@@ -198,6 +225,150 @@ function renderSyncChip() {
   chip.textContent = `保存先: ${provider.label}（${label}）`;
   chip.classList.toggle("is-pending", syncStatus === "pending");
   chip.classList.toggle("is-error", syncStatus === "error" || syncStatus === "offline");
+}
+
+// ─── Account / Login / Migration ────────────────────────────
+
+/** Header右上のAccount UI（§14） */
+function renderAccountUI() {
+  const container = el("tb-account");
+  if (!container) return;
+  const s = account.getState();
+
+  if (s.status !== "authenticated" || !s.user) {
+    container.innerHTML = `<button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="open-login">ログイン</button>`;
+    return;
+  }
+
+  const initial = (s.user.email || "?").trim().charAt(0).toUpperCase();
+  container.innerHTML = `
+    <div class="tb-account-menu ${s.accountMenuOpen ? "is-open" : ""}">
+      <button type="button" class="tb-account-trigger" data-action="account-menu-toggle"
+        aria-haspopup="true" aria-expanded="${s.accountMenuOpen}">
+        <span class="tb-account-avatar" aria-hidden="true">${esc(initial)}</span>
+        <span class="tb-account-email">${esc(s.user.email || "")}</span>
+        <span class="tb-account-chevron" aria-hidden="true">⌄</span>
+      </button>
+      ${
+        s.accountMenuOpen
+          ? `<ul class="tb-account-dropdown" role="menu">
+        <li role="none"><button type="button" role="menuitem" data-action="account-goto-settings" data-section="account">アカウント</button></li>
+        <li role="none"><button type="button" role="menuitem" data-action="account-goto-settings" data-section="storage">データ</button></li>
+        <li role="none"><button type="button" role="menuitem" data-action="account-goto-settings" data-section="integrations">連携</button></li>
+        <li role="none"><button type="button" role="menuitem" data-action="account-logout">ログアウト</button></li>
+      </ul>`
+          : ""
+      }
+    </div>`;
+}
+
+/** ログインモーダル（§15/§16）: STEP1 メール → STEP2 6桁OTP */
+function renderLoginModal() {
+  const modal = el("tb-login-modal");
+  const body = el("tb-login-body");
+  if (!modal || !body) return;
+  const s = account.getState();
+  modal.hidden = !s.loginModalOpen;
+  if (!s.loginModalOpen) return;
+
+  if (s.loginStep === "otp") {
+    const cooldown = account.resendCooldownRemaining();
+    body.innerHTML = `
+      <p class="tb-card-hint">確認コードを送りました</p>
+      <p class="tb-card-title" style="margin-bottom:12px;">${esc(s.loginEmail)}</p>
+      <div class="tb-otp-group" role="group" aria-label="6桁の確認コード">
+        ${Array.from({ length: 6 })
+          .map(
+            (_, i) => `<input class="tb-otp-box" id="tb-otp-${i}" data-otp-index="${i}" type="text"
+              inputmode="numeric" pattern="[0-9]*" maxlength="1"
+              autocomplete="${i === 0 ? "one-time-code" : "off"}" aria-label="確認コード ${i + 1}桁目">`
+          )
+          .join("")}
+      </div>
+      ${s.otpError ? `<div class="tb-notice tb-notice-error"><span>${esc(s.otpError)}</span></div>` : ""}
+      <div class="tb-row-actions" style="margin-top:16px;">
+        <button type="button" class="tb-btn tb-btn-primary" data-action="otp-submit" ${
+          s.otpSubmitting ? "disabled" : ""
+        }>DAYLOOPを始める</button>
+      </div>
+      <div class="tb-row-actions">
+        <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="otp-resend" ${
+          cooldown > 0 ? "disabled" : ""
+        }>コードを再送${cooldown > 0 ? `（${cooldown}秒）` : ""}</button>
+        <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="otp-change-email">メールを変更</button>
+      </div>`;
+    if (!body.contains(document.activeElement)) el("tb-otp-0")?.focus();
+  } else {
+    body.innerHTML = `
+      <p class="tb-card-title">時間がない。<br>だから、考える時間を減らす。</p>
+      <label class="visually-hidden" for="tb-login-email">メールアドレス</label>
+      <input type="email" id="tb-login-email" class="tb-text" placeholder="example@gmail.com"
+        autocomplete="email" inputmode="email">
+      ${s.loginError ? `<div class="tb-notice tb-notice-error"><span>${esc(s.loginError)}</span></div>` : ""}
+      <div class="tb-row-actions" style="margin-top:12px;">
+        <button type="button" class="tb-btn tb-btn-primary" data-action="login-email-submit" ${
+          s.emailSubmitting ? "disabled" : ""
+        }>メールで続ける</button>
+      </div>
+      <div class="tb-row-actions">
+        <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="continue-guest">ログインせず試す</button>
+      </div>
+      ${
+        !account.isCloudAvailable()
+          ? `<p class="tb-card-hint">Cloud機能は未設定です。ログインせずに使えます。</p>`
+          : ""
+      }`;
+    if (!body.contains(document.activeElement)) el("tb-login-email")?.focus();
+  }
+}
+
+const MIGRATION_COPY = {
+  "empty-cloud": {
+    title: "データの引き継ぎ",
+    body: (n) => `この端末に<strong>${n}件</strong>のタスクがあります。<br>DAYLOOPアカウントへ引き継ぎますか？`,
+    actions: [
+      { choice: "migrate", label: "アカウントへ引き継ぐ", primary: true },
+      { choice: "keep-local", label: "この端末のまま使う", primary: false },
+    ],
+  },
+  "both-have-data": {
+    title: "この端末とCloudにデータがあります",
+    body: (localN, cloudN) =>
+      `この端末: <strong>${localN} Tasks</strong><br>DAYLOOP Cloud: <strong>${cloudN} Tasks</strong>`,
+    actions: [
+      { choice: "merge", label: "内容を統合", primary: true },
+      { choice: "use-cloud", label: "Cloudを使用", primary: false },
+      { choice: "use-local", label: "この端末を使用", primary: false },
+    ],
+  },
+};
+
+/** Guest→Account引き継ぎ / Local+Cloud統合（§19/§20）。絶対に自動実行しない */
+function renderMigrationModal() {
+  const modal = el("tb-migration-modal");
+  const body = el("tb-migration-body");
+  if (!modal || !body) return;
+  const s = account.getState();
+  const prompt = s.migrationPrompt;
+  modal.hidden = !prompt;
+  if (!prompt) return;
+
+  const copy = MIGRATION_COPY[prompt.scenario];
+  if (!copy) {
+    modal.hidden = true;
+    return;
+  }
+  body.innerHTML = `
+    <p class="tb-card-hint">${copy.body(prompt.localCount, prompt.cloudCount)}</p>
+    <div class="tb-row-actions" style="margin-top:16px;">
+      ${copy.actions
+        .map(
+          (a) =>
+            `<button type="button" class="tb-btn ${a.primary ? "tb-btn-primary" : "tb-btn-ghost"}"
+              data-action="migration-choice" data-choice="${a.choice}">${esc(a.label)}</button>`
+        )
+        .join("")}
+    </div>`;
 }
 
 /** 保存したブロックへ、最新のタスク状態（完了・削除）を重ねる */
@@ -481,12 +652,59 @@ function bindEvents() {
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") closeModals();
+    onOtpKeydown(event);
   });
+  document.addEventListener("input", onOtpInput);
+  document.addEventListener("paste", onOtpPaste);
 
   el("tb-import-file")?.addEventListener("change", onImportFileSelected);
 }
 
+// ─── OTP入力（数字のみ・auto advance・paste対応。§16/§59） ──────
+
+function onOtpInput(event) {
+  const target = event.target;
+  if (!target?.matches?.("[data-otp-index]")) return;
+  const index = Number(target.dataset.otpIndex);
+  const clean = sanitizeDigits(target.value).slice(-1);
+  target.value = clean;
+  if (clean && index < 5) el(`tb-otp-${index + 1}`)?.focus();
+}
+
+function onOtpKeydown(event) {
+  const target = event.target;
+  if (!target?.matches?.("[data-otp-index]")) return;
+  const index = Number(target.dataset.otpIndex);
+  if (event.key === "Backspace" && !target.value && index > 0) {
+    el(`tb-otp-${index - 1}`)?.focus();
+  }
+}
+
+function onOtpPaste(event) {
+  const target = event.target;
+  if (!target?.matches?.("[data-otp-index]")) return;
+  const text = event.clipboardData?.getData("text") ?? "";
+  const digits = sanitizeDigits(text);
+  if (!digits) return;
+  event.preventDefault();
+  for (let i = 0; i < 6; i += 1) {
+    const box = el(`tb-otp-${i}`);
+    if (box) box.value = digits[i] ?? "";
+  }
+  el(`tb-otp-${Math.max(0, Math.min(digits.length, 6) - 1)}`)?.focus();
+}
+
+function readOtpCode() {
+  let code = "";
+  for (let i = 0; i < 6; i += 1) code += el(`tb-otp-${i}`)?.value ?? "";
+  return sanitizeDigits(code);
+}
+
 function onClick(event) {
+  if (account.getState().accountMenuOpen && !event.target.closest(".tb-account-menu")) {
+    account.toggleAccountMenu(false);
+  }
+
   const target = event.target.closest("[data-action]");
   if (!target) return;
   const { action, id } = target.dataset;
@@ -593,6 +811,66 @@ function onClick(event) {
       break;
     case "close-modal":
       closeModals();
+      break;
+    case "open-login":
+      account.openLoginModal();
+      break;
+    case "close-login-modal":
+      account.closeLoginModal();
+      break;
+    case "continue-guest":
+      account.continueAsGuest();
+      break;
+    case "login-email-submit":
+      account.submitEmail(el("tb-login-email")?.value ?? "");
+      break;
+    case "otp-submit":
+      account.submitOtp(readOtpCode());
+      break;
+    case "otp-resend":
+      account.resendOtp();
+      break;
+    case "otp-change-email":
+      account.changeEmail();
+      break;
+    case "account-menu-toggle":
+      account.toggleAccountMenu();
+      break;
+    case "account-goto-settings":
+      account.toggleAccountMenu(false);
+      settingsSection = target.dataset.section;
+      openSettings();
+      break;
+    case "account-logout":
+      account.toggleAccountMenu(false);
+      account.signOut();
+      break;
+    case "open-cloud-settings":
+      if (account.getState().status !== "authenticated") {
+        account.openLoginModal();
+      } else {
+        settingsSection = "storage";
+        openSettings();
+      }
+      break;
+    case "cloud-manual-sync":
+      syncStateToActiveProvider();
+      notify("info", "同期を開始しました。");
+      break;
+    case "migration-choice":
+      account.chooseMigration(target.dataset.choice);
+      break;
+    case "account-delete-start":
+      account.startAccountDelete();
+      break;
+    case "account-delete-confirm":
+      account.confirmAccountDeleteStep();
+      break;
+    case "account-delete-cancel":
+      account.cancelAccountDelete();
+      break;
+    case "account-delete-final":
+      account.finalizeAccountDelete();
       break;
     default:
       break;
@@ -829,14 +1107,14 @@ function closeModals() {
   el("tb-settings-modal").hidden = true;
   reviewDraft = null;
   providerSwitchDraft = null;
+  account.closeLoginModal();
+  // tb-migration-modal はここでは閉じない（§20: 明示的な選択でしか閉じない）
 }
 
 function openPlanModal(feature) {
   const labels = {
     googleCalendarSync:
       "Googleカレンダーとの直接同期は準備中です。いまは .ics ファイルを書き出して取り込めます。",
-    cloudBackup:
-      "クラウド保存と複数端末での共有は準備中です。いまのデータはこの端末に保存されています。",
   };
   el("tb-plan-modal-body").textContent = labels[feature] ?? "この機能は準備中です。";
   el("tb-plan-modal").hidden = false;
@@ -1149,12 +1427,20 @@ function syncStateToActiveProvider() {
     syncStatus = null;
     return;
   }
+  if (typeof navigator !== "undefined" && navigator.onLine === false) {
+    setSyncStatus("offline");
+    return;
+  }
   const config = activeProviderConfig();
+  const namespace = storage.getActiveNamespace();
   setSyncStatus("pending");
   queueSync(async () => {
     try {
-      const result = await provider.saveState(state, config);
+      const result = await provider.saveState(state, config, { namespace });
       setSyncStatus(result?.ok === false ? "error" : "synced", result?.error ?? "");
+      if (result?.conflicts?.length > 0) {
+        notify("warn", `別の端末で${result.conflicts.length}件のタスクが変更されています。「今すぐ同期」で最新の内容を取り込んでください。`);
+      }
     } catch {
       setSyncStatus("error", "同期に失敗しました。");
     }
@@ -1184,12 +1470,10 @@ function openSettings() {
 }
 
 const SETTINGS_SECTIONS = [
-  { id: "account", label: "Account" },
-  { id: "ai", label: "AI" },
-  { id: "storage", label: "Data Storage" },
-  { id: "calendar", label: "Calendar" },
-  { id: "backup", label: "Backup" },
-  { id: "privacy", label: "Privacy" },
+  { id: "account", label: "アカウント" },
+  { id: "integrations", label: "連携" },
+  { id: "storage", label: "データ" },
+  { id: "privacy", label: "プライバシー" },
 ];
 
 function renderSettingsModal() {
@@ -1202,12 +1486,8 @@ function renderSettingsModal() {
   const body = el("tb-settings-body");
   if (settingsSection === "storage") {
     body.innerHTML = renderDataStorageSection();
-  } else if (settingsSection === "ai") {
-    body.innerHTML = renderAiSection();
-  } else if (settingsSection === "calendar") {
-    body.innerHTML = renderCalendarSection();
-  } else if (settingsSection === "backup") {
-    body.innerHTML = renderBackupSection();
+  } else if (settingsSection === "integrations") {
+    body.innerHTML = renderIntegrationsSection();
   } else if (settingsSection === "privacy") {
     body.innerHTML = renderPrivacySection();
   } else {
@@ -1215,62 +1495,122 @@ function renderSettingsModal() {
   }
 }
 
+/** §33/§34: アカウント */
 function renderAccountSection() {
-  return `
-    <div class="tb-settings-section">
-      <h3>Account</h3>
-      <p class="tb-card-hint">現在はゲスト利用です。ログイン機能は準備中です（Phase 2でGoogleログインを予定）。</p>
-      <p class="tb-card-hint">現在のプラン: <strong>${esc(state.settings.plan ?? "free")}</strong></p>
-    </div>`;
-}
+  const s = account.getState();
 
-function renderAiSection() {
-  return `
-    <div class="tb-settings-section">
-      <h3>AI</h3>
-      <p class="tb-card-hint">
-        AIは「頭の中を全部書く」入力（Brain Dump）を、タスク候補として整理するために使います。
-        実際の時間割配置はAIではなく、Timebox Engineが決定論的に行います。
-      </p>
-      <p class="tb-card-hint">
-        バックエンドが未設定の場合、Brain Dumpは自動的に「入力した行をそのままタスク候補にする」
-        方式へ切り替わります。Manual Entryはこの状態でも通常どおり使えます。
-      </p>
-    </div>`;
-}
+  if (s.status !== "authenticated" || !s.user) {
+    return `
+      <div class="tb-settings-section">
+        <h3>アカウント</h3>
+        <p class="tb-card-hint">現在はゲスト利用です。ログインしなくても使えます。</p>
+        <p class="tb-card-hint">アカウントを作ると、DAYLOOP Cloudへ保存でき、複数端末から同じDAYLOOPを使えます。</p>
+        <div class="tb-row-actions">
+          <button type="button" class="tb-btn tb-btn-primary tb-btn-sm" data-action="open-login">ログイン / 新規登録</button>
+        </div>
+      </div>`;
+  }
 
-function renderCalendarSection() {
   return `
     <div class="tb-settings-section">
-      <h3>Calendar</h3>
-      <p class="tb-card-hint"><strong>今すぐ使える:</strong> ICS書き出し（Googleカレンダーの「他のカレンダーを追加 → インポート」から取り込めます）。</p>
-      <p class="tb-card-hint"><strong>準備中:</strong> Googleカレンダーとの直接同期。既存のGoogle予定をDAYLOOPが勝手に変更・削除することはありません。</p>
-    </div>`;
-}
-
-function renderBackupSection() {
-  return `
-    <div class="tb-settings-section">
-      <h3>Backup</h3>
-      <p class="tb-card-hint">保存先に関わらず、JSON Export / Import はいつでも使えます。ドメインや端末を変えるときの移行手段です。</p>
+      <h3>アカウント</h3>
+      <p class="tb-card-hint">Email: <strong>${esc(s.user.email ?? "")}</strong></p>
+      <p class="tb-card-hint">プラン: <strong>Free Plan</strong></p>
+      <p class="tb-card-hint">ログイン状態: <strong>✓ DAYLOOP Cloud</strong></p>
       <div class="tb-row-actions">
-        <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="export-json">バックアップを保存</button>
-        <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="import-json">バックアップを読み込む</button>
+        <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="account-logout">ログアウト</button>
       </div>
     </div>`;
 }
 
+/** §33: 連携（Google Calendar / Obsidian / Google Sheets）。Coming Soonは誇張しない */
+function renderIntegrationsSection() {
+  return `
+    <div class="tb-settings-section">
+      <h3>連携</h3>
+      <p class="tb-card-title" style="margin-bottom:4px;">Googleカレンダー</p>
+      <p class="tb-card-hint"><strong>今すぐ使える:</strong> ICS書き出し（Googleカレンダーの「他のカレンダーを追加 → インポート」から取り込めます）。</p>
+      <p class="tb-card-hint"><strong>Coming Soon:</strong> 直接同期。既存のGoogle予定をDAYLOOPが勝手に変更・削除することはありません。</p>
+      <div class="tb-row-actions">
+        <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="export-ics">Googleカレンダーへ追加（.ics）</button>
+      </div>
+      <hr class="tb-settings-divider">
+      <p class="tb-card-title" style="margin-bottom:4px;">Obsidian / Google Sheets</p>
+      <p class="tb-card-hint">
+        Vaultフォルダの接続・Spreadsheetの接続は「データ」タブの保存先一覧から行えます。
+      </p>
+      <div class="tb-row-actions">
+        <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="settings-section" data-section="storage">データを開く</button>
+      </div>
+    </div>`;
+}
+
+/** §33: プライバシー（AIへ送る内容 / Cloudへ保存する内容 / Account Delete） */
 function renderPrivacySection() {
   const provider = activeProvider();
   const location =
     provider.id === "local"
       ? "この端末（ブラウザのlocalStorage）"
       : `この端末（キャッシュ） + ${provider.label}`;
+  const s = account.getState();
+
   return `
     <div class="tb-settings-section">
-      <h3>Privacy</h3>
+      <h3>プライバシー</h3>
       <p class="tb-card-hint">現在の保存先: <strong>${esc(location)}</strong></p>
-      <p class="tb-card-hint">Phase 1では、利用者が選んだ保存先以外にデータを送信しません。AI Brain Dumpの解析はテキストをAPIへ送りますが、保存はしません。</p>
+
+      <p class="tb-card-title" style="margin-bottom:4px;">AIへ送る内容</p>
+      <p class="tb-card-hint">
+        AIは「頭の中を全部書く」入力（Brain Dump）のテキストだけを、タスク候補として整理するために送ります。
+        実際の時間割配置はAIではなく、Timebox Engineが決定論的に行います。保存はしません。
+      </p>
+      <p class="tb-card-hint">
+        バックエンドが未設定の場合、Brain Dumpは自動的に「入力した行をそのままタスク候補にする」
+        方式へ切り替わります。Manual Entryはこの状態でも通常どおり使えます。
+      </p>
+
+      <p class="tb-card-title" style="margin-bottom:4px;">Cloudへ保存する内容</p>
+      <p class="tb-card-hint">
+        ログインしてDAYLOOP Cloudを使う場合、タスク・時間割・Brain Dump・実行記録・Skillの候補をSupabaseへ保存します。
+        Obsidianのフォルダ選択情報など端末固有の設定はCloudへ送りません。
+      </p>
+
+      <hr class="tb-settings-divider">
+      <p class="tb-card-title" style="margin-bottom:4px;">アカウントの削除</p>
+      ${renderAccountDeleteControls(s)}
+    </div>`;
+}
+
+function renderAccountDeleteControls(s) {
+  if (s.status !== "authenticated") {
+    return `<p class="tb-card-hint">ログイン中のアカウントがある場合、ここから削除できます。</p>`;
+  }
+  if (s.deleteStep === 0) {
+    return `
+      <div class="tb-row-actions">
+        <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="account-delete-start">アカウントを削除する</button>
+      </div>`;
+  }
+  if (s.deleteStep === 1) {
+    return `
+      <div class="tb-notice tb-notice-warn">
+        <span>アカウントとCloud上のデータが削除されます。この操作は取り消せません。</span>
+      </div>
+      <div class="tb-row-actions">
+        <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="account-delete-cancel">キャンセル</button>
+        <button type="button" class="tb-btn tb-btn-primary tb-btn-sm" data-action="account-delete-confirm">続ける</button>
+      </div>`;
+  }
+  return `
+    <div class="tb-notice tb-notice-warn">
+      <span>本当によろしいですか？ ${esc(s.user?.email ?? "")} のアカウントとCloud上のすべてのデータが削除されます。</span>
+    </div>
+    ${s.deleteError ? `<div class="tb-notice tb-notice-error"><span>${esc(s.deleteError)}</span></div>` : ""}
+    <div class="tb-row-actions">
+      <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="account-delete-cancel">キャンセル</button>
+      <button type="button" class="tb-btn tb-btn-danger tb-btn-sm" data-action="account-delete-final" ${
+        s.deleteSubmitting ? "disabled" : ""
+      }>アカウントを削除</button>
     </div>`;
 }
 
@@ -1286,13 +1626,20 @@ function renderDataStorageSection() {
 
   return `
     <div class="tb-settings-section">
-      <h3>Data Storage</h3>
+      <h3>データ</h3>
       <p class="tb-card-hint">
         現在の保存先: <strong>${esc(provider.label)}</strong>
         ${syncStatus ? ` / 状態: ${esc(SYNC_STATUS_LABEL[syncStatus] ?? syncStatus)}` : ""}
       </p>
       ${switchPanel}
       <ul class="tb-provider-list">${cards}</ul>
+      <hr class="tb-settings-divider">
+      <p class="tb-card-title" style="margin-bottom:4px;">バックアップ</p>
+      <p class="tb-card-hint">保存先に関わらず、JSON Export / Import はいつでも使えます。ドメインや端末を変えるときの移行手段です。</p>
+      <div class="tb-row-actions">
+        <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="export-json">バックアップを保存</button>
+        <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="import-json">バックアップを読み込む</button>
+      </div>
     </div>`;
 }
 
@@ -1329,8 +1676,28 @@ function renderProviderCard(provider, isActive) {
         ${isActive ? `<span class="tb-chip tb-chip-pinned">現在の保存先</span>` : ""}
         ${isActive ? `<button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="provider-disconnect" data-provider="google-sheets-gas">切断</button>` : ""}
       </div>`;
+  } else if (provider.id === "cloud") {
+    const s = account.getState();
+    if (s.status !== "authenticated") {
+      controls = `
+        <p class="tb-card-hint">アカウントでログインすると、複数端末から同じDAYLOOPデータを使えます。</p>
+        <div class="tb-row-actions">
+          <button type="button" class="tb-btn tb-btn-primary tb-btn-sm" data-action="open-login">ログインしてCloudを使う</button>
+        </div>`;
+    } else {
+      controls = `
+        <p class="tb-card-hint">✓ Accountと同期（${esc(s.user?.email ?? "")}）</p>
+        <div class="tb-row-actions">
+          ${
+            isActive
+              ? `<span class="tb-chip tb-chip-pinned">現在の保存先</span>`
+              : `<button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="provider-select" data-provider="cloud">Cloudにする</button>`
+          }
+          <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="cloud-manual-sync">今すぐ同期</button>
+        </div>`;
+    }
   } else {
-    controls = `<span class="tb-lock">近日対応</span>`;
+    controls = `<span class="tb-lock">Coming Soon</span>`;
   }
 
   return `<li class="tb-provider-card ${isActive ? "is-active" : ""}">
@@ -1359,6 +1726,15 @@ async function beginProviderSwitch(targetId) {
     providerSwitchDraft = null;
     commit();
     notify("success", "保存先をこの端末に切り替えました。");
+    renderSettingsModal();
+    return;
+  }
+  if (targetId === "cloud") {
+    if (account.getState().status !== "authenticated") {
+      account.openLoginModal();
+      return;
+    }
+    await account.connectCloudNow();
     renderSettingsModal();
     return;
   }

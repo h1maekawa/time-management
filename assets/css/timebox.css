@@ -814,7 +814,9 @@
 .tb-appbar-nav a:hover { opacity: 0.65; }
 
 @media (max-width: 560px) {
-    .tb-appbar-nav { display: none; }
+    /* サイト内リンクは隠すが、設定・Account UIはモバイルでも常に到達できるようにする（§58） */
+    .tb-appbar-nav a { display: none; }
+    .tb-appbar-nav { gap: 10px; }
 }
 
 .tb-appfooter {
@@ -1017,3 +1019,153 @@
     gap: 8px 14px;
     margin: 10px 0;
 }
+
+/* --- Account UI（Header右上。§14） --- */
+.tb-account {
+    position: relative;
+}
+
+.tb-account-menu {
+    position: relative;
+}
+
+.tb-account-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: transparent;
+    border: 1px solid rgba(13, 13, 13, 0.3);
+    color: var(--accent-color);
+    border-radius: 100px;
+    padding: 4px 12px 4px 4px;
+    cursor: pointer;
+    max-width: 220px;
+}
+
+.tb-account-trigger:hover { opacity: 0.75; }
+
+.tb-account-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 800;
+    flex: 0 0 auto;
+}
+
+.tb-account-email {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 130px;
+}
+
+.tb-account-chevron {
+    font-size: 0.7rem;
+    transition: transform 0.15s ease;
+}
+
+.tb-account-menu.is-open .tb-account-chevron { transform: rotate(180deg); }
+
+.tb-account-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 180px;
+    background: var(--surface-color, #fff);
+    border: 1px solid var(--tb-line);
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgba(13, 13, 13, 0.18);
+    padding: 6px;
+    z-index: 3100;
+}
+
+.tb-account-dropdown button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 10px;
+    cursor: pointer;
+    color: inherit;
+}
+
+.tb-account-dropdown button:hover,
+.tb-account-dropdown button:focus-visible {
+    background: rgba(13, 13, 13, 0.06);
+}
+
+@media (max-width: 400px) {
+    .tb-account-email { max-width: 72px; }
+}
+
+/* --- ログイン / Migration モーダル --- */
+.tb-modal-panel-narrow {
+    width: min(400px, 100%);
+}
+
+@media (max-width: 480px) {
+    .tb-modal-panel-narrow { width: 100%; padding: 20px; }
+}
+
+/* --- OTP入力（6桁。§16/§59） --- */
+.tb-otp-group {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0;
+}
+
+.tb-otp-box {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-width: 52px;
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    font-family: inherit;
+    border: 1px solid var(--tb-line-strong);
+    border-radius: 12px;
+    background: #fff;
+    color: inherit;
+}
+
+.tb-otp-box:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+@media (max-width: 400px) {
+    .tb-otp-group { gap: 6px; }
+    .tb-otp-box { font-size: 1.1rem; }
+}
+
+/* --- 設定内の区切り / 危険操作ボタン --- */
+.tb-settings-divider {
+    border: none;
+    border-top: 1px solid var(--tb-line);
+    margin: 6px 0;
+}
+
+.tb-btn-danger {
+    background: transparent;
+    border: 2px solid var(--tb-danger);
+    color: var(--tb-danger);
+}
+
+.tb-btn-danger:hover:not(:disabled) { background: rgba(197, 48, 48, 0.08); }
+
+.tb-notice-warn span { color: var(--tb-warn); }
+.tb-notice-error span { color: var(--tb-danger); }
