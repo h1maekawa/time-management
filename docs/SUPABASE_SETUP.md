@@ -86,6 +86,26 @@ Authentication → Settings → SMTP Settings から [Resend](https://resend.com
 `VITE_` 接頭辞が付いた変数だけがViteのビルドでブラウザバンドルへ含まれます。
 `SUPABASE_SERVICE_ROLE_KEY` に `VITE_` を付けないでください。
 
+## 7b. DAYLOOP Mini / Web Push（§65-92）
+
+`push_subscriptions` はSupabaseの通常のマイグレーション/RLSで完結しており、
+端末の購読登録（Settings → 実行サポート → 「この端末の通知を有効にする」）は
+ログイン中のSupabase Clientから直接書き込みます（追加のServer Endpointは不要）。
+
+VAPID鍵を生成し、`VITE_PUSH_VAPID_PUBLIC_KEY` に公開鍵を設定してください。
+
+```bash
+npx web-push generate-vapid-keys
+```
+
+**残課題（このリポジトリには含まれていません）**: 「5分前」等、DAYLOOPを閉じている間に
+実際にPushを送信するサーバー処理（VAPID秘密鍵でのペイロード署名・送信、および
+それを決まった時刻に起動するスケジューラ）です。Cloudflare Pages Functions単体では
+定期実行の仕組みを持たないため、Cloudflare Cron Triggers（`wrangler.toml`の`[triggers]`）
+を使った別ワーカー、またはSupabase Edge Functions + `pg_cron`等の構成が必要です。
+DAYLOOPを開いている間の通知（Task Start / 5分前 / 完了後Next / End）はNotification API
+で完結しており、この残課題の影響を受けません。
+
 ## 8. Local Development
 
 1. `cp .env.example .env` として値を埋める（`.env` は `.gitignore` 済み）。
