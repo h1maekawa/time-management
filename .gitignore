@@ -5,3 +5,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+
+# Supabase / secrets（VITE_接頭辞のURLやpublishable keyはコミットしてよいが、
+# .envファイル自体はローカル値が混ざりやすいため一律で除外する。Serverの秘密(service_role等)は絶対に含めない）
+.env
+.env.local
+.env.*.local
