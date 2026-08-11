@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<!--
+  DAYLOOP note Cover Template (1280x720, 16:9)
+  記事タイトルだけ差し替えて使う再利用テンプレート。
+  ?title=... で見出しを変更できる（未指定時は既定のExample 1を表示）。
+-->
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&family=Syne:wght@700;800&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1270px; height:710px; overflow:hidden; }
+  body { font-family:'Noto Sans JP',sans-serif; background:#ffffff; position:relative; }
+  .dots {
+    position:absolute; width:640px; height:640px; top:-180px; right:-200px;
+    background-image:
+      radial-gradient(circle, rgba(61,90,254,0.5) 2.4px, transparent 2.8px),
+      radial-gradient(circle, rgba(20,184,166,0.42) 2.4px, transparent 2.8px),
+      radial-gradient(circle, rgba(110,231,183,0.36) 2.4px, transparent 2.8px);
+    background-size:34px 34px;
+    background-position:0 0, 17px 17px, 34px 0;
+    -webkit-mask-image: radial-gradient(circle at center, #000 0%, transparent 72%);
+  }
+  .curve { position:absolute; bottom:-260px; left:-220px; width:720px; height:720px; border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, rgba(61,90,254,0.10), rgba(20,184,166,0.06) 60%, transparent 70%); }
+  .logo { position:absolute; top:60px; left:72px; display:flex; align-items:center; gap:12px; }
+  .logo-word { font-family:'Syne',sans-serif; font-weight:800; font-size:24px; color:#150C33; }
+  .layout { position:absolute; top:0; left:0; width:1270px; height:710px; display:flex; align-items:center; }
+  .left { width:720px; padding:0 0 0 72px; }
+  .eyebrow { font-family:'Syne',sans-serif; font-weight:800; font-size:16px; letter-spacing:0.2em; color:#0D9488; margin-bottom:22px; }
+  h1 { font-size:42px; line-height:1.5; font-weight:900; color:#150C33; letter-spacing:-0.02em; white-space:pre-line; }
+  .right { width:700px; display:flex; align-items:center; justify-content:center; }
+  .ui-card { width:520px; background:#F7F7FB; border:1px solid rgba(21,12,51,0.08); border-radius:28px; padding:36px; box-shadow:0 40px 90px rgba(21,12,51,0.12); }
+  .ui-row { display:flex; align-items:center; gap:14px; padding:14px 0; border-bottom:1px solid rgba(21,12,51,0.06); font-size:20px; font-weight:600; color:#150C33; }
+  .ui-row:last-child { border-bottom:none; }
+  .ui-num { width:30px; height:30px; border-radius:50%; background:#0F2A4A; color:#fff; font-size:14px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  .ui-time { font-weight:800; color:#3D5AFE; width:76px; }
+  .ui-title { flex:1; color:#150C33; }
+</style>
+</head>
+<body>
+  <div class="dots"></div>
+  <div class="curve"></div>
+  <div class="layout">
+    <div class="left">
+      <div class="logo">
+        <svg width="36" height="36" viewBox="0 0 32 32">
+          <defs><linearGradient id="g" x1="5" y1="5" x2="27" y2="27" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#3D5AFE"/><stop offset="1" stop-color="#14B8A6"/>
+          </linearGradient></defs>
+          <rect width="32" height="32" rx="9" fill="#0F2A4A"/>
+          <path d="M22.9 20.1A7.6 7.6 0 1 1 20.9 9.3" fill="none" stroke="url(#g)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M20.9 9.3 24.6 9.8 21.9 12.8Z" fill="url(#g)"/>
+          <line x1="16" y1="16" x2="16" y2="12" stroke="url(#g)" stroke-width="1.6" stroke-linecap="round"/>
+          <line x1="16" y1="16" x2="19.4" y2="16" stroke="url(#g)" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="16" cy="16" r="1.3" fill="url(#g)"/>
+          <circle cx="16" cy="6.6" r="1.1" fill="url(#g)"/>
+        </svg>
+        <span class="logo-word">DAYLOOP</span>
+      </div>
+      <p class="eyebrow" style="margin-top:64px;">DAYLOOP NOTE</p>
+      <h1 id="title">時間がない。
+だから、考える時間を減らす。</h1>
+    </div>
+    <div class="right">
+      <div class="ui-card">
+        <div class="ui-row"><span class="ui-num">01</span><span class="ui-title">明日の商談準備</span><span style="color:#55507A;font-size:16px;">45分</span></div>
+        <div class="ui-row"><span class="ui-num">02</span><span class="ui-title">FS週次資料</span><span style="color:#55507A;font-size:16px;">60分</span></div>
+        <div class="ui-row"><span class="ui-time">09:00</span><span class="ui-title">商談準備</span></div>
+        <div class="ui-row"><span class="ui-time">10:00</span><span class="ui-title">FS資料</span></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    var p = new URLSearchParams(location.search);
+    var t = p.get('title');
+    if (t) document.getElementById('title').textContent = t;
+  </script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!--
+  DAYLOOP OGP Template (1200x630)
+  再利用可能なOGP/SNSシェア画像テンプレート。ブランドトークンは
+  assets/css/base.css と同じ値をここでは直書きしている（このファイルは
+  単体で開いてスクリーンショットするための独立アセットのため）。
+  更新時は dayloop-ogp.png を作り直すこと。
+-->
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&family=Syne:wght@700;800&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1200px; height:630px; overflow:hidden; }
+  body {
+    font-family:'Noto Sans JP',sans-serif;
+    background:#ffffff;
+    position:relative;
+  }
+  .dots {
+    position:absolute; width:520px; height:520px; top:-140px; right:-160px;
+    background-image:
+      radial-gradient(circle, rgba(61,90,254,0.55) 2px, transparent 2.4px),
+      radial-gradient(circle, rgba(20,184,166,0.46) 2px, transparent 2.4px),
+      radial-gradient(circle, rgba(110,231,183,0.4) 2px, transparent 2.4px);
+    background-size:30px 30px;
+    background-position:0 0, 15px 15px, 30px 0;
+    -webkit-mask-image: radial-gradient(circle at center, #000 0%, transparent 70%);
+  }
+  .curve {
+    position:absolute; bottom:-220px; left:-160px; width:640px; height:640px;
+    border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, rgba(61,90,254,0.10), rgba(20,184,166,0.06) 60%, transparent 70%);
+  }
+  .logo { position:absolute; top:56px; left:64px; display:flex; align-items:center; gap:12px; }
+  .logo-mark { width:40px; height:40px; border-radius:12px; background:#0F2A4A; position:relative; }
+  .logo-word { font-family:'Syne',sans-serif; font-weight:800; font-size:24px; letter-spacing:-0.01em; color:#150C33; }
+  .content { position:absolute; top:190px; left:64px; width:920px; }
+  .eyebrow { font-family:'Syne',sans-serif; font-weight:800; font-size:15px; letter-spacing:0.22em; color:#0D9488; margin-bottom:18px; }
+  h1 { font-size:58px; line-height:1.35; font-weight:900; color:#150C33; letter-spacing:-0.02em; }
+  h1 .accent { background:linear-gradient(120deg,#3D5AFE,#14B8A6); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { margin-top:26px; font-size:26px; font-weight:700; color:#3D5AFE; }
+  .flow { position:absolute; bottom:56px; left:64px; display:flex; align-items:center; gap:14px; font-family:'Syne',sans-serif; font-weight:800; font-size:16px; color:#55507A; }
+  .flow span.node { background:#F3F1FF; border:1px solid rgba(21,12,51,0.1); border-radius:100px; padding:8px 18px; }
+  .flow span.arrow { color:#14B8A6; }
+</style>
+</head>
+<body>
+  <div class="dots"></div>
+  <div class="curve"></div>
+  <div class="logo">
+    <svg class="logo-mark" width="40" height="40" viewBox="0 0 32 32">
+      <defs><linearGradient id="g" x1="5" y1="5" x2="27" y2="27" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#3D5AFE"/><stop offset="1" stop-color="#14B8A6"/>
+      </linearGradient></defs>
+      <rect width="32" height="32" rx="9" fill="#0F2A4A"/>
+      <path d="M22.9 20.1A7.6 7.6 0 1 1 20.9 9.3" fill="none" stroke="url(#g)" stroke-width="3" stroke-linecap="round"/>
+      <path d="M20.9 9.3 24.6 9.8 21.9 12.8Z" fill="url(#g)"/>
+      <line x1="16" y1="16" x2="16" y2="12" stroke="url(#g)" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="16" y1="16" x2="19.4" y2="16" stroke="url(#g)" stroke-width="1.6" stroke-linecap="round"/>
+      <circle cx="16" cy="16" r="1.3" fill="url(#g)"/>
+      <circle cx="16" cy="6.6" r="1.1" fill="url(#g)"/>
+    </svg>
+    <span class="logo-word">DAYLOOP</span>
+  </div>
+  <div class="content">
+    <p class="eyebrow">AI DAILY EXECUTION APP</p>
+    <h1>時間がない。<br>だから、<span class="accent">考える時間を減らす。</span></h1>
+    <p class="sub">全部書く。AIが整理。今日が決まる。</p>
+  </div>
+  <div class="flow">
+    <span class="node">Brain Dump</span><span class="arrow">→</span>
+    <span class="node">AI Organize</span><span class="arrow">→</span>
+    <span class="node">Timeline</span>
+  </div>
+</body>
+</html>

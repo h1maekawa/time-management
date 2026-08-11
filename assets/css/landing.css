@@ -30,13 +30,37 @@
     border: 1px solid var(--dl-line-dark);
 }
 
-.lp-decor-ring.r1 { width: 620px; height: 620px; top: -180px; right: -220px; border-color: rgba(139, 92, 246, 0.18); }
+.lp-decor-ring.r1 { width: 620px; height: 620px; top: -180px; right: -220px; border-color: rgba(20, 184, 166, 0.18); }
 .lp-decor-ring.r2 { width: 420px; height: 420px; top: 46%; left: -200px; border-color: rgba(61, 90, 254, 0.16); }
 .lp-decor-ring.r3 { width: 300px; height: 300px; bottom: -80px; right: 8%; border-color: rgba(245, 242, 255, 0.08); }
 
 @media (max-width: 720px) {
     .lp-decor-ring.r1 { width: 380px; height: 380px; }
     .lp-decor-ring.r2 { width: 260px; height: 260px; }
+}
+
+/* Dot Pattern: DAYLOOPのVisual Motif。Corner / Edge にだけ薄く置く（全面には敷かない）。
+   Blue / Teal / Mint の淡いグラデーションのドットグリッドを、中心から外側へフェードさせる。 */
+.lp-dot-pattern {
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    pointer-events: none;
+    background-image:
+        radial-gradient(circle, rgba(61, 90, 254, 0.5) 1.4px, transparent 1.6px),
+        radial-gradient(circle, rgba(20, 184, 166, 0.42) 1.4px, transparent 1.6px),
+        radial-gradient(circle, rgba(110, 231, 183, 0.36) 1.4px, transparent 1.6px);
+    background-size: 26px 26px;
+    background-position: 0 0, 13px 13px, 26px 0;
+    -webkit-mask-image: radial-gradient(circle at center, #000 0%, transparent 72%);
+    mask-image: radial-gradient(circle at center, #000 0%, transparent 72%);
+}
+
+.lp-dot-pattern.is-hero { top: -60px; right: -120px; }
+.lp-dot-pattern.is-final { bottom: -140px; left: -140px; }
+
+@media (max-width: 720px) {
+    .lp-dot-pattern { width: 260px; height: 260px; }
 }
 
 .lp-shell {
@@ -252,17 +276,34 @@
     color: var(--dl-on-dark-muted);
 }
 
+.lp-hero-eyebrow {
+    display: block;
+    font-family: var(--font-en);
+    font-weight: 800;
+    letter-spacing: 0.24em;
+    font-size: 0.7rem;
+    color: var(--dl-mint);
+    margin-bottom: 18px;
+}
+
 .lp-hero-catch {
     font-size: clamp(2rem, 6.6vw, 3.4rem);
     line-height: 1.42;
     letter-spacing: -0.02em;
     font-weight: 800;
     max-width: 15em;
-    margin: 0 auto 26px;
-    background: linear-gradient(120deg, #ffffff 30%, var(--dl-violet-soft) 100%);
+    margin: 0 auto 18px;
+    background: linear-gradient(120deg, #ffffff 30%, var(--dl-mint) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+}
+
+.lp-hero-subcatch {
+    font-size: clamp(1.05rem, 2.6vw, 1.3rem);
+    font-weight: 700;
+    color: var(--dl-on-dark);
+    margin-bottom: 22px;
 }
 
 .lp-hero-lead {
@@ -271,6 +312,12 @@
     max-width: 34em;
     margin: 0 auto;
     color: var(--dl-on-dark-muted);
+}
+
+.lp-hero-support {
+    font-size: 0.9rem;
+    margin-top: 14px;
+    color: var(--dl-on-dark-faint);
 }
 
 .lp-hero-actions {
@@ -451,6 +498,24 @@
     background: rgba(36, 18, 89, 0.06);
     border-radius: 10px;
     padding: 10px 12px;
+}
+
+/* --- Calendar（約束 vs 実行） --- */
+.lp-mock-calendar-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 480px) {
+    .lp-mock-calendar-compare { grid-template-columns: 1fr; }
+}
+
+.lp-mock-calendar-role {
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: var(--dl-indigo);
+    margin-bottom: 10px;
 }
 
 /* --- Before / After --- */
@@ -812,6 +877,15 @@
     font-size: 0.86rem;
     color: var(--dl-on-dark-faint);
     margin-top: 4px;
+}
+
+.lp-problem-strong {
+    text-align: center;
+    font-size: 1.06rem;
+    font-weight: 700;
+    line-height: 1.7;
+    color: var(--dl-on-dark);
+    margin-top: 24px;
 }
 
 .lp-problem-note {

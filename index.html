@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DAYLOOP | 全部書く。AIが整理。今日が決まる。</title>
-    <meta name="description" content="やることを頭の中のまま書くだけ。AIが整理して優先順位を決め、今日の時間割までつくる1日設計アプリ、DAYLOOP。登録不要・無料・ローカル/Obsidian保存対応。">
+    <title>DAYLOOP | 時間がない。だから、考える時間を減らす。</title>
+    <meta name="description" content="やることを全部書けば、AIが整理して、「今日、何を、いつやるか」まで決めてくれるAI 1日実行アプリ、DAYLOOP。登録不要・無料・ローカル/Obsidian保存対応。">
     <link rel="canonical" href="https://timebox.maemichi.com/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="DAYLOOP">
-    <meta property="og:title" content="DAYLOOP | 全部書く。AIが整理。今日が決まる。">
-    <meta property="og:description" content="やることを頭の中のまま書くだけ。AIが整理して優先順位を決め、今日の時間割までつくる1日設計アプリ。">
+    <meta property="og:title" content="DAYLOOP | 時間がない。だから、考える時間を減らす。">
+    <meta property="og:description" content="やることを全部書けば、AIが整理して、「今日、何を、いつやるか」まで決めてくれるAI 1日実行アプリ。">
     <meta property="og:url" content="https://timebox.maemichi.com/">
-    <meta property="og:image" content="https://timebox.maemichi.com/favicon.svg">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="DAYLOOP | 全部書く。AIが整理。今日が決まる。">
-    <meta name="twitter:description" content="頭の中のタスクをそのまま書くだけで、AIが整理して今日の時間割まで作るアプリ。">
+    <meta property="og:image" content="https://timebox.maemichi.com/images/dayloop/ogp/dayloop-ogp.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="DAYLOOP | 時間がない。だから、考える時間を減らす。">
+    <meta name="twitter:description" content="やることを全部書けば、AIが整理して今日の時間割まで決めてくれるAI 1日実行アプリ。">
     <meta name="robots" content="index,follow">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,19 +28,23 @@
 <body class="lp-page">
     <a class="skip-link" href="#lp-main">本文へ移動</a>
 
-    <!-- DAYLOOP Symbol Mark（Loop Motif）。header / footer / hero から <use> で参照する -->
+    <!-- DAYLOOP Symbol Mark（Loop + Clock + Flow）。header / footer / hero から <use> で参照する。
+         同じマークは public/images/dayloop/brand/dayloop-logo-*.svg にも実体化してある。 -->
     <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
         <defs>
             <linearGradient id="dl-mark-grad" x1="5" y1="5" x2="27" y2="27" gradientUnits="userSpaceOnUse">
-                <stop offset="0" stop-color="#5B7CFF"/>
-                <stop offset="1" stop-color="#9B6BFF"/>
+                <stop offset="0" stop-color="#3D5AFE"/>
+                <stop offset="1" stop-color="#14B8A6"/>
             </linearGradient>
         </defs>
         <symbol id="dl-mark" viewBox="0 0 32 32">
-            <rect width="32" height="32" rx="9" fill="#150B36"/>
+            <rect width="32" height="32" rx="9" fill="#0F2A4A"/>
             <path d="M22.9 20.1A7.6 7.6 0 1 1 20.9 9.3" fill="none" stroke="url(#dl-mark-grad)" stroke-width="3" stroke-linecap="round"/>
             <path d="M20.9 9.3 24.6 9.8 21.9 12.8Z" fill="url(#dl-mark-grad)"/>
-            <circle cx="16" cy="16" r="2.1" fill="url(#dl-mark-grad)"/>
+            <line x1="16" y1="16" x2="16" y2="12" stroke="url(#dl-mark-grad)" stroke-width="1.6" stroke-linecap="round"/>
+            <line x1="16" y1="16" x2="19.4" y2="16" stroke="url(#dl-mark-grad)" stroke-width="1.6" stroke-linecap="round"/>
+            <circle cx="16" cy="16" r="1.3" fill="url(#dl-mark-grad)"/>
+            <circle cx="16" cy="6.6" r="1.1" fill="url(#dl-mark-grad)"/>
         </symbol>
     </svg>
 
@@ -46,6 +52,8 @@
         <span class="lp-decor-ring r1"></span>
         <span class="lp-decor-ring r2"></span>
         <span class="lp-decor-ring r3"></span>
+        <span class="lp-dot-pattern is-hero"></span>
+        <span class="lp-dot-pattern is-final"></span>
     </div>
 
     <header class="lp-header">
@@ -73,14 +81,18 @@
                     <svg class="lp-hero-word-mark" width="34" height="34" aria-hidden="true"><use href="#dl-mark"></use></svg>
                     <span class="lp-hero-wordmark">DAYLOOP</span>
                 </p>
-                <h1 class="lp-hero-catch">全部書く。<br>AIが整理。<br>今日が決まる。</h1>
+                <span class="lp-hero-eyebrow">AI DAILY EXECUTION APP</span>
+                <h1 class="lp-hero-catch">時間がない。<br>だから、<br>考える時間を減らす。</h1>
+                <p class="lp-hero-subcatch">全部書く。AIが整理。今日が決まる。</p>
                 <p class="lp-hero-lead">
-                    やることを頭の中のまま書くだけ。<br>
-                    AIが整理して、優先順位を決め、<br>
-                    今日の時間割までつくります。
+                    DAYLOOPは、やることを全部書けば、<br>
+                    AIが整理して、<br>
+                    「今日、何を、いつやるか」まで決めてくれる<br>
+                    AI 1日実行アプリです。
                 </p>
+                <p class="lp-hero-support">考える時間を減らして、本当にやる時間を増やします。</p>
                 <div class="lp-hero-actions">
-                    <a href="/app/" class="lp-btn">無料ではじめる</a>
+                    <a href="/app/" class="lp-btn">今日を組み立てる</a>
                     <a href="#how" class="lp-btn lp-btn-ghost">使い方を見る</a>
                 </div>
                 <ul class="lp-hero-notes">
@@ -189,7 +201,8 @@ DAYLOOPのLP修正
                     <span class="lp-problem-chip">打ち合わせ</span>
                 </div>
                 <p class="lp-problem-question">頭の中で、ぐるぐる考え続けている状態。</p>
-                <p class="lp-problem-note">Todoを増やすだけでは、今日やることは決まりません。</p>
+                <p class="lp-problem-strong">時間がない人ほど、<br>「次に何をするか」を考えている時間が長い。</p>
+                <p class="lp-problem-note">DAYLOOPは、その「考える時間」を減らします。</p>
             </div>
         </section>
 
@@ -277,6 +290,43 @@ LPも直したい</p>
             </div>
         </section>
 
+        <!-- ═══ CALENDAR ═══════════════════════════════════════ -->
+        <section class="lp-section" id="calendar">
+            <div class="lp-shell lp-reveal">
+                <div class="lp-section-head is-centered">
+                    <span class="lp-section-eyebrow">CALENDAR</span>
+                    <h2 class="lp-section-title">予定と、<br>やることをひとつに。</h2>
+                    <p class="lp-section-lead">
+                        会議や商談などの「約束」はGoogleカレンダー。<br>
+                        資料作成、返信、準備、執筆などの「実行」はDAYLOOP。<br>
+                        DAYLOOPが、空いている時間に実行するタスクを配置します。
+                    </p>
+                </div>
+                <div class="lp-mock" aria-hidden="true">
+                    <div class="lp-mock-calendar-compare">
+                        <div>
+                            <p class="lp-mock-col-label">Google Calendar</p>
+                            <p class="lp-mock-calendar-role">約束</p>
+                            <div class="lp-mock-timeline-compact">
+                                <div class="lp-mock-timeline-compact-row"><time>13:00</time><span>商談</span></div>
+                                <div class="lp-mock-timeline-compact-row"><time>16:00</time><span>定例会議</span></div>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="lp-mock-col-label">DAYLOOP</p>
+                            <p class="lp-mock-calendar-role">実行</p>
+                            <div class="lp-mock-timeline-compact">
+                                <div class="lp-mock-timeline-compact-row"><time>09:00</time><span>商談準備</span></div>
+                                <div class="lp-mock-timeline-compact-row"><time>11:00</time><span>資料作成</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="lp-mock-callout" style="margin-top:16px;text-align:center;">Google Calendar = 約束　DAYLOOP = 実行</p>
+                    <span class="lp-mock-badge-soon">Googleカレンダー直接同期は Coming Soon（現在は.ics書き出しで取り込み可能）</span>
+                </div>
+            </div>
+        </section>
+
         <!-- ═══ BEFORE / AFTER（recap） ════════════════════════ -->
         <section class="lp-section" id="before-after">
             <div class="lp-shell lp-reveal">
@@ -335,6 +385,29 @@ LPも直したい</p>
                         <span>FS週次資料</span>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- ═══ RE-PLAN ════════════════════════════════════════ -->
+        <section class="lp-section" id="replan">
+            <div class="lp-shell lp-reveal">
+                <div class="lp-section-head is-centered">
+                    <span class="lp-section-eyebrow">RE-PLAN</span>
+                    <h2 class="lp-section-title">予定は崩れる。<br>だから、すぐ組み直せる。</h2>
+                    <p class="lp-section-lead">
+                        急な会議。予定変更。思ったより時間がかかった。<br>
+                        忙しい人の1日は、予定通りには進みません。
+                    </p>
+                </div>
+                <div class="lp-mock" aria-hidden="true">
+                    <p class="lp-mock-title">11:20 予定が崩れた</p>
+                    <div class="lp-mock-timeline-compact">
+                        <div class="lp-mock-timeline-compact-row"><time>11:20</time><span>急な電話が入った</span></div>
+                    </div>
+                    <p class="lp-mock-callout" style="margin-top:14px;">今の時間と残っているタスクから、残りの1日を組み直せる。</p>
+                    <span class="lp-mock-cta-ghost" style="margin-top:16px;">今から組み直す</span>
+                </div>
+                <p class="lp-problem-strong" style="margin-top:28px;">忙しい人に必要なのは、完璧な計画ではなく、<br>崩れても立て直せること。</p>
             </div>
         </section>
 
@@ -584,7 +657,7 @@ LPも直したい</p>
                 <p class="lp-final-cta-word">DAYLOOP</p>
                 <h2 class="lp-final-cta-title">全部書く。<br>AIが整理。<br>今日が決まる。</h2>
                 <p class="lp-final-cta-sub">考える時間を減らして、やる時間を増やそう。</p>
-                <a href="/app/" class="lp-btn">無料ではじめる</a>
+                <a href="/app/" class="lp-btn">今日を組み立てる</a>
             </div>
         </section>
     </main>
