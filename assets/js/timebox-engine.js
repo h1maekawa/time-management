@@ -427,14 +427,26 @@ export function summarize(plan, currentHHMM) {
   }
 
   const now = toMinutes(currentHHMM);
+  // currentBlock: 「今実行しているとみなす枠」＝ 開始済み・未完了のうち最後に始まったもの。
+  // end を過ぎても完了していなければcurrentBlockであり続ける（予定を過ぎても勝手に「次」へ
+  // 切り替えない。§85の再プラン確認はこの状態を前提にする）。
   let currentBlock = null;
+  let currentStart = -Infinity;
   let nextBlock = null;
   for (const block of blocks) {
+    if (block.done) continue;
     const start = toMinutes(block.start);
-    const end = toMinutes(block.end);
-    if (now >= start && now < end && !block.done) currentBlock = block;
-    if (start > now && !nextBlock && !block.done) nextBlock = block;
+    if (start <= now && start > currentStart) {
+      currentBlock = block;
+      currentStart = start;
+    }
+    if (start > now && !nextBlock) nextBlock = block;
   }
+
+  // currentBlockの残り時間(分)。予定時間を過ぎていれば負の値になる（Mini/Push双方の
+  // 「予定時間超過」判定＝再プラン確認の表示条件として使う。§83/§85）。
+  const remainingMinutes = currentBlock ? toMinutes(currentBlock.end) - now : null;
+  const overdue = remainingMinutes !== null && remainingMinutes < 0;
 
   return {
     total,
@@ -447,6 +459,8 @@ export function summarize(plan, currentHHMM) {
     used,
     currentBlock,
     nextBlock,
+    remainingMinutes,
+    overdue,
   };
 }
 
