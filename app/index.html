@@ -17,6 +17,8 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="robots" content="index,follow">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#241259">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
@@ -130,8 +132,9 @@
                         <div class="tb-card">
                             <div class="tb-card-head">
                                 <h2 class="tb-card-title">1日のタイムライン</h2>
-                                <span class="tb-card-hint">タスクをここへドラッグすると時刻を固定できます（スマートフォンではタスクの「固定」欄から時刻を入力してください）</span>
+                                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" id="tb-mini-toggle" data-action="mini-toggle" hidden>ミニ表示を開く</button>
                             </div>
+                            <span class="tb-card-hint">タスクをここへドラッグすると時刻を固定できます（スマートフォンではタスクの「固定」欄から時刻を入力してください）</span>
                             <div class="tb-timeline-scroll" id="tb-timeline-scroll">
                                 <div class="tb-timeline" id="tb-timeline"></div>
                             </div>
@@ -272,6 +275,24 @@
             </div>
             <div id="tb-migration-body"></div>
         </div>
+    </div>
+
+    <!-- ─── DAYLOOP Mini（Document PiP / PCフォールバック Sticky Player。§65-71） ─── -->
+    <div class="tb-mini" id="tb-mini" hidden>
+        <div class="tb-mini-head">
+            <span class="tb-mini-logo">DAYLOOP</span>
+            <span class="tb-mini-clock" id="tb-mini-clock"></span>
+            <button type="button" class="tb-mini-close" data-action="mini-minimize" aria-label="ミニ表示を閉じる" id="tb-mini-minimize">－</button>
+        </div>
+        <div class="tb-mini-body" id="tb-mini-body"></div>
+    </div>
+
+    <!-- ─── Mobile Sticky NOW Bar（§73/§74） ─── -->
+    <div class="tb-mobile-now" id="tb-mobile-now" hidden>
+        <button type="button" class="tb-mobile-now-bar" data-action="mobile-now-toggle" id="tb-mobile-now-bar" aria-expanded="false">
+            <span id="tb-mobile-now-summary"></span>
+        </button>
+        <div class="tb-mobile-now-expanded" id="tb-mobile-now-expanded" hidden></div>
     </div>
 
     <footer class="tb-appfooter">

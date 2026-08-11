@@ -1,0 +1,21 @@
+{
+  "name": "DAYLOOP — AI Daily Planner",
+  "short_name": "DAYLOOP",
+  "description": "全部書く。AIが整理。今日が決まる。",
+  "start_url": "/app/",
+  "scope": "/",
+  "id": "/app/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#EEEBFC",
+  "theme_color": "#241259",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "/images/dayloop/brand/dayloop-logo-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

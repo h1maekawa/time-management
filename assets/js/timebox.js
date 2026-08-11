@@ -45,6 +45,24 @@ import * as aiClient from "./ai-client.js";
 import { getProvider, listProviders } from "./storage-providers/registry.js";
 import { createAccountController } from "./supabase/account-controller.js";
 import { sanitizeDigits } from "./supabase/otp-input.js";
+import { isPipSupported, openPipWindow, currentPipWindow } from "./mini/pip-support.js";
+import { deriveMiniView } from "./mini/mini-state.js";
+import {
+  normalizeNotificationPrefs,
+  planNotifications,
+  planCompletionNotification,
+  buildNotificationMessage,
+} from "./mini/notification-prefs.js";
+import { isAppBadgeSupported, setAppBadgeCount } from "./mini/app-badge.js";
+import { getDeviceId } from "./mini/device-id.js";
+import { getSupabaseClient } from "./supabase/client.js";
+import {
+  isPushSupported,
+  isPushConfigured,
+  getVapidPublicKey,
+  urlBase64ToUint8Array,
+  subscriptionToRow,
+} from "./mini/push-subscription.js";
 
 /** タイムラインの1時間あたりの高さ(px) */
 const HOUR_HEIGHT = 44;
@@ -84,13 +102,33 @@ const account = createAccountController({
   },
 });
 
+// ─── DAYLOOP Mini（Execution UI。§65-71） ────────────────────
+/** "closed" | "sticky"（PC Fallback / 開いた直後） | "pip" */
+let miniMode = "closed";
+let miniPipWindow = null;
+/**
+ * #tb-mini要素への安定した参照。PiP windowへ実体移動すると
+ * document.getElementById("tb-mini")（＝メインdocument基準のel()）は
+ * 見つからなくなる（要素がメインdocumentのツリーから抜けるため）ので、
+ * 一度取得した参照をnamespaceを跨いで使い回す。
+ */
+let miniElRef = null;
+/** 予定時間超過の確認（§85）を、同じcurrentBlockの間だけ1回抑制する */
+let overdueDismissedKey = null;
+/** モバイルSticky NOW Barの展開状態（§74） */
+let mobileNowExpanded = false;
+/** 通知の二重発火を避けるため、直前にtickを処理した"HH:MM"を憶えておく */
+let lastNotificationMinute = null;
+
 // ─── 起動 ──────────────────────────────────────────────────
 
 function init() {
+  miniElRef = el("tb-mini");
   rollover();
   bindEvents();
   render();
   account.init();
+  registerServiceWorker();
 
   window.addEventListener("online", () => {
     if (activeProvider().id === "cloud") {
@@ -196,6 +234,10 @@ function render() {
   renderLoginModal();
   renderMigrationModal();
   if (el("tb-settings-modal") && !el("tb-settings-modal").hidden) renderSettingsModal();
+  renderMini(summary);
+  renderMobileNow(summary);
+  updateAppBadge(tasks);
+  checkAndFireNotifications(summary);
 }
 
 /** 入力タブ（AIと整理する/自分で追加する）の見た目を切り替える。DOMは作り直さない */
@@ -369,6 +411,313 @@ function renderMigrationModal() {
         )
         .join("")}
     </div>`;
+}
+
+// ─── DAYLOOP Mini（Execution UI。§65-71） ────────────────────
+
+function notificationPrefs() {
+  return normalizeNotificationPrefs(state.settings?.notifications);
+}
+
+function saveNotificationPrefs(patch) {
+  state.settings = { ...state.settings, notifications: { ...notificationPrefs(), ...patch } };
+  commit();
+}
+
+async function toggleMini() {
+  if (miniMode !== "closed") {
+    closeMini();
+    return;
+  }
+  if (isPipSupported()) {
+    try {
+      const pipWindow = await openPipWindow({ width: 320, height: 360 });
+      if (!pipWindow) throw new Error("pip_unavailable");
+      miniPipWindow = pipWindow;
+      miniMode = "pip";
+      const miniEl = miniElRef;
+      miniEl.classList.remove("is-sticky");
+      miniEl.hidden = false;
+      pipWindow.document.body.append(miniEl);
+      // PiP windowも同じdata-action delegationを使えるようにする（Documentが別なため）
+      pipWindow.document.addEventListener("click", onClick);
+      pipWindow.addEventListener("pagehide", () => {
+        if (miniMode === "pip") returnMiniToMainDocument();
+      });
+      render();
+      return;
+    } catch {
+      miniMode = "closed";
+      miniPipWindow = null;
+      // requestWindow()はユーザー操作起点でも失敗しうる（Window数上限等）。Fallbackへ落ちる。
+    }
+  }
+  openMiniSticky();
+}
+
+function openMiniSticky() {
+  miniMode = "sticky";
+  const miniEl = miniElRef;
+  miniEl.classList.add("is-sticky");
+  miniEl.hidden = false;
+  render();
+}
+
+function returnMiniToMainDocument() {
+  const miniEl = miniElRef;
+  if (miniEl && miniPipWindow && miniEl.ownerDocument === miniPipWindow.document) {
+    document.body.append(miniEl);
+  }
+  miniMode = "closed";
+  miniPipWindow = null;
+  if (miniEl) miniEl.hidden = true;
+  render();
+}
+
+function closeMini() {
+  if (miniMode === "pip" && miniPipWindow) {
+    miniPipWindow.close();
+    return; // pagehide が returnMiniToMainDocument() を呼ぶ
+  }
+  const miniEl = miniElRef;
+  if (miniEl) {
+    miniEl.hidden = true;
+    miniEl.classList.remove("is-sticky");
+  }
+  miniMode = "closed";
+  render();
+}
+
+function completeCurrentMiniTask() {
+  const summary = summarize({ ...day(), tasks: todayTasks(), blocks: decorateBlocks(day().blocks ?? [], todayTasks()) }, nowHHMM());
+  if (!summary.currentBlock) return;
+  toggleDone(summary.currentBlock.taskId);
+  overdueDismissedKey = null;
+
+  const nextSummary = summarize({ ...day(), tasks: todayTasks(), blocks: decorateBlocks(day().blocks ?? [], todayTasks()) }, nowHHMM());
+  const plan = planCompletionNotification({ prefs: notificationPrefs(), nextBlock: nextSummary.nextBlock });
+  if (plan) fireNotification(plan.kind, plan.block);
+}
+
+function renderMini(summary) {
+  const container = miniElRef;
+  const toggleBtn = el("tb-mini-toggle");
+  if (toggleBtn) toggleBtn.hidden = false;
+  if (!container) return;
+
+  const clock = container.querySelector("#tb-mini-clock");
+  if (clock) clock.textContent = nowHHMM();
+
+  if (miniMode === "closed") return;
+
+  const view = deriveMiniView(summary);
+  const body = container.querySelector("#tb-mini-body");
+  if (!body) return;
+
+  if (view.mode === "empty") {
+    body.innerHTML = `<p class="tb-mini-time">今日の予定はまだありません。DAYLOOPで時間割をつくってください。</p>`;
+  } else if (view.mode === "overdue") {
+    const key = `${view.block.taskId}-${view.block.start}`;
+    if (overdueDismissedKey === key) {
+      body.innerHTML = miniNowMarkup(view.block, 0, view.nextBlock);
+    } else {
+      body.innerHTML = `
+        <p class="tb-mini-label">NOW</p>
+        <p class="tb-mini-title">${esc(view.block.title)}</p>
+        <p class="tb-mini-overdue">予定時間を過ぎています。</p>
+        <div class="tb-mini-row">
+          <button type="button" class="tb-mini-btn is-ghost" data-action="mini-continue">続ける</button>
+          <button type="button" class="tb-mini-btn" data-action="mini-replan">残りを組み直す</button>
+        </div>`;
+    }
+  } else if (view.mode === "now") {
+    body.innerHTML = miniNowMarkup(view.block, view.remainingMinutes, view.nextBlock);
+  } else if (view.mode === "next-only") {
+    body.innerHTML = `
+      <p class="tb-mini-label">NEXT</p>
+      <p class="tb-mini-title">${esc(view.nextBlock.title)}</p>
+      <p class="tb-mini-time">${esc(view.nextBlock.start)} - ${esc(view.nextBlock.end)}</p>`;
+  }
+}
+
+function miniNowMarkup(block, remainingMinutes, nextBlock) {
+  return `
+    <p class="tb-mini-label">NOW</p>
+    <p class="tb-mini-title">${esc(block.title)}</p>
+    <p class="tb-mini-time">${esc(block.start)} - ${esc(block.end)}</p>
+    <p class="tb-mini-remaining">残り ${Math.max(0, remainingMinutes)}分</p>
+    <div class="tb-mini-row">
+      <button type="button" class="tb-mini-btn" data-action="mini-complete">完了</button>
+      <button type="button" class="tb-mini-btn is-ghost" data-action="mini-open-main">DAYLOOPを開く</button>
+    </div>
+    ${
+      nextBlock
+        ? `<div class="tb-mini-next"><strong>NEXT</strong> ${esc(nextBlock.title)}（${esc(nextBlock.start)}〜）</div>`
+        : ""
+    }`;
+}
+
+// ─── Mobile Sticky NOW Bar（§73/§74） ─────────────────────────
+
+function renderMobileNow(summary) {
+  const container = el("tb-mobile-now");
+  if (!container) return;
+  const view = deriveMiniView(summary);
+
+  if (view.mode === "empty") {
+    container.hidden = true;
+    return;
+  }
+  container.hidden = false;
+
+  const summaryEl = el("tb-mobile-now-summary");
+  if (summaryEl) {
+    if (view.mode === "now") {
+      summaryEl.textContent = `NOW ｜ ${view.block.title} ｜ 残り${Math.max(0, view.remainingMinutes)}分`;
+    } else if (view.mode === "overdue") {
+      summaryEl.textContent = `NOW ｜ ${view.block.title} ｜ 予定時間を超過`;
+    } else {
+      summaryEl.textContent = `NEXT ｜ ${view.nextBlock.title} ｜ ${view.nextBlock.start}〜`;
+    }
+  }
+
+  const bar = el("tb-mobile-now-bar");
+  if (bar) bar.setAttribute("aria-expanded", String(mobileNowExpanded));
+
+  const expanded = el("tb-mobile-now-expanded");
+  if (!expanded) return;
+  expanded.hidden = !mobileNowExpanded;
+  if (!mobileNowExpanded) return;
+
+  if (view.mode === "now") {
+    expanded.innerHTML = miniNowMarkup(view.block, view.remainingMinutes, view.nextBlock);
+  } else if (view.mode === "overdue") {
+    const key = `mobile-${view.block.taskId}-${view.block.start}`;
+    expanded.innerHTML =
+      overdueDismissedKey === key
+        ? miniNowMarkup(view.block, 0, view.nextBlock)
+        : `
+      <p class="tb-mini-label">NOW</p>
+      <p class="tb-mini-title">${esc(view.block.title)}</p>
+      <p class="tb-mini-overdue">予定時間を過ぎています。</p>
+      <div class="tb-mini-row">
+        <button type="button" class="tb-mini-btn is-ghost" data-action="mini-continue">続ける</button>
+        <button type="button" class="tb-mini-btn" data-action="mini-replan">残りを組み直す</button>
+      </div>`;
+  } else {
+    expanded.innerHTML = `
+      <p class="tb-mini-label">NEXT</p>
+      <p class="tb-mini-title">${esc(view.nextBlock.title)}</p>
+      <p class="tb-mini-time">${esc(view.nextBlock.start)} - ${esc(view.nextBlock.end)}</p>`;
+  }
+}
+
+// ─── App Badge（§82） ──────────────────────────────────────────
+
+function updateAppBadge(tasks) {
+  const incomplete = tasks.filter((t) => !t.done).length;
+  setAppBadgeCount(incomplete);
+}
+
+// ─── 実行サポート通知（§78/§79/§86/§87） ─────────────────────
+
+function fireNotification(kind, block) {
+  if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
+  const { title, body } = buildNotificationMessage(kind, block, {
+    showTaskTitle: notificationPrefs().showTaskTitleInNotification,
+  });
+  try {
+    const n = new Notification(title, { body, tag: `daylock-${kind}`, icon: "/images/dayloop/brand/dayloop-logo-icon.svg" });
+    n.onclick = () => {
+      window.focus();
+      n.close();
+    };
+  } catch {
+    // Notification生成に失敗しても実行そのものは継続する（付加機能のため）
+  }
+}
+
+/** 1分ごとのtickからだけ呼ぶ（renderのたびに呼ぶと同じ通知が連打される） */
+function checkAndFireNotifications(summary) {
+  const nowKey = nowHHMM();
+  if (lastNotificationMinute === nowKey) return;
+  lastNotificationMinute = nowKey;
+
+  const toFire = planNotifications({ summary, prefs: notificationPrefs(), nowHHMM: nowKey });
+  for (const { kind, block } of toFire) fireNotification(kind, block);
+}
+
+// ─── Web Push 購読（§75-77/§90） ──────────────────────────────
+
+async function registerServiceWorker() {
+  if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return null;
+  try {
+    return await navigator.serviceWorker.register("/sw.js", { scope: "/app/" });
+  } catch {
+    return null;
+  }
+}
+
+async function subscribeToPush() {
+  if (!isPushSupported() || !isPushConfigured()) {
+    notify("warn", "通知機能は未設定です。");
+    return;
+  }
+  const authState = account.getState();
+  if (authState.status !== "authenticated") {
+    notify("warn", "Push通知はログイン後に使えます。");
+    return;
+  }
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") {
+      notify("warn", "通知が許可されませんでした。");
+      return;
+    }
+    const registration = await registerServiceWorker();
+    if (!registration) throw new Error("service_worker_unavailable");
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(getVapidPublicKey()),
+    });
+    const row = subscriptionToRow({
+      subscriptionJson: subscription.toJSON(),
+      userId: authState.user.id,
+      deviceId: getDeviceId(),
+    });
+    const client = await getSupabaseClient();
+    if (!client) throw new Error("not_configured");
+    const { error } = await client.from("push_subscriptions").upsert(row, { onConflict: "user_id,device_id" });
+    if (error) throw error;
+    notify("success", "この端末への通知を有効にしました。");
+    renderSettingsModal();
+  } catch {
+    notify("error", "通知の設定に失敗しました。");
+  }
+}
+
+async function unsubscribeFromPush() {
+  try {
+    const registration = await navigator.serviceWorker?.getRegistration("/app/");
+    const subscription = await registration?.pushManager?.getSubscription();
+    if (subscription) await subscription.unsubscribe();
+
+    const authState = account.getState();
+    if (authState.status === "authenticated") {
+      const client = await getSupabaseClient();
+      if (client) {
+        await client
+          .from("push_subscriptions")
+          .update({ enabled: false })
+          .eq("user_id", authState.user.id)
+          .eq("device_id", getDeviceId());
+      }
+    }
+    notify("info", "この端末への通知を無効にしました。");
+    renderSettingsModal();
+  } catch {
+    notify("error", "解除に失敗しました。");
+  }
 }
 
 /** 保存したブロックへ、最新のタスク状態（完了・削除）を重ねる */
@@ -871,6 +1220,48 @@ function onClick(event) {
       break;
     case "account-delete-final":
       account.finalizeAccountDelete();
+      break;
+    case "mini-toggle":
+      toggleMini();
+      break;
+    case "mini-minimize":
+      closeMini();
+      break;
+    case "mini-complete":
+      completeCurrentMiniTask();
+      break;
+    case "mini-open-main":
+      window.focus();
+      break;
+    case "mini-continue": {
+      const summary = summarize(
+        { ...day(), tasks: todayTasks(), blocks: decorateBlocks(day().blocks ?? [], todayTasks()) },
+        nowHHMM()
+      );
+      if (summary.currentBlock) overdueDismissedKey = `${summary.currentBlock.taskId}-${summary.currentBlock.start}`;
+      render();
+      break;
+    }
+    case "mini-replan":
+      overdueDismissedKey = null;
+      rebuild({ fromHHMM: nowHHMM() });
+      break;
+    case "mobile-now-toggle":
+      mobileNowExpanded = !mobileNowExpanded;
+      render();
+      break;
+    case "notif-toggle":
+      saveNotificationPrefs({ [target.dataset.pref]: !notificationPrefs()[target.dataset.pref] });
+      renderSettingsModal();
+      break;
+    case "notif-request-permission":
+      Notification?.requestPermission?.().then(() => renderSettingsModal());
+      break;
+    case "push-subscribe":
+      subscribeToPush();
+      break;
+    case "push-unsubscribe":
+      unsubscribeFromPush();
       break;
     default:
       break;
@@ -1473,6 +1864,7 @@ const SETTINGS_SECTIONS = [
   { id: "account", label: "アカウント" },
   { id: "integrations", label: "連携" },
   { id: "storage", label: "データ" },
+  { id: "focus", label: "実行サポート" },
   { id: "privacy", label: "プライバシー" },
 ];
 
@@ -1488,11 +1880,60 @@ function renderSettingsModal() {
     body.innerHTML = renderDataStorageSection();
   } else if (settingsSection === "integrations") {
     body.innerHTML = renderIntegrationsSection();
+  } else if (settingsSection === "focus") {
+    body.innerHTML = renderFocusSection();
   } else if (settingsSection === "privacy") {
     body.innerHTML = renderPrivacySection();
   } else {
     body.innerHTML = renderAccountSection();
   }
+}
+
+/** §79: 実行サポート（Mini / 通知） */
+function renderFocusSection() {
+  const prefs = notificationPrefs();
+  const permission = typeof Notification !== "undefined" ? Notification.permission : "unsupported";
+
+  const toggle = (pref, label) => `
+    <label class="tb-inline-field">
+      <input type="checkbox" data-action="notif-toggle" data-pref="${pref}" ${prefs[pref] ? "checked" : ""}>
+      ${esc(label)}
+    </label>`;
+
+  return `
+    <div class="tb-settings-section">
+      <h3>実行サポート</h3>
+      <p class="tb-card-hint">DAYLOOPを開かなくても、今やること・次にやることが分かるようにします。</p>
+
+      <p class="tb-card-title" style="margin-bottom:4px;">Desktop Mini</p>
+      ${toggle("desktopMiniEnabled", "Desktop Mini")}
+      <p class="tb-card-hint">${isPipSupported() ? "このブラウザはミニ表示（常時手前表示）に対応しています。" : "このブラウザは常時手前表示に対応していないため、アプリ内の固定表示で代わります。"}</p>
+
+      <hr class="tb-settings-divider">
+      <p class="tb-card-title" style="margin-bottom:4px;">通知</p>
+      ${toggle("taskStartNotification", "Task Start Notification")}
+      ${toggle("fiveMinutesBefore", "5 Minutes Before")}
+      ${toggle("showNextAfterComplete", "Show Next After Complete")}
+      ${toggle("endNotification", "End Notification")}
+      ${toggle("showTaskTitleInNotification", "通知にタスク名を表示する")}
+
+      <p class="tb-card-hint">
+        通知の許可状態: <strong>${esc(permission === "granted" ? "許可済み" : permission === "denied" ? "拒否されています" : "未確認")}</strong>
+      </p>
+      ${
+        permission !== "granted"
+          ? `<div class="tb-row-actions"><button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="notif-request-permission">通知を許可する</button></div>`
+          : ""
+      }
+
+      <hr class="tb-settings-divider">
+      <p class="tb-card-title" style="margin-bottom:4px;">アプリを閉じていても通知を受け取る（Web Push）</p>
+      <p class="tb-card-hint">DAYLOOPアカウントでログインすると、この端末をPush通知の対象として登録できます。</p>
+      <div class="tb-row-actions">
+        <button type="button" class="tb-btn tb-btn-primary tb-btn-sm" data-action="push-subscribe">この端末の通知を有効にする</button>
+        <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="push-unsubscribe">無効にする</button>
+      </div>
+    </div>`;
 }
 
 /** §33/§34: アカウント */
