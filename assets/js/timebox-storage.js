@@ -16,9 +16,35 @@ import { defaultWeeklyTemplate, todayLocal } from "./timebox-engine.js";
 const KEY = "timebox-os/v1";
 export const STORAGE_VERSION = 2;
 
-/** localStorageが使えない環境（プライベートモード等）ではメモリ上で動かす */
-let memoryFallback = null;
+/**
+ * Cache Namespace（§39）。
+ * Guest利用中はnull＝既存の "timebox-os/v1" をそのまま使う（rename/deleteしない）。
+ * ログイン中は `user/<user-id>` へ切り替え、Account Cache と Guest State を分離する。
+ * ログアウトすると null へ戻り、Guest画面へAccount側のキャッシュがそのまま出ることを防ぐ。
+ * 同じAccountへ再ログインすれば同じキーを再び使うため、キャッシュは再利用される。
+ */
+let namespaceSuffix = null;
+/** namespace(storageKey())ごとに分離したメモリ退避先。localStorageが無い環境でも
+ * namespace切り替え後に元のnamespaceへ戻ればキャッシュが再利用できるようにする。 */
+const memoryFallbackStore = new Map();
 
+export function setActiveNamespace(namespace) {
+  namespaceSuffix = namespace || null;
+}
+
+export function getActiveNamespace() {
+  return namespaceSuffix;
+}
+
+export function userNamespace(userId) {
+  return `user/${userId}`;
+}
+
+function storageKey() {
+  return namespaceSuffix ? `${KEY}::${namespaceSuffix}` : KEY;
+}
+
+/** localStorageが使えない環境（プライベートモード等）ではメモリ上で動かす */
 function storage() {
   try {
     const test = "__timebox_probe__";
@@ -166,14 +192,16 @@ export function saveAutomationCandidate(candidate) {
 }
 
 export function load() {
-  if (memoryFallback) return memoryFallback;
   const store = storage();
   if (!store) {
-    memoryFallback = emptyState();
-    return memoryFallback;
+    const cached = memoryFallbackStore.get(storageKey());
+    if (cached) return cached;
+    const empty = emptyState();
+    memoryFallbackStore.set(storageKey(), empty);
+    return empty;
   }
   try {
-    const raw = store.getItem(KEY);
+    const raw = store.getItem(storageKey());
     return normalize(raw ? JSON.parse(raw) : null);
   } catch (error) {
     console.error("[timebox] 保存データを読めませんでした:", error);
@@ -185,15 +213,15 @@ export function save(state) {
   const next = normalize(state);
   const store = storage();
   if (!store) {
-    memoryFallback = next;
+    memoryFallbackStore.set(storageKey(), next);
     return next;
   }
   try {
-    store.setItem(KEY, JSON.stringify(next));
+    store.setItem(storageKey(), JSON.stringify(next));
   } catch (error) {
     // 容量超過など。データは失いたくないのでメモリへ退避する
     console.error("[timebox] 保存に失敗しました:", error);
-    memoryFallback = next;
+    memoryFallbackStore.set(storageKey(), next);
   }
   return next;
 }
@@ -204,9 +232,9 @@ export function patch(changes) {
 }
 
 export function clearAll() {
-  memoryFallback = null;
+  memoryFallbackStore.delete(storageKey());
   const store = storage();
-  if (store) store.removeItem(KEY);
+  if (store) store.removeItem(storageKey());
   return emptyState();
 }
 
