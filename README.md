@@ -182,6 +182,18 @@ Landing Pageでも「登録不要・無料・データは自分の場所へ」�
 - Build output directory: `dist`
 - Node: `.node-version`（22）
 
+> **要確認（2026-08-13時点で未設定）**: 実際のPagesプロジェクトの
+> **Build output directory がリポジトリのルートになっている**。そのため配信されているのは
+> Viteのビルド結果ではなくソースそのもので、次の不具合が出ている。
+>
+> - `public/` の中身がルート直下に来ないため、`/images/dayloop/...` がすべて404になる
+>   （アプリのロゴ・OGP画像が表示されない。SNSシェアのカードも出ない）
+> - `/package.json` `/README.md` `/supabase/migrations/*.sql` `/.env.example` が公開されている
+> - `assets/` のCSS/JSがバンドル・minifyされずそのまま配信される
+>
+> ダッシュボードの **Settings → Builds & deployments → Build output directory** を
+> `dist` に変更すれば解消する。
+
 `@supabase/supabase-js` が `engines: node >= 22` を要求するため、Nodeのバージョンを
 リポジトリ側で固定してCI（`node-version: 22`）と揃えている。
 
