@@ -85,7 +85,9 @@ Viteでビルドし、`dist/` に以下を出力します。
 dist/index.html         Landing Page
 dist/app/index.html     DAYLOOPアプリ本体
 dist/assets/...         CSS / JS（ハッシュ付き）
-dist/favicon.svg
+dist/images/dayloop/    ロゴ・OGP等の画像（public/ をそのままコピー）
+dist/favicon.png        ファビコン
+dist/apple-touch-icon.png
 dist/_redirects         /app → /app/ の301リダイレクト（Cloudflare Pages用）
 ```
 
@@ -101,12 +103,15 @@ assets/js/timebox-engine.js    時間割の計算（純粋関数・DOMに触ら�
 assets/js/timebox-storage.js   端末への保存・JSONエクスポート/インポート
 assets/js/timebox.js           描画とユーザー操作
 assets/js/storage-providers/   Local / Obsidian / Google Sheets(GAS) / Google Drive の保存先実装
+assets/brand-source/           ロゴの元データ（高解像度PNG）。デプロイ対象外
 tests/timebox-engine.test.js   エンジンのテスト
 tests/timebox-storage.test.js  保存層のテスト
 tests/storage-providers.test.js Storage Providerのテスト
 tests/ai-lib.test.js           AI Brain Dump解析ロジックのテスト
 public/_redirects              Cloudflare Pagesのルーティング設定
-public/favicon.svg             ファビコン（DAYLOOP Symbol Mark）
+public/images/dayloop/brand/   正式ロゴPNG（明るい面用 / 暗い面用 / マーク単体）
+public/favicon.png             ファビコン（DAYLOOP Symbol Mark）
+public/apple-touch-icon.png    iOSホーム画面アイコン（白地180px）
 docs/PRODUCT_ROADMAP.md        プロダクトロードマップ（Phase 1〜5）
 vite.config.js                 マルチページビルド設定（index.html / app/index.html）
 ```

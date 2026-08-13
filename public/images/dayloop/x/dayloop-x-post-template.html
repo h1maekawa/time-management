@@ -30,8 +30,9 @@
     background-position:0 0, 12px 12px, 24px 0;
     -webkit-mask-image: radial-gradient(circle at center, #000 0%, transparent 72%);
   }
-  .logo { position:absolute; bottom:40px; left:64px; display:flex; align-items:center; gap:10px; }
-  .logo-word { font-family:'Syne',sans-serif; font-weight:800; font-size:18px; color:#150C33; }
+  .logo { position:absolute; bottom:40px; left:64px; display:flex; align-items:center; }
+  /* 正式ロゴ（public/images/dayloop/brand/）。白背景なので明るい面用を使う */
+  .logo-img { height:34px; width:auto; display:block; }
   h1 { font-size:56px; line-height:1.5; font-weight:900; color:#150C33; letter-spacing:-0.01em; white-space:pre-line; }
   h1 .accent { background:linear-gradient(120deg,#3D5AFE,#14B8A6); -webkit-background-clip:text; background-clip:text; color:transparent; }
   .sub { margin-top:22px; font-size:24px; font-weight:700; color:#3D5AFE; white-space:pre-line; }
@@ -44,19 +45,7 @@
 だから、<span class="accent">考える時間を減らす。</span></h1>
   <p class="sub" id="sub"></p>
   <div class="logo">
-    <svg width="28" height="28" viewBox="0 0 32 32">
-      <defs><linearGradient id="g" x1="5" y1="5" x2="27" y2="27" gradientUnits="userSpaceOnUse">
-        <stop offset="0" stop-color="#3D5AFE"/><stop offset="1" stop-color="#14B8A6"/>
-      </linearGradient></defs>
-      <rect width="32" height="32" rx="9" fill="#0F2A4A"/>
-      <path d="M22.9 20.1A7.6 7.6 0 1 1 20.9 9.3" fill="none" stroke="url(#g)" stroke-width="3" stroke-linecap="round"/>
-      <path d="M20.9 9.3 24.6 9.8 21.9 12.8Z" fill="url(#g)"/>
-      <line x1="16" y1="16" x2="16" y2="12" stroke="url(#g)" stroke-width="1.6" stroke-linecap="round"/>
-      <line x1="16" y1="16" x2="19.4" y2="16" stroke="url(#g)" stroke-width="1.6" stroke-linecap="round"/>
-      <circle cx="16" cy="16" r="1.3" fill="url(#g)"/>
-      <circle cx="16" cy="6.6" r="1.1" fill="url(#g)"/>
-    </svg>
-    <span class="logo-word">DAYLOOP</span>
+    <img class="logo-img" src="../brand/dayloop-wordmark.png" alt="DAYLOOP">
   </div>
   <script>
     var p = new URLSearchParams(location.search);

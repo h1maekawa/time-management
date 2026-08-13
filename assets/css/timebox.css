@@ -71,8 +71,10 @@
 }
 
 /* --- App shell --- */
+/* タイムライン（カレンダー）をファーストビューに収めるため、
+   アプリ上部（ステータスバー・KPI）は1行で完結する高さに抑えている。 */
 .tb-app {
-    padding-bottom: 120px;
+    padding: 14px 0 120px;
 }
 
 .tb-statusbar {
@@ -80,18 +82,26 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: 10px 16px;
+    margin-bottom: 12px;
+}
+
+.tb-statusbar-id {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 10px;
 }
 
 .tb-statusbar-date {
     font-family: var(--font-en);
     font-weight: 800;
-    font-size: 1.3rem;
+    font-size: 1.15rem;
+    line-height: 1.3;
 }
 
 .tb-statusbar-now {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-secondary);
 }
 
@@ -102,11 +112,13 @@
 }
 
 .tb-kpi {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
     background: rgba(255, 255, 255, 0.6);
     border: 1px solid rgba(13, 13, 13, 0.1);
-    border-radius: 14px;
-    padding: 8px 14px;
-    min-width: 92px;
+    border-radius: 100px;
+    padding: 5px 12px;
 }
 
 .tb-kpi-label {
@@ -116,7 +128,7 @@
 
 .tb-kpi-value {
     font-weight: 700;
-    font-size: 1.05rem;
+    font-size: 0.9rem;
     line-height: 1.3;
 }
 
@@ -147,10 +159,6 @@
     align-items: start;
 }
 
-@media (max-width: 992px) {
-    .tb-grid { grid-template-columns: 1fr; }
-}
-
 .tb-col {
     display: flex;
     flex-direction: column;
@@ -161,8 +169,26 @@
 @media (min-width: 993px) {
     .tb-col-sticky {
         position: sticky;
-        top: 96px;
+        top: 84px;
     }
+}
+
+/* 1カラムになる幅では、カラムをたたんでカードを直接並べ替える。
+   タイムライン（カレンダー）を最上部に置き、開いた直後に今日の予定が見える状態にする。 */
+@media (max-width: 992px) {
+    .tb-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .tb-col { display: contents; }
+
+    .tb-card-timeline { order: 1; }
+    .tb-card-entry { order: 2; }
+    .tb-card-triage { order: 3; }
+    .tb-card-export { order: 4; }
+    .tb-card-data { order: 5; }
 }
 
 /* --- Card --- */
@@ -482,8 +508,9 @@
 .tb-capacity {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 14px;
+    gap: 10px;
+    flex: 1 1 260px;
+    min-width: 0;
 }
 
 @media (max-width: 480px) {
@@ -492,17 +519,37 @@
 
 .tb-capacity-item {
     border: 1px solid var(--tb-line);
-    border-radius: 14px;
-    padding: 10px 12px;
+    border-radius: 12px;
+    padding: 7px 10px;
+    min-width: 0;
 }
 
 .tb-capacity-label {
     display: flex;
     justify-content: space-between;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: var(--tb-muted);
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     gap: 8px;
+    white-space: nowrap;
+}
+
+/* スマートフォンでもタイムラインを上に置くため、上部の情報量を1行ずつに詰める */
+@media (max-width: 560px) {
+    .tb-app { padding-top: 10px; }
+
+    .tb-statusbar { gap: 8px; margin-bottom: 10px; }
+    .tb-statusbar-kpis { gap: 6px; }
+    .tb-kpi { padding: 4px 10px; }
+    .tb-kpi-label { font-size: 0.62rem; }
+    .tb-kpi-value { font-size: 0.8rem; }
+
+    .tb-capacity { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .tb-capacity-item { padding: 6px 8px; }
+    .tb-capacity-label { font-size: 0.62rem; gap: 4px; }
+
+    .tb-planbar-actions { gap: 6px; }
+    .tb-planbar-actions .tb-btn-sm { font-size: 0.7rem; padding: 7px 9px; }
 }
 
 .tb-bar {
@@ -519,14 +566,34 @@
 }
 
 /* --- Timeline --- */
+/* 枠の容量バーと「時間割をつくる」を1行にまとめ、タイムライン本体を上へ引き上げる */
+.tb-planbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+    margin-top: 12px;
+}
+
+.tb-planbar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
 .tb-timeline-scroll {
     position: relative;
-    margin-top: 14px;
-    height: 520px;
+    margin-top: 12px;
+    /* ファーストビューに収める。ヘッダー・ステータスバー・プランバーの実測ぶんを引く */
+    height: clamp(320px, calc(100vh - 330px), 640px);
     overflow-y: auto;
     border: 1px solid var(--tb-line);
     border-radius: 14px;
     background: #fbfcfd;
+}
+
+.tb-timeline-hint {
+    margin-top: 10px;
 }
 
 .tb-timeline {
@@ -757,7 +824,7 @@
 @media (max-width: 768px) {
     .tb-hero { padding-top: 120px; }
     .tb-card { padding: 18px; }
-    .tb-timeline-scroll { height: 420px; }
+    .tb-timeline-scroll { height: clamp(300px, calc(100vh - 380px), 520px); }
     .tb-modal-panel-wide { width: 100%; padding: 20px; }
     .tb-review-list { max-height: 60vh; }
     .tb-entry-tabs { flex-direction: column; }
@@ -787,12 +854,19 @@
 .tb-appbar-logo {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     font-family: var(--font-en);
     font-size: 1.15rem;
     font-weight: 800;
     letter-spacing: -0.01em;
     white-space: nowrap;
+}
+
+/* ロゴ画像（明るい面用。文字が濃紺なので白〜ラベンダー背景に置く） */
+.tb-appbar-logo-img {
+    height: 30px;
+    width: auto;
+    flex: 0 0 auto;
 }
 
 .tb-appbar-logo-sub {
@@ -813,10 +887,27 @@
 
 .tb-appbar-nav a:hover { opacity: 0.65; }
 
+/* 紹介ページ（LP）へ戻る導線。アプリ側からの出口はここだけにする */
+.tb-appbar-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--tb-muted);
+}
+
+/* 幅が狭いときは、紹介ページの各セクションへのリンクだけを隠す。
+   「ホーム」「設定」「Account」はモバイルでも常に到達できるようにする（§58）。
+   ここを `.tb-appbar-nav a` で一括に隠すと、アプリから出る導線が無くなってしまう。 */
 @media (max-width: 560px) {
-    /* サイト内リンクは隠すが、設定・Account UIはモバイルでも常に到達できるようにする（§58） */
-    .tb-appbar-nav a { display: none; }
-    .tb-appbar-nav { gap: 10px; }
+    .tb-appbar-nav { gap: 8px; }
+    .tb-appbar-nav a:not(.tb-appbar-home) { display: none; }
+    .tb-appbar-logo-sub { display: none; }
+
+    /* 「ホー／ム」のように途中で折り返さないようにする */
+    .tb-appbar-nav > * { white-space: nowrap; }
+    .tb-appbar-home { font-size: 0.72rem; }
+    .tb-appbar-settings { padding: 5px 10px; font-size: 0.72rem; }
+    .tb-appbar-logo-img { height: 26px; }
 }
 
 .tb-appfooter {
@@ -870,7 +961,6 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    margin-top: 6px;
     font-family: inherit;
     font-size: 0.68rem;
     font-weight: 700;
