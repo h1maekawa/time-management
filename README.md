@@ -180,6 +180,17 @@ Landing Pageでも「登録不要・無料・データは自分の場所へ」�
 - Production branch: `main`
 - Build command: `npm run build`
 - Build output directory: `dist`
+- Node: `.node-version`（22）
+
+`@supabase/supabase-js` が `engines: node >= 22` を要求するため、Nodeのバージョンを
+リポジトリ側で固定してCI（`node-version: 22`）と揃えている。
+
+> **未解決**: Cloudflare Pagesのビルドは #5（Supabase導入）以降失敗しており、
+> 本番は #4 のデプロイのまま止まっている。`.node-version` を置いても解消しなかった。
+> ビルドシステムv1のプロジェクトは `.node-version` を読まないため、ダッシュボードで
+> 環境変数 `NODE_VERSION=22` を設定するか、ビルドシステムをv2へ上げる必要があるかもしれない。
+> ローカルとGitHub Actions（Node 22）では `npm ci && npm run build` が通るため、
+> Pages側のログを見ないと切り分けられない。
 
 `public/_redirects` により `/app`（末尾スラッシュなし）へのアクセスも
 `/app/` へ301リダイレクトされ、`dist/app/index.html` が表示されます。
