@@ -104,6 +104,30 @@ test("security: SUPABASE_SERVICE_ROLE_KEYはfunctions/(Cloudflare Pages Function
   assert.match(deleteFn, /SUPABASE_SERVICE_ROLE_KEY/);
 });
 
+test("build: functions/ から npm パッケージを import しない（Pages Functionsのビルドが壊れるため）", () => {
+  // Cloudflare Pages は functions/ をWorkerへバンドルする。@supabase/supabase-js を
+  // ここでimportすると http / crypto / process といったNode組み込みモジュールが
+  // 取り込まれ、nodejs_compat が無い環境でビルドが落ちる。
+  // GitHub Actionsは `npm run build` しか実行せず functions/ をバンドルしないため、
+  // CIが緑のままPagesのデプロイだけが失敗する（実際に #5 以降そうなっていた）。
+  // Auth の管理操作は REST API を fetch で叩くこと。
+  const functionFiles = listSourceFiles(path.join(root, "functions"));
+  assert.ok(functionFiles.length > 0, "functions/ にJSファイルが存在すること");
+
+  for (const file of functionFiles) {
+    const source = fs.readFileSync(file, "utf8");
+    const imports = [...source.matchAll(/(?:from\s*|import\s*\(\s*)["']([^"']+)["']/g)].map((m) => m[1]);
+    for (const specifier of imports) {
+      const isRelative = specifier.startsWith("./") || specifier.startsWith("../");
+      const isNodeBuiltin = specifier.startsWith("node:");
+      assert.ok(
+        isRelative || isNodeBuiltin,
+        `${path.relative(root, file)} が npm パッケージ "${specifier}" を import している`
+      );
+    }
+  }
+});
+
 test("security: .env.exampleにVITE_接頭辞のClient向け変数のみ記載し、値は空である", () => {
   const envExample = fs.readFileSync(path.join(root, ".env.example"), "utf8");
   assert.match(envExample, /VITE_SUPABASE_URL=\s*$/m);

@@ -85,7 +85,9 @@ Viteでビルドし、`dist/` に以下を出力します。
 dist/index.html         Landing Page
 dist/app/index.html     DAYLOOPアプリ本体
 dist/assets/...         CSS / JS（ハッシュ付き）
-dist/favicon.svg
+dist/images/dayloop/    ロゴ・OGP等の画像（public/ をそのままコピー）
+dist/favicon.png        ファビコン
+dist/apple-touch-icon.png
 dist/_redirects         /app → /app/ の301リダイレクト（Cloudflare Pages用）
 ```
 
@@ -101,12 +103,15 @@ assets/js/timebox-engine.js    時間割の計算（純粋関数・DOMに触ら�
 assets/js/timebox-storage.js   端末への保存・JSONエクスポート/インポート
 assets/js/timebox.js           描画とユーザー操作
 assets/js/storage-providers/   Local / Obsidian / Google Sheets(GAS) / Google Drive の保存先実装
+assets/brand-source/           ロゴの元データ（高解像度PNG）。デプロイ対象外
 tests/timebox-engine.test.js   エンジンのテスト
 tests/timebox-storage.test.js  保存層のテスト
 tests/storage-providers.test.js Storage Providerのテスト
 tests/ai-lib.test.js           AI Brain Dump解析ロジックのテスト
 public/_redirects              Cloudflare Pagesのルーティング設定
-public/favicon.svg             ファビコン（DAYLOOP Symbol Mark）
+public/images/dayloop/brand/   正式ロゴPNG（明るい面用 / 暗い面用 / マーク単体）
+public/favicon.png             ファビコン（DAYLOOP Symbol Mark）
+public/apple-touch-icon.png    iOSホーム画面アイコン（白地180px）
 docs/PRODUCT_ROADMAP.md        プロダクトロードマップ（Phase 1〜5）
 vite.config.js                 マルチページビルド設定（index.html / app/index.html）
 ```
@@ -175,6 +180,29 @@ Landing Pageでも「登録不要・無料・データは自分の場所へ」�
 - Production branch: `main`
 - Build command: `npm run build`
 - Build output directory: `dist`
+- Node: `.node-version`（22）
+
+> **要確認（2026-08-13時点で未設定）**: 実際のPagesプロジェクトの
+> **Build output directory がリポジトリのルートになっている**。そのため配信されているのは
+> Viteのビルド結果ではなくソースそのもので、次の不具合が出ている。
+>
+> - `public/` の中身がルート直下に来ないため、`/images/dayloop/...` がすべて404になる
+>   （アプリのロゴ・OGP画像が表示されない。SNSシェアのカードも出ない）
+> - `/package.json` `/README.md` `/supabase/migrations/*.sql` `/.env.example` が公開されている
+> - `assets/` のCSS/JSがバンドル・minifyされずそのまま配信される
+>
+> ダッシュボードの **Settings → Builds & deployments → Build output directory** を
+> `dist` に変更すれば解消する。
+
+`@supabase/supabase-js` が `engines: node >= 22` を要求するため、Nodeのバージョンを
+リポジトリ側で固定してCI（`node-version: 22`）と揃えている。
+
+> **未解決**: Cloudflare Pagesのビルドは #5（Supabase導入）以降失敗しており、
+> 本番は #4 のデプロイのまま止まっている。`.node-version` を置いても解消しなかった。
+> ビルドシステムv1のプロジェクトは `.node-version` を読まないため、ダッシュボードで
+> 環境変数 `NODE_VERSION=22` を設定するか、ビルドシステムをv2へ上げる必要があるかもしれない。
+> ローカルとGitHub Actions（Node 22）では `npm ci && npm run build` が通るため、
+> Pages側のログを見ないと切り分けられない。
 
 `public/_redirects` により `/app`（末尾スラッシュなし）へのアクセスも
 `/app/` へ301リダイレクトされ、`dist/app/index.html` が表示されます。

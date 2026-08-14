@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DAYLOOP アプリ | 全部書く。AIが整理。今日が決まる。</title>
-    <meta name="description" content="今日やることを書き出し、AIが整理して優先順位と使える時間から1日の時間割を自動で組み立てるアプリ、DAYLOOP。無料で使えて、データは端末やObsidianに保存されます。">
+    <meta name="description"
+        content="今日やることを書き出し、AIが整理して優先順位と使える時間から1日の時間割を自動で組み立てるアプリ、DAYLOOP。無料で使えて、データは端末やObsidianに保存されます。">
     <link rel="canonical" href="https://timebox.maemichi.com/app/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="DAYLOOP">
@@ -16,25 +18,32 @@
     <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="robots" content="index,follow">
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Syne:wght@700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/base.css">
     <link rel="stylesheet" href="../assets/css/timebox.css">
 </head>
+
 <body class="tb-page">
-    <a class="skip-link" href="#tb-main">本文へ移動</a>
+    <a class="skip-link" href="#tb-main">今日のタイムラインへ移動</a>
 
     <header class="tb-appbar">
         <div class="container tb-appbar-inner">
-            <a href="/" class="tb-appbar-logo">
-                <img src="/images/dayloop/brand/dayloop-logo-icon.svg" width="22" height="22" alt="" aria-hidden="true">
-                DAYLOOP <span class="tb-appbar-logo-sub">AI Daily Planner / by maemichi</span>
+            <!-- アプリ内のロゴは /app/ （アプリのホーム）へ。紹介ページ（LP）へは右の「ホーム」から戻る -->
+            <a href="/app/" class="tb-appbar-logo">
+                <img class="tb-appbar-logo-img" src="/images/dayloop/brand/dayloop-wordmark.png" width="113"
+                    height="30" alt="DAYLOOP">
+                <span class="tb-appbar-logo-sub">AI Daily Planner / by maemichi</span>
             </a>
             <nav class="tb-appbar-nav" aria-label="サイト内リンク">
-                <a href="/#features">できること</a>
-                <a href="/#roadmap">今後の予定</a>
+                <a class="tb-appbar-home" href="/">
+                    <span aria-hidden="true">←</span> ホーム
+                </a>
                 <button type="button" class="tb-appbar-settings" data-action="open-settings">設定</button>
                 <div class="tb-account" id="tb-account"></div>
             </nav>
@@ -45,10 +54,11 @@
         <section class="tb-app">
             <div class="container">
                 <div class="tb-statusbar">
-                    <div>
+                    <div class="tb-statusbar-id">
                         <p class="tb-statusbar-date" id="tb-date">—</p>
                         <p class="tb-statusbar-now" id="tb-now">—</p>
-                        <button type="button" class="tb-sync-chip" id="tb-sync-chip" data-action="open-settings"></button>
+                        <button type="button" class="tb-sync-chip" id="tb-sync-chip"
+                            data-action="open-settings"></button>
                     </div>
                     <div class="tb-statusbar-kpis" id="tb-kpis"></div>
                 </div>
@@ -58,10 +68,11 @@
                 <div class="tb-grid">
                     <!-- 左：入力とタスク -->
                     <div class="tb-col">
-                        <div class="tb-card">
+                        <div class="tb-card tb-card-entry">
                             <div class="tb-entry-tabs" role="tablist" aria-label="タスクの入力方法">
                                 <button type="button" class="tb-entry-tab" role="tab" id="tb-entry-tab-brain-dump"
-                                    data-action="entry-mode" data-mode="brain-dump" aria-selected="true">AIと整理する</button>
+                                    data-action="entry-mode" data-mode="brain-dump"
+                                    aria-selected="true">AIと整理する</button>
                                 <button type="button" class="tb-entry-tab" role="tab" id="tb-entry-tab-manual"
                                     data-action="entry-mode" data-mode="manual" aria-selected="false">自分で追加する</button>
                             </div>
@@ -74,7 +85,8 @@
                                 <textarea id="tb-braindump-input" rows="6" class="tb-textarea"
                                     placeholder="FS週次資料作らないと&#10;明日の商談準備&#10;田中さん返信&#10;noteも書きたい&#10;LPも直したい"></textarea>
                                 <div class="tb-row-actions">
-                                    <button type="button" class="tb-btn tb-btn-primary" data-action="brain-dump-analyze">AIに整理してもらう</button>
+                                    <button type="button" class="tb-btn tb-btn-primary"
+                                        data-action="brain-dump-analyze">AIに整理してもらう</button>
                                 </div>
                                 <p class="tb-card-hint" id="tb-braindump-ai-state" role="status" aria-live="polite"></p>
                             </div>
@@ -96,14 +108,16 @@
                                     </label>
                                     <label class="tb-inline-field">
                                         所要
-                                        <input id="tb-input-minutes" class="tb-number" type="number" min="5" max="480" step="5" value="30">分
+                                        <input id="tb-input-minutes" class="tb-number" type="number" min="5" max="480"
+                                            step="5" value="30">分
                                     </label>
-                                    <button type="button" class="tb-btn tb-btn-primary" data-action="add-tasks">タスクを追加</button>
+                                    <button type="button" class="tb-btn tb-btn-primary"
+                                        data-action="add-tasks">タスクを追加</button>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="tb-card">
+                        <div class="tb-card tb-card-triage">
                             <div class="tb-card-head">
                                 <h2 class="tb-card-title">仕分ける</h2>
                                 <span class="tb-card-hint" id="tb-triage-hint"></span>
@@ -115,34 +129,39 @@
 
                     <!-- 右：枠とタイムライン -->
                     <div class="tb-col tb-col-sticky">
-                        <div class="tb-card">
-                            <div class="tb-card-head">
-                                <h2 class="tb-card-title">今日の使い方</h2>
-                                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="open-windows">枠を編集</button>
-                            </div>
-                            <div class="tb-capacity" id="tb-capacity"></div>
-                            <div class="tb-row-actions">
-                                <button type="button" class="tb-btn tb-btn-primary" data-action="build">時間割をつくる</button>
-                                <button type="button" class="tb-btn tb-btn-ghost" data-action="build-from-now">今から詰め直す</button>
-                            </div>
-                        </div>
-
-                        <div class="tb-card">
+                        <!-- 1日のタイムライン（＝カレンダー）。ファーストビューに置くため、
+                             「今日の使い方」の枠・容量と時間割生成のボタンはこのカードの上部バーへ統合している。 -->
+                        <div class="tb-card tb-card-timeline">
                             <div class="tb-card-head">
                                 <h2 class="tb-card-title">1日のタイムライン</h2>
-                                <span class="tb-card-hint">タスクをここへドラッグすると時刻を固定できます（スマートフォンではタスクの「固定」欄から時刻を入力してください）</span>
+                                <div class="tb-planbar-actions">
+                                    <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm"
+                                        data-action="open-windows">枠を編集</button>
+                                    <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm"
+                                        data-action="build-from-now">今から詰め直す</button>
+                                    <button type="button" class="tb-btn tb-btn-primary tb-btn-sm"
+                                        data-action="build">時間割をつくる</button>
+                                </div>
+                            </div>
+                            <div class="tb-planbar">
+                                <div class="tb-capacity" id="tb-capacity"></div>
                             </div>
                             <div class="tb-timeline-scroll" id="tb-timeline-scroll">
                                 <div class="tb-timeline" id="tb-timeline"></div>
                             </div>
+                            <p class="tb-card-hint tb-timeline-hint">
+                                タスクをここへドラッグすると時刻を固定できます（スマートフォンではタスクの「固定」欄から時刻を入力してください）
+                            </p>
                             <div id="tb-overflow"></div>
                         </div>
 
-                        <div class="tb-card">
+                        <div class="tb-card tb-card-export">
                             <h2 class="tb-card-title">カレンダーへ入れる</h2>
                             <div class="tb-export">
-                                <button type="button" class="tb-btn tb-btn-primary" data-action="export-ics">Googleカレンダーへ追加（.ics）</button>
-                                <button type="button" class="tb-btn tb-btn-locked" data-action="locked" data-feature="googleCalendarSync">
+                                <button type="button" class="tb-btn tb-btn-primary"
+                                    data-action="export-ics">Googleカレンダーへ追加（.ics）</button>
+                                <button type="button" class="tb-btn tb-btn-locked" data-action="locked"
+                                    data-feature="googleCalendarSync">
                                     Googleカレンダーと直接同期
                                     <span class="tb-lock">近日</span>
                                 </button>
@@ -155,15 +174,19 @@
                             </p>
                         </div>
 
-                        <div class="tb-card tb-card-quiet">
+                        <div class="tb-card tb-card-quiet tb-card-data">
                             <h2 class="tb-card-title">データの扱い</h2>
                             <p class="tb-card-hint" id="tb-storage-state"></p>
                             <div class="tb-row-actions">
-                                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="export-json">バックアップを保存</button>
-                                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="import-json">バックアップを読み込む</button>
-                                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="reset">すべて消す</button>
+                                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm"
+                                    data-action="export-json">バックアップを保存</button>
+                                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm"
+                                    data-action="import-json">バックアップを読み込む</button>
+                                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm"
+                                    data-action="reset">すべて消す</button>
                             </div>
-                            <input type="file" id="tb-import-file" class="tb-file-input" accept="application/json,.json">
+                            <input type="file" id="tb-import-file" class="tb-file-input"
+                                accept="application/json,.json">
                             <p class="tb-card-hint" style="margin-top: 10px;">
                                 別の端末やドメイン（maemichi.com版など）からの引っ越しは、バックアップの保存 → 読み込みで行えます。
                             </p>
@@ -187,8 +210,10 @@
             </p>
             <ul class="tb-windows" id="tb-windows"></ul>
             <div class="tb-row-actions">
-                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="add-window" data-category="work">💼 仕事の枠を足す</button>
-                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="add-window" data-category="life">🏠 生活の枠を足す</button>
+                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="add-window"
+                    data-category="work">💼 仕事の枠を足す</button>
+                <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="add-window"
+                    data-category="life">🏠 生活の枠を足す</button>
             </div>
             <div class="tb-modal-foot">
                 <label class="tb-inline-field">
@@ -221,7 +246,8 @@
     <!-- ─── AI提案のレビュー ─────────────────────────── -->
     <div class="tb-modal" id="tb-review-modal" hidden>
         <div class="tb-modal-backdrop" data-action="close-modal"></div>
-        <div class="tb-modal-panel tb-modal-panel-wide" role="dialog" aria-modal="true" aria-labelledby="tb-review-modal-title">
+        <div class="tb-modal-panel tb-modal-panel-wide" role="dialog" aria-modal="true"
+            aria-labelledby="tb-review-modal-title">
             <div class="tb-modal-head">
                 <h2 id="tb-review-modal-title">タスク候補を確認する</h2>
                 <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="close-modal">閉じる</button>
@@ -241,7 +267,8 @@
     <!-- ─── 設定 ─────────────────────────────────────── -->
     <div class="tb-modal" id="tb-settings-modal" hidden>
         <div class="tb-modal-backdrop" data-action="close-modal"></div>
-        <div class="tb-modal-panel tb-modal-panel-wide" role="dialog" aria-modal="true" aria-labelledby="tb-settings-modal-title">
+        <div class="tb-modal-panel tb-modal-panel-wide" role="dialog" aria-modal="true"
+            aria-labelledby="tb-settings-modal-title">
             <div class="tb-modal-head">
                 <h2 id="tb-settings-modal-title">設定</h2>
                 <button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="close-modal">閉じる</button>
@@ -279,11 +306,13 @@
             <p>DAYLOOP — データはこの端末（または選んだ保存先）にだけ保存されます。</p>
             <div class="tb-appfooter-links">
                 <a href="/">トップへ</a>
-                <a href="https://github.com/h1maekawa/time-management" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="https://github.com/h1maekawa/time-management" target="_blank"
+                    rel="noopener noreferrer">GitHub</a>
             </div>
         </div>
     </footer>
 
     <script src="../assets/js/timebox.js" type="module"></script>
 </body>
+
 </html>
