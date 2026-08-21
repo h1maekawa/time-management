@@ -48,6 +48,7 @@ import { sanitizeDigits } from "./supabase/otp-input.js";
 
 /** タイムラインの1時間あたりの高さ(px) */
 const HOUR_HEIGHT = 44;
+let timelineMetrics = { startMinutes: 0, pixelsPerHour: HOUR_HEIGHT };
 
 const el = (id) => document.getElementById(id);
 
@@ -182,6 +183,7 @@ function render() {
   const summary = summarize({ ...current, tasks, blocks }, nowHHMM());
 
   renderStatus(summary);
+  renderFocus(summary);
   renderNotices();
   renderTabs();
   renderTasks();
@@ -389,6 +391,8 @@ function renderStatus(summary) {
     day: "numeric",
     weekday: "short",
   }).format(date);
+  const calendarDate = document.querySelector(".tb-calendar-date");
+  if (calendarDate) calendarDate.textContent = el("tb-date").textContent;
   el("tb-now").textContent = `現在 ${nowHHMM()}${
     summary.currentBlock ? ` — いまは「${summary.currentBlock.title}」の時間です` : ""
   }${!summary.currentBlock && summary.nextBlock ? ` — 次は ${summary.nextBlock.start} 「${summary.nextBlock.title}」` : ""}`;
@@ -404,6 +408,23 @@ function renderStatus(summary) {
         `<div class="tb-kpi"><p class="tb-kpi-label">${esc(k.label)}</p><p class="tb-kpi-value">${esc(k.value)}</p></div>`
     )
     .join("");
+}
+
+function renderFocus(summary) {
+  const container = el("tb-focus-cards");
+  if (!container) return;
+  const current = summary.currentBlock;
+  const overdue = summary.overdue;
+  const next = summary.nextBlock;
+  const nowCard = current
+    ? `<article class="tb-focus-now"><span class="tb-focus-label">NOW</span><h3>${esc(current.title)}</h3><p>${esc(current.start)} → ${esc(current.end)}</p><strong>あと ${summary.remainingMinutes}分</strong><button type="button" class="tb-btn tb-btn-primary tb-btn-sm" data-action="done" data-id="${current.taskId}">完了</button></article>`
+    : overdue
+      ? `<article class="tb-focus-now is-overdue"><span class="tb-focus-label">NOW · 予定超過</span><h3>${esc(overdue.title)}</h3><p>${esc(overdue.start)} → ${esc(overdue.end)}</p><strong>予定より ${summary.overdueMinutes}分超過</strong><div class="tb-row-actions"><button type="button" class="tb-btn tb-btn-ghost tb-btn-sm" data-action="build-from-now">残りを組み直す</button><button type="button" class="tb-btn tb-btn-primary tb-btn-sm" data-action="done" data-id="${overdue.taskId}">完了</button></div></article>`
+      : `<article class="tb-focus-now is-empty"><span class="tb-focus-label">NOW</span><h3>予定されたタスクはありません</h3><p>Brain Dumpから今日を組み立てましょう。</p></article>`;
+  const nextCard = next
+    ? `<article class="tb-focus-next"><span class="tb-focus-label">NEXT</span><h3>${esc(next.title)}</h3><p><strong>${esc(next.start)}</strong> · ${toMinutes(next.end) - toMinutes(next.start)}分</p></article>`
+    : `<article class="tb-focus-next is-empty"><span class="tb-focus-label">NEXT</span><h3>次の予定はありません</h3></article>`;
+  container.innerHTML = nowCard + nextCard;
 }
 
 function renderNotices() {
@@ -522,12 +543,23 @@ function renderCapacity(summary) {
 }
 
 function renderTimeline(windows, blocks) {
-  const y = (minutes) => (minutes / 60) * HOUR_HEIGHT;
+  const compact = window.matchMedia("(min-width: 1181px)").matches;
+  const relevantStarts = [...windows.map((w) => toMinutes(w.start)), ...blocks.map((b) => toMinutes(b.start))];
+  const relevantEnds = [...windows.map((w) => toMinutes(w.end)), ...blocks.map((b) => toMinutes(b.end))];
+  const earliest = Math.min(360, ...(relevantStarts.length ? relevantStarts : [360]));
+  const startMinutes = compact ? Math.floor(earliest / 60) * 60 : 0;
+  const endMinutes = compact ? Math.max(1440, ...(relevantEnds.length ? relevantEnds : [1440])) : 1440;
+  const scroll = el("tb-timeline-scroll");
+  const availableHeight = compact ? Math.max(360, scroll.clientHeight || 540) : (DAY_MINUTES / 60) * HOUR_HEIGHT;
+  const pixelsPerHour = availableHeight / ((endMinutes - startMinutes) / 60);
+  timelineMetrics = { startMinutes, pixelsPerHour };
+  const y = (minutes) => ((minutes - startMinutes) / 60) * pixelsPerHour;
   const parts = [];
 
-  for (let hour = 0; hour <= 24; hour += 1) {
+  for (let hour = startMinutes / 60; hour <= endMinutes / 60; hour += 1) {
+    const major = hour % 3 === 0;
     parts.push(
-      `<div class="tb-hour" style="top:${y(hour * 60)}px">${String(hour).padStart(2, "0")}:00</div>`
+      `<div class="tb-hour ${major ? "is-major" : ""}" style="top:${y(hour * 60)}px">${major ? String(hour).padStart(2, "0") : ""}</div>`
     );
   }
 
@@ -568,9 +600,9 @@ function renderTimeline(windows, blocks) {
   parts.push(`<div class="tb-now" style="top:${y(toMinutes(nowHHMM()))}px"></div>`);
 
   const timeline = el("tb-timeline");
-  timeline.style.height = `${(DAY_MINUTES / 60) * HOUR_HEIGHT}px`;
+  timeline.style.height = `${availableHeight}px`;
   timeline.innerHTML = parts.join("");
-  scrollTimelineToNow();
+  if (!compact) scrollTimelineToNow();
 }
 
 let timelineScrolled = false;
@@ -645,7 +677,7 @@ function bindEvents() {
     const id = event.dataTransfer.getData("text/plain") || dragTaskId;
     if (!id) return;
     const rect = timeline.getBoundingClientRect();
-    const minutes = ((event.clientY - rect.top) / HOUR_HEIGHT) * 60;
+    const minutes = timelineMetrics.startMinutes + ((event.clientY - rect.top) / timelineMetrics.pixelsPerHour) * 60;
     const snapped = Math.round(minutes / SNAP_MINUTES) * SNAP_MINUTES;
     pinTask(id, toHHMM(Math.max(0, Math.min(DAY_MINUTES - SNAP_MINUTES, snapped))));
   });
@@ -1210,6 +1242,9 @@ async function analyzeBrainDumpInput() {
     return;
   }
 
+  const latest = el("tb-chat-latest-user");
+  if (latest) latest.innerHTML = `<article class="tb-chat-message tb-chat-message-user"><span class="tb-chat-speaker">YOU</span><p>${esc(text).replace(/\n/g, "<br>")}</p></article>`;
+
   const capture = createCapture({ text });
   state.captures = [...state.captures, capture];
   state = storage.save(state);
@@ -1272,6 +1307,7 @@ function openReview(capture, analysis) {
   };
   el("tb-review-modal").hidden = false;
   renderReview();
+  el("tb-review-modal")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 function renderReview() {
