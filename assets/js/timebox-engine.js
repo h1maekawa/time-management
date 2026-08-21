@@ -429,12 +429,17 @@ export function summarize(plan, currentHHMM) {
   const now = toMinutes(currentHHMM);
   let currentBlock = null;
   let nextBlock = null;
+  let overdueBlock = null;
   for (const block of blocks) {
     const start = toMinutes(block.start);
     const end = toMinutes(block.end);
     if (now >= start && now < end && !block.done) currentBlock = block;
     if (start > now && !nextBlock && !block.done) nextBlock = block;
+    if (end <= now && !block.done) overdueBlock = block;
   }
+
+  const remainingMinutes = currentBlock ? Math.max(0, toMinutes(currentBlock.end) - now) : 0;
+  const overdueMinutes = !currentBlock && overdueBlock ? Math.max(0, now - toMinutes(overdueBlock.end)) : 0;
 
   return {
     total,
@@ -447,6 +452,9 @@ export function summarize(plan, currentHHMM) {
     used,
     currentBlock,
     nextBlock,
+    remainingMinutes,
+    overdue: overdueBlock,
+    overdueMinutes,
   };
 }
 
