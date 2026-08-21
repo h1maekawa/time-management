@@ -1,690 +1,394 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DAYLOOP | 時間がない。だから、考える時間を減らす。</title>
-    <meta name="description" content="やることを全部書けば、AIが整理して、「今日、何を、いつやるか」まで決めてくれるAI 1日実行アプリ、DAYLOOP。登録不要・無料・ローカル/Obsidian保存対応。">
-    <link rel="canonical" href="https://timebox.maemichi.com/">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="DAYLOOP">
-    <meta property="og:title" content="DAYLOOP | 時間がない。だから、考える時間を減らす。">
-    <meta property="og:description" content="やることを全部書けば、AIが整理して、「今日、何を、いつやるか」まで決めてくれるAI 1日実行アプリ。">
-    <meta property="og:url" content="https://timebox.maemichi.com/">
-    <meta property="og:image" content="https://timebox.maemichi.com/images/dayloop/ogp/dayloop-ogp.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="DAYLOOP | 時間がない。だから、考える時間を減らす。">
-    <meta name="twitter:description" content="やることを全部書けば、AIが整理して今日の時間割まで決めてくれるAI 1日実行アプリ。">
-    <meta name="robots" content="index,follow">
-    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/base.css">
-    <link rel="stylesheet" href="assets/css/landing.css">
-</head>
-<body class="lp-page">
-    <a class="skip-link" href="#lp-main">本文へ移動</a>
-
-    <!-- DAYLOOP のロゴは public/images/dayloop/brand/ のPNG（正式ロゴ）を使う。
-         明るい面: dayloop-wordmark.png / dayloop-mark.png
-         暗い面  : dayloop-wordmark-dark.png / dayloop-mark-dark.png / dayloop-mark-glow.png
-         元データは assets/brand-source/（デプロイ対象外）。 -->
-
-    <div class="lp-decor" aria-hidden="true">
-        <span class="lp-decor-ring r1"></span>
-        <span class="lp-decor-ring r2"></span>
-        <span class="lp-decor-ring r3"></span>
-        <span class="lp-dot-pattern is-hero"></span>
-        <span class="lp-dot-pattern is-final"></span>
-    </div>
-
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>DAYLOOP | AIで1日の仕事を組み立てる</title>
+    <meta
+      name="description"
+      content="予定とタスクから、今日何をいつやるかまで決めるAI 1日実行アプリ、DAYLOOP。"
+    />
+    <link rel="canonical" href="https://time-management-cx7.pages.dev/" />
+    <meta property="og:title" content="DAYLOOP | AIで1日の仕事を組み立てる" />
+    <meta
+      property="og:description"
+      content="予定とタスクから今日の実行順まで決めるAI 1日実行アプリ。"
+    />
+    <meta
+      property="og:image"
+      content="https://time-management-cx7.pages.dev/images/dayloop/ogp/dayloop-ogp.png"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700;800&family=Syne:wght@700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/css/base.css" />
+    <link rel="stylesheet" href="assets/css/landing.css" />
+  </head>
+  <body class="lp-page">
+    <a class="skip-link" href="#main">本文へ移動</a>
     <header class="lp-header">
-        <div class="lp-header-inner">
-            <a href="/" class="lp-logo">
-                <img class="lp-logo-img" src="/images/dayloop/brand/dayloop-wordmark-dark.png" width="121" height="32"
-                    alt="DAYLOOP">
-            </a>
-            <nav class="lp-nav" aria-label="サイト内リンク">
-                <div class="lp-nav-links">
-                    <a href="#how">使い方</a>
-                    <a href="#roadmap">ロードマップ</a>
-                    <a href="#faq">FAQ</a>
-                </div>
-                <a href="/app/" class="lp-btn lp-btn-sm">無料ではじめる</a>
-            </nav>
-        </div>
+      <div class="lp-shell lp-header-inner">
+        <a href="/" class="lp-logo"
+          ><img src="/images/dayloop/brand/dayloop-wordmark.png" alt="DAYLOOP"
+        /></a>
+        <nav class="lp-nav" aria-label="サイト内リンク">
+          <div>
+            <a href="#features">できること</a><a href="#how">使い方</a
+            ><a href="#automation">AI自動化</a><a href="#faq">FAQ</a>
+          </div>
+          <a class="lp-btn small" href="/app/">無料で使ってみる</a>
+        </nav>
+      </div>
     </header>
-
-    <main id="lp-main">
-        <!-- ═══ HERO ═══════════════════════════════════════════ -->
-        <section class="lp-hero">
-            <div class="lp-shell">
-                <p class="lp-hero-word">
-                    <img class="lp-hero-word-mark" src="/images/dayloop/brand/dayloop-mark-glow.png" width="44"
-                        height="44" alt="" aria-hidden="true">
-                    <span class="lp-hero-wordmark">DAYLOOP</span>
-                </p>
-                <span class="lp-hero-eyebrow">AI DAILY EXECUTION APP</span>
-                <h1 class="lp-hero-catch">時間がない。<br>だから、<br>考える時間を減らす。</h1>
-                <p class="lp-hero-subcatch">全部書く。AIが整理。今日が決まる。</p>
-                <p class="lp-hero-lead">
-                    DAYLOOPは、やることを全部書けば、<br>
-                    AIが整理して、<br>
-                    「今日、何を、いつやるか」まで決めてくれる<br>
-                    AI 1日実行アプリです。
-                </p>
-                <p class="lp-hero-support">考える時間を減らして、本当にやる時間を増やします。</p>
-                <div class="lp-hero-actions">
-                    <a href="/app/" class="lp-btn">今日を組み立てる</a>
-                    <a href="#how" class="lp-btn lp-btn-ghost">使い方を見る</a>
-                </div>
-                <ul class="lp-hero-notes">
-                    <li>登録不要</li>
-                    <li>AIを使わなくても利用可能</li>
-                    <li>Local / Obsidian対応</li>
-                </ul>
-
-                <!-- Hero Product Demo: Input → AI → Timeline（3秒で伝わる価値） -->
-                <div class="lp-hero-demo-wrap lp-reveal">
-                    <div class="lp-demo" aria-hidden="true">
-                        <div class="lp-mock">
-                            <span class="lp-demo-step-label">頭の中にあること</span>
-                            <p class="lp-mock-braindump-text">明日の商談準備
-FS週次資料
-田中さん返信
-note書きたい
-DAYLOOPのLP修正
-資料確認</p>
-                        </div>
-                        <span class="lp-demo-arrow">→</span>
-                        <div class="lp-mock">
-                            <span class="lp-demo-step-label">AIの整理結果</span>
-                            <div class="lp-mock-organize">
-                                <div class="lp-mock-organize-row">
-                                    <span class="lp-mock-organize-num">01</span>
-                                    <span class="lp-mock-organize-title">明日の商談準備</span>
-                                    <span class="lp-mock-organize-min">45分</span>
-                                </div>
-                                <div class="lp-mock-organize-row">
-                                    <span class="lp-mock-organize-num">02</span>
-                                    <span class="lp-mock-organize-title">FS週次資料</span>
-                                    <span class="lp-mock-organize-min">60分</span>
-                                </div>
-                                <div class="lp-mock-organize-row">
-                                    <span class="lp-mock-organize-num">03</span>
-                                    <span class="lp-mock-organize-title">田中さん返信</span>
-                                    <span class="lp-mock-organize-min">10分</span>
-                                </div>
-                            </div>
-                            <p class="lp-mock-later"><strong>後でいい:</strong> note / LP修正</p>
-                        </div>
-                        <span class="lp-demo-arrow">→</span>
-                        <div class="lp-mock">
-                            <span class="lp-demo-step-label">今日のTimeline</span>
-                            <div class="lp-mock-timeline-compact">
-                                <div class="lp-mock-timeline-compact-row"><time>09:00</time><span>商談準備</span></div>
-                                <div class="lp-mock-timeline-compact-row"><time>10:00</time><span>FS資料</span></div>
-                                <div class="lp-mock-timeline-compact-row"><time>11:15</time><span>田中さん返信</span></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <main id="main">
+      <section class="lp-hero" id="features">
+        <div class="lp-shell lp-hero-grid">
+          <div
+            class="lp-app lp-reveal"
+            aria-label="DAYLOOPの実アプリを再現したプレビュー"
+          >
+            <div class="lp-appbar">
+              <span
+                ><img
+                  src="/images/dayloop/brand/dayloop-mark-glow.png"
+                  alt=""
+                />DAYLOOP</span
+              ><small>TODAY · 08.21</small>
             </div>
-        </section>
-
-        <!-- ═══ WHAT IS DAYLOOP ═══════════════════════════════ -->
-        <section class="lp-section" id="whatis">
-            <div class="lp-shell lp-reveal">
-                <div class="lp-section-head is-centered">
-                    <span class="lp-section-eyebrow">DAYLOOPって？</span>
-                    <h2 class="lp-section-title">AIで今日を組み立てる、<br>1日設計アプリです。</h2>
+            <div class="lp-appgrid">
+              <div class="lp-pane">
+                <em>BRAIN DUMP</em>
+                <h3>頭の中を全部書く</h3>
+                <div class="lp-input">
+                  商談準備<br />週次資料を仕上げる<br />田中さんへ返信<br />企画書の構成を考える
                 </div>
-                <div class="lp-whatis-box">
-                    <p class="lp-whatis-lead">
-                        DAYLOOPは、<br>
-                        <strong>「やることを全部書けば、AIが整理して今日の時間割までつくってくれる」</strong><br>
-                        1日設計アプリです。
-                    </p>
-                    <p class="lp-whatis-sub">
-                        Todoリストを増やすのではなく、「今日、何を、いつやるか」まで決めます。
-                        Todo App / Task Manager / Calendarのどれか一つだけでは説明できません。
-                        頭の中から今日の行動まで決める、AI Daily Planning Appです。
-                    </p>
-                    <div class="lp-loop-diagram">
-                        <span class="lp-loop-node">Dump</span>
-                        <span class="lp-loop-sep">→</span>
-                        <span class="lp-loop-node">Organize</span>
-                        <span class="lp-loop-sep">→</span>
-                        <span class="lp-loop-node">Plan</span>
-                        <span class="lp-loop-sep">→</span>
-                        <span class="lp-loop-node">Do</span>
-                        <span class="lp-loop-sep">→</span>
-                        <span class="lp-loop-node">Learn</span>
-                        <span class="lp-loop-sep">→</span>
-                        <span class="lp-loop-node">Next Day</span>
-                        <span class="lp-loop-sep is-cycle">↺</span>
-                    </div>
+                <b class="lp-ui-btn">AIと整理する</b><em>TODAY'S TASKS</em>
+                <p class="lp-task"><i></i>商談準備 <small>45min</small></p>
+                <p class="lp-task"><i></i>週次資料 <small>60min</small></p>
+              </div>
+              <div class="lp-pane">
+                <em>TODAY'S TIMELINE</em>
+                <h3>今日の時間割</h3>
+                <div class="lp-time">
+                  <p>
+                    <time>09:00</time><b>商談準備 <small>45min</small></b>
+                  </p>
+                  <p>
+                    <time>10:00</time><b>営業会議 <small>Calendar</small></b>
+                  </p>
+                  <p>
+                    <time>11:00</time><b>週次資料 <small>60min</small></b>
+                  </p>
+                  <p>
+                    <time>13:00</time><b>田中さんへ返信 <small>15min</small></b>
+                  </p>
                 </div>
+              </div>
             </div>
-        </section>
-
-        <!-- ═══ PROBLEM ════════════════════════════════════════ -->
-        <section class="lp-section" id="problem">
-            <div class="lp-shell lp-reveal">
-                <div class="lp-section-head is-centered">
-                    <span class="lp-section-eyebrow">PROBLEM</span>
-                    <h2 class="lp-section-title">やることは分かってる。<br>でも、何からやればいい？</h2>
-                </div>
-                <div class="lp-problem-cloud" aria-hidden="true">
-                    <span class="lp-problem-chip">資料</span>
-                    <span class="lp-problem-chip">返信</span>
-                    <span class="lp-problem-chip">商談</span>
-                    <span class="lp-problem-chip">note</span>
-                    <span class="lp-problem-chip">開発</span>
-                    <span class="lp-problem-chip">打ち合わせ</span>
-                </div>
-                <p class="lp-problem-question">頭の中で、ぐるぐる考え続けている状態。</p>
-                <p class="lp-problem-strong">時間がない人ほど、<br>「次に何をするか」を考えている時間が長い。</p>
-                <p class="lp-problem-note">DAYLOOPは、その「考える時間」を減らします。</p>
-            </div>
-        </section>
-
-        <!-- ═══ BRAIN DUMP ═════════════════════════════════════ -->
-        <section class="lp-section" id="braindump">
-            <div class="lp-shell lp-reveal">
-                <div class="lp-section-head is-centered">
-                    <span class="lp-section-eyebrow">BRAIN DUMP</span>
-                    <h2 class="lp-section-title">まず、<br>全部書く。</h2>
-                    <p class="lp-section-lead">
-                        整理しなくて大丈夫です。順番も、所要時間も、優先順位も、
-                        最初は考えなくていい。頭に浮かんだことを、そのまま書き出してください。
-                    </p>
-                </div>
-                <div class="lp-mock" aria-hidden="true">
-                    <div class="lp-mock-chrome"><span class="lp-mock-dot"></span><span class="lp-mock-dot"></span><span class="lp-mock-dot"></span></div>
-                    <p class="lp-mock-braindump-text">FS週次資料作らないと
-明日の商談準備
-田中さん返信
-noteも書きたい
-LPも直したい</p>
-                    <span class="lp-mock-cta-ghost">AIと整理する</span>
-                </div>
-                <p class="lp-problem-note" style="margin-top:20px;">AIを使わなくても、自分で1行ずつ手入力できます。</p>
-            </div>
-        </section>
-
-        <!-- ═══ AI ORGANIZE ════════════════════════════════════ -->
-        <section class="lp-section" id="organize">
-            <div class="lp-shell lp-reveal">
-                <div class="lp-section-head is-centered">
-                    <span class="lp-section-eyebrow">AI ORGANIZE</span>
-                    <h2 class="lp-section-title">何からやるかを、<br>AIと一緒に決める。</h2>
-                    <p class="lp-section-lead">
-                        殴り書きを、タスク・優先度候補・所要時間候補・最初の一歩へ分解し、
-                        「今日やる／後でいい／回答待ち」に仕分けます。
-                    </p>
-                </div>
-                <div class="lp-mock" aria-hidden="true">
-                    <p class="lp-mock-title">今日やる</p>
-                    <div class="lp-mock-organize">
-                        <div class="lp-mock-organize-row">
-                            <span class="lp-mock-organize-num">01</span>
-                            <span class="lp-mock-organize-title">明日の商談準備</span>
-                            <span class="lp-mock-organize-min">45分</span>
-                        </div>
-                        <div class="lp-mock-organize-row">
-                            <span class="lp-mock-organize-num">02</span>
-                            <span class="lp-mock-organize-title">FS週次資料</span>
-                            <span class="lp-mock-organize-min">60分</span>
-                        </div>
-                        <div class="lp-mock-organize-row">
-                            <span class="lp-mock-organize-num">03</span>
-                            <span class="lp-mock-organize-title">田中さん返信</span>
-                            <span class="lp-mock-organize-min">10分</span>
-                        </div>
-                    </div>
-                    <p class="lp-mock-later"><strong>後でいい:</strong> note、LP修正</p>
-                    <p class="lp-mock-callout">提案するのはAI。決めるのはあなた。</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ TIMEBOX ════════════════════════════════════════ -->
-        <section class="lp-section" id="timebox">
-            <div class="lp-shell lp-reveal">
-                <div class="lp-section-head is-centered">
-                    <span class="lp-section-eyebrow">TIMEBOX</span>
-                    <h2 class="lp-section-title">今日の時間に、<br>落とし込む。</h2>
-                    <p class="lp-section-lead">
-                        AIの整理結果を、決定論的なTimebox Engineが24時間タイムラインへ配置します。
-                        同じ入力なら毎回同じ結果になる、再現性のあるスケジューリングです。
-                    </p>
-                </div>
-                <div class="lp-mock" aria-hidden="true">
-                    <div class="lp-mock-timeline">
-                        <div class="lp-mock-timeline-row"><span>09:00</span><div class="lp-mock-timeline-bar" style="background:var(--dl-indigo);">資料確認</div></div>
-                        <div class="lp-mock-timeline-row"><span>10:00</span><div class="lp-mock-timeline-bar" style="background:var(--dl-blue);">商談準備</div></div>
-                        <div class="lp-mock-now"></div>
-                        <div class="lp-mock-timeline-row"><span>11:00</span><div class="lp-mock-timeline-bar" style="background:var(--dl-blue);opacity:.75;">返信</div></div>
-                        <div class="lp-mock-timeline-row"><span>13:00</span><div class="lp-mock-timeline-bar" style="background:var(--dl-violet);">FS資料</div></div>
-                    </div>
-                </div>
-                <p class="lp-mock-insight" style="text-align:center;max-width:28em;margin:24px auto 0;">Todoではなく、実行する時間まで決める。</p>
-            </div>
-        </section>
-
-        <!-- ═══ CALENDAR ═══════════════════════════════════════ -->
-        <section class="lp-section" id="calendar">
-            <div class="lp-shell lp-reveal">
-                <div class="lp-section-head is-centered">
-                    <span class="lp-section-eyebrow">CALENDAR</span>
-                    <h2 class="lp-section-title">予定と、<br>やることをひとつに。</h2>
-                    <p class="lp-section-lead">
-                        会議や商談などの「約束」はGoogleカレンダー。<br>
-                        資料作成、返信、準備、執筆などの「実行」はDAYLOOP。<br>
-                        DAYLOOPが、空いている時間に実行するタスクを配置します。
-                    </p>
-                </div>
-                <div class="lp-mock" aria-hidden="true">
-                    <div class="lp-mock-calendar-compare">
-                        <div>
-                            <p class="lp-mock-col-label">Google Calendar</p>
-                            <p class="lp-mock-calendar-role">約束</p>
-                            <div class="lp-mock-timeline-compact">
-                                <div class="lp-mock-timeline-compact-row"><time>13:00</time><span>商談</span></div>
-                                <div class="lp-mock-timeline-compact-row"><time>16:00</time><span>定例会議</span></div>
-                            </div>
-                        </div>
-                        <div>
-                            <p class="lp-mock-col-label">DAYLOOP</p>
-                            <p class="lp-mock-calendar-role">実行</p>
-                            <div class="lp-mock-timeline-compact">
-                                <div class="lp-mock-timeline-compact-row"><time>09:00</time><span>商談準備</span></div>
-                                <div class="lp-mock-timeline-compact-row"><time>11:00</time><span>資料作成</span></div>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="lp-mock-callout" style="margin-top:16px;text-align:center;">Google Calendar = 約束　DAYLOOP = 実行</p>
-                    <span class="lp-mock-badge-soon">Googleカレンダー直接同期は Coming Soon（現在は.ics書き出しで取り込み可能）</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ BEFORE / AFTER（recap） ════════════════════════ -->
-        <section class="lp-section" id="before-after">
-            <div class="lp-shell lp-reveal">
-                <div class="lp-section-head is-centered">
-                    <span class="lp-section-eyebrow">BEFORE / AFTER</span>
-                    <h2 class="lp-section-title">次にやることが、<br>決まっている状態へ。</h2>
-                </div>
-                <div class="lp-mock" aria-hidden="true">
-                    <div class="lp-mock-before-after">
-                        <div>
-                            <p class="lp-mock-col-label">BEFORE — 頭の中</p>
-                            <div class="lp-mock-chips-loose">
-                                <span class="lp-mock-chip-float">資料</span>
-                                <span class="lp-mock-chip-float">返信</span>
-                                <span class="lp-mock-chip-float">商談</span>
-                                <span class="lp-mock-chip-float">note</span>
-                                <span class="lp-mock-chip-float">開発</span>
-                            </div>
-                            <p style="margin-top:12px;font-size:0.78rem;color:var(--text-secondary);">「何からやろう？」</p>
-                        </div>
-                        <span class="lp-mock-arrow">→</span>
-                        <div>
-                            <p class="lp-mock-col-label">AFTER — Timeline</p>
-                            <div class="lp-mock-timeline-compact">
-                                <div class="lp-mock-timeline-compact-row"><time>09:00</time><span>商談準備</span></div>
-                                <div class="lp-mock-timeline-compact-row"><time>10:00</time><span>資料</span></div>
-                                <div class="lp-mock-timeline-compact-row"><time>11:10</time><span>返信</span></div>
-                            </div>
-                            <p style="margin-top:12px;font-size:0.78rem;font-weight:700;color:var(--dl-indigo);">「次にやることが決まっている。」</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ FOCUS ══════════════════════════════════════════ -->
-        <section class="lp-section" id="focus">
-            <div class="lp-shell lp-reveal">
-                <div class="lp-section-head is-centered">
-                    <span class="lp-section-eyebrow">FOCUS</span>
-                    <h2 class="lp-section-title">今やることだけを、<br>見る。</h2>
-                    <p class="lp-section-lead">次に何をするかを、毎回考えなくていい。</p>
-                </div>
-                <div class="lp-mock" aria-hidden="true">
-                    <div class="lp-mock-focus-now">
-                        <span class="lp-mock-focus-tag">NOW</span>
-                        <p class="lp-mock-focus-title">商談準備</p>
-                        <div class="lp-mock-focus-meta">
-                            <span>10:00 – 10:45</span>
-                            <span class="lp-mock-focus-remain">残り 32min</span>
-                        </div>
-                        <span class="lp-mock-cta-ghost" style="margin-top:14px;">完了</span>
-                    </div>
-                    <div class="lp-mock-focus-next">
-                        <span>NEXT</span>
-                        <span>FS週次資料</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ RE-PLAN ════════════════════════════════════════ -->
-        <section class="lp-section" id="replan">
-            <div class="lp-shell lp-reveal">
-                <div class="lp-section-head is-centered">
-                    <span class="lp-section-eyebrow">RE-PLAN</span>
-                    <h2 class="lp-section-title">予定は崩れる。<br>だから、すぐ組み直せる。</h2>
-                    <p class="lp-section-lead">
-                        急な会議。予定変更。思ったより時間がかかった。<br>
-                        忙しい人の1日は、予定通りには進みません。
-                    </p>
-                </div>
-                <div class="lp-mock" aria-hidden="true">
-                    <p class="lp-mock-title">11:20 予定が崩れた</p>
-                    <div class="lp-mock-timeline-compact">
-                        <div class="lp-mock-timeline-compact-row"><time>11:20</time><span>急な電話が入った</span></div>
-                    </div>
-                    <p class="lp-mock-callout" style="margin-top:14px;">今の時間と残っているタスクから、残りの1日を組み直せる。</p>
-                    <span class="lp-mock-cta-ghost" style="margin-top:16px;">今から組み直す</span>
-                </div>
-                <p class="lp-problem-strong" style="margin-top:28px;">忙しい人に必要なのは、完璧な計画ではなく、<br>崩れても立て直せること。</p>
-            </div>
-        </section>
-
-        <!-- ═══ MEMORY ═════════════════════════════════════════ -->
-        <section class="lp-section" id="memory">
-            <div class="lp-shell lp-reveal">
-                <div class="lp-section-head is-centered">
-                    <span class="lp-section-eyebrow">MEMORY</span>
-                    <h2 class="lp-section-title">やったことが、<br>そのまま残る。</h2>
-                    <p class="lp-section-lead">完了したタスクは実行履歴として記録され、Obsidianへも同期できます。</p>
-                </div>
-                <div class="lp-mock" aria-hidden="true">
-                    <div class="lp-mock-memory-row">
-                        <span>商談準備</span>
-                        <span class="lp-mock-memory-diff">予定 30min ／ 開始 10:00</span>
-                    </div>
-                    <div class="lp-mock-memory-row">
-                        <span>FS週次資料</span>
-                        <span class="lp-mock-memory-diff">予定 60min ／ 開始 13:00</span>
-                    </div>
-                    <div class="lp-mock-memory-row">
-                        <span>田中さん返信</span>
-                        <span class="lp-mock-memory-diff">Completed ✓</span>
-                    </div>
-                    <span class="lp-mock-badge-soon">実測タイマー（実績分数の自動計測）は Coming Soon</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ LEARN ══════════════════════════════════════════ -->
-        <section class="lp-section" id="learn">
-            <div class="lp-shell lp-reveal">
-                <div class="lp-section-head is-centered">
-                    <span class="lp-section-eyebrow">LEARN</span>
-                    <h2 class="lp-section-title">使うほど、<br>自分の仕事が見えてくる。</h2>
-                    <p class="lp-section-lead">実行履歴はすでに記録されています。そこからの改善提案は準備中です。</p>
-                </div>
-                <div class="lp-mock" aria-hidden="true">
-                    <p class="lp-mock-title">商談準備</p>
-                    <div class="lp-mock-memory-row">
-                        <span>予定</span>
-                        <span class="lp-mock-memory-diff">30min</span>
-                    </div>
-                    <div class="lp-mock-memory-row">
-                        <span>実績平均</span>
-                        <span class="lp-mock-memory-diff">47min</span>
-                    </div>
-                    <p class="lp-mock-insight">次回: 50分を推奨</p>
-                    <span class="lp-mock-badge-soon">AIによる改善提案は Coming Soon</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ SKILLS ═════════════════════════════════════════ -->
-        <section class="lp-section" id="skill">
-            <div class="lp-shell lp-reveal">
-                <div class="lp-section-head is-centered">
-                    <span class="lp-section-eyebrow">SKILLS</span>
-                    <h2 class="lp-section-title">繰り返す仕事が、<br>自分の型になる。</h2>
-                    <p class="lp-section-lead">似た手順を繰り返しているタスクは、Skill候補として見つかります。承認するまでは何も自動化されません。</p>
-                </div>
-                <div class="lp-mock" aria-hidden="true">
-                    <div class="lp-mock-skill-head">
-                        <strong>FS商談準備</strong>
-                        <span class="lp-mock-confidence">14回実行</span>
-                    </div>
-                    <ol class="lp-mock-skill-steps">
-                        <li>GBP確認</li>
-                        <li>HP確認</li>
-                        <li>SNS確認</li>
-                        <li>刺しポイント作成</li>
-                    </ol>
-                    <span class="lp-mock-badge-soon">Skillの自動検出・自動化は Coming Soon</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ PHILOSOPHY ═════════════════════════════════════ -->
-        <section class="lp-section lp-philosophy" id="philosophy">
-            <div class="lp-shell lp-reveal">
-                <p>やることを<br>管理したかったわけじゃない。</p>
-                <p>「何からやろう」と考えている時間を<br>減らしたかった。</p>
-                <p>全部書けば、<br>今日が決まる。</p>
-                <p>そして、毎日の行動が残れば、<br>自分の仕事の型が見えてくる。</p>
-                <p class="lp-philosophy-brand">DAYLOOP</p>
-            </div>
-        </section>
-
-        <!-- ═══ YOUR DATA / Obsidian ═══════════════════════════ -->
-        <section class="lp-section" id="storage">
-            <div class="lp-shell lp-reveal">
-                <div class="lp-section-head is-centered">
-                    <span class="lp-section-eyebrow">YOUR DATA</span>
-                    <h2 class="lp-section-title">あなたの記録は、<br>あなたが選んだ場所へ。</h2>
-                    <p class="lp-section-lead">データはこの端末に保存されます。Obsidianを主な保存先として選び、Brain DumpからSkillまでMarkdownで残すこともできます。</p>
-                </div>
-                <div class="lp-mock" aria-hidden="true">
-                    <div class="lp-mock-storage-grid">
-                        <div class="lp-mock-storage-item">この端末</div>
-                        <div class="lp-mock-storage-item is-selected">Obsidian</div>
-                        <div class="lp-mock-storage-item">Google Sheets<br>(GAS)</div>
-                        <div class="lp-mock-storage-item is-soon">Google Drive<br>近日</div>
-                        <div class="lp-mock-storage-item is-soon">DAYLOOP Cloud<br>近日</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ HOW TO USE ═════════════════════════════════════ -->
-        <section class="lp-section" id="how">
-            <div class="lp-shell lp-reveal">
-                <div class="lp-section-head is-centered">
-                    <span class="lp-section-eyebrow">HOW TO USE</span>
-                    <h2 class="lp-section-title">使い方は、4STEPだけ。</h2>
-                </div>
-                <div class="lp-steps">
-                    <div class="lp-step-card">
-                        <span class="lp-step-num">01</span>
-                        <p class="lp-step-title">全部書く</p>
-                    </div>
-                    <div class="lp-step-card">
-                        <span class="lp-step-num">02</span>
-                        <p class="lp-step-title">AIと整理</p>
-                    </div>
-                    <div class="lp-step-card">
-                        <span class="lp-step-num">03</span>
-                        <p class="lp-step-title">今日の時間へ</p>
-                    </div>
-                    <div class="lp-step-card">
-                        <span class="lp-step-num">04</span>
-                        <p class="lp-step-title">実行する</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ Current / Coming Soon ══════════════════════════ -->
-        <section class="lp-section" id="features">
-            <div class="lp-shell lp-reveal">
-                <div class="lp-section-head is-centered">
-                    <span class="lp-section-eyebrow">NOW AVAILABLE</span>
-                    <h2 class="lp-section-title">今すぐ使える機能</h2>
-                </div>
-                <ul class="lp-feature-grid">
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>Brain Dump入力（AI整理 / Backend未設定時は行ごとに候補化）</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>手動タスク追加（複数行 / 仕事・生活 / 優先度 / 所要時間）</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>タスク仕分け・自動時間割生成（Timebox）</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>24時間タイムライン・Drag &amp; Drop</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>手動時間固定・今から詰め直す・持ち越し</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>ローカル保存 + Obsidian保存</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>JSONバックアップ（保存・読み込み）</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>ICS書き出し（Googleカレンダー取り込み用）</li>
-                    <li class="lp-feature-item"><span class="lp-feature-check">✓</span>実行履歴・Skill候補の土台</li>
-                </ul>
-
-                <div class="lp-section-head is-centered" style="margin-top:56px;">
-                    <span class="lp-section-eyebrow">COMING SOON</span>
-                    <h2 class="lp-section-title">これから追加する機能</h2>
-                    <p class="lp-section-lead">まだ実装していません。準備ができ次第、このページでお知らせします。</p>
-                </div>
-                <ul class="lp-future-grid">
-                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>実行の実測タイマー</li>
-                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>Skillの自動検出</li>
-                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>Automation（承認フロー）</li>
-                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>Google Drive完全連携</li>
-                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>DAYLOOP Cloud</li>
-                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>複数端末同期</li>
-                    <li class="lp-future-item"><span class="lp-future-tag">近日</span>Googleカレンダー直接同期</li>
-                </ul>
-            </div>
-        </section>
-
-        <!-- ═══ ROADMAP ════════════════════════════════════════ -->
-        <section class="lp-section" id="roadmap">
-            <div class="lp-shell lp-reveal">
-                <div class="lp-section-head is-centered">
-                    <span class="lp-section-eyebrow">ROADMAP</span>
-                    <h2 class="lp-section-title">DAYLOOPが、<br>これから向かう場所。</h2>
-                </div>
-                <div class="lp-roadmap">
-                    <div class="lp-roadmap-item is-now">
-                        <span class="lp-roadmap-phase">NOW</span>
-                        <p class="lp-roadmap-title">Plan your day</p>
-                        <p class="lp-roadmap-sub">今日を決める。Brain Dump・AI Organize・Timebox・Focus・ローカル/Obsidian保存。</p>
-                    </div>
-                    <div class="lp-roadmap-item">
-                        <span class="lp-roadmap-phase">NEXT</span>
-                        <p class="lp-roadmap-title">Learn your work</p>
-                        <p class="lp-roadmap-sub">自分を理解する。実測タイマー、予定と実績の差分から所要時間や時間帯を提案。</p>
-                    </div>
-                    <div class="lp-roadmap-item">
-                        <span class="lp-roadmap-phase">FUTURE</span>
-                        <p class="lp-roadmap-title">Automate your routine</p>
-                        <p class="lp-roadmap-sub">繰り返しを自動化する。Skillの自動検出、Google Calendar直接同期、複数端末同期、DAYLOOP Cloud。</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ FAQ ═════════════════════════════════════════════ -->
-        <section class="lp-section" id="faq">
-            <div class="lp-shell lp-reveal">
-                <div class="lp-section-head is-centered">
-                    <span class="lp-section-eyebrow">FAQ</span>
-                    <h2 class="lp-section-title">よくある質問</h2>
-                </div>
-                <div class="lp-faq">
-                    <details class="lp-faq-item">
-                        <summary>DAYLOOPって何？</summary>
-                        <p class="lp-faq-answer">やることを全部書けば、AIが整理して今日の時間割までつくる1日設計アプリです。</p>
-                    </details>
-                    <details class="lp-faq-item">
-                        <summary>無料？</summary>
-                        <p class="lp-faq-answer">はい、無料で使えます。登録も不要です。将来的にGoogleカレンダー直接同期やクラウド保存などの上位プランを予定していますが、無料の範囲だけでも今日の時間割は組めます。</p>
-                    </details>
-                    <details class="lp-faq-item">
-                        <summary>AIを使わなくても使える？</summary>
-                        <p class="lp-faq-answer">使えます。AI Backendを設定していない場合は、Brain Dumpの1行ごとにタスク候補を作る仕組みにフォールバックします。手動でのタスク追加も常に使えます。</p>
-                    </details>
-                    <details class="lp-faq-item">
-                        <summary>データはどこに保存される？</summary>
-                        <p class="lp-faq-answer">初期状態では、この端末のブラウザ（localStorage）にだけ保存されます。サーバーへは送信しません。設定からObsidianやGoogle Sheetsを保存先に選ぶこともできます。</p>
-                    </details>
-                    <details class="lp-faq-item">
-                        <summary>Obsidian対応？</summary>
-                        <p class="lp-faq-answer">対応しています。VaultのTimeboxフォルダへ、Brain DumpからSkillまでMarkdownとして保存できます。</p>
-                    </details>
-                    <details class="lp-faq-item">
-                        <summary>スマホで使える？</summary>
-                        <p class="lp-faq-answer">使えます。ブラウザで開けば動作し、時刻の固定はモバイル向けの入力欄から行えます。</p>
-                    </details>
-                    <details class="lp-faq-item">
-                        <summary>Google Calendar対応？</summary>
-                        <p class="lp-faq-answer">作った時間割を.icsファイルとして書き出し、Googleカレンダーへインポートできます。カレンダーとの直接同期は準備中です。</p>
-                    </details>
-                    <details class="lp-faq-item">
-                        <summary>AIが勝手に予定を決める？</summary>
-                        <p class="lp-faq-answer">決めません。AIが行うのはタスクの整理と優先度・所要時間の提案までです。実際の時間割への配置は決定論的なTimebox Engineが行い、最終的な確定は常にあなたです。</p>
-                    </details>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══ FINAL CTA ══════════════════════════════════════ -->
-        <section class="lp-final-cta">
-            <div class="lp-shell lp-reveal">
-                <p class="lp-final-cta-word">DAYLOOP</p>
-                <h2 class="lp-final-cta-title">全部書く。<br>AIが整理。<br>今日が決まる。</h2>
-                <p class="lp-final-cta-sub">考える時間を減らして、やる時間を増やそう。</p>
-                <a href="/app/" class="lp-btn">今日を組み立てる</a>
-            </div>
-        </section>
-    </main>
-
-    <footer class="lp-footer">
-        <div class="lp-footer-inner">
-            <div class="lp-footer-brand">
-                <img class="lp-footer-mark" src="/images/dayloop/brand/dayloop-mark-dark.png" width="26" height="26"
-                    alt="" aria-hidden="true">
-                <div>
-                    <div class="lp-footer-logo">DAYLOOP</div>
-                    <div class="lp-footer-sub">by maemichi</div>
-                </div>
-            </div>
-            <div class="lp-footer-links">
-                <a href="/app/">アプリを開く</a>
-                <a href="https://github.com/h1maekawa/time-management" target="_blank" rel="noopener noreferrer">GitHub</a>
-                <a href="https://maemichi.com/" target="_blank" rel="noopener noreferrer">maemichi.com</a>
-            </div>
+          </div>
+          <div class="lp-hero-copy lp-reveal">
+            <em class="lp-kicker">AI DAILY EXECUTION</em>
+            <h1>DAYLOOPで<br />できること</h1>
+            <p>
+              予定もタスクも多い、働く人へ。<br />今日の実行順まで、ひとつの画面で。
+            </p>
+            <ol>
+              <li><b>01</b>今日やることを全部書く</li>
+              <li><b>02</b>必要ならAIと整理する</li>
+              <li><b>03</b>予定とタスクから時間割をつくる</li>
+              <li><b>04</b>崩れたら残りの1日を組み直す</li>
+            </ol>
+            <a class="lp-btn" href="/app/">無料で使ってみる →</a>
+          </div>
         </div>
+      </section>
+      <section class="lp-about">
+        <div class="lp-shell lp-about-grid lp-reveal">
+          <div>
+            <em class="lp-kicker">DAYLOOPって？</em>
+            <h2>予定ではなく、<br />実行を管理する。</h2>
+          </div>
+          <p>
+            「今日、何を、いつやるか」まで決めるAI
+            1日実行アプリ。計画だけで終わらず、実行と振り返りを次の日へつなげます。
+          </p>
+          <div class="lp-loop">
+            <span>PLAN</span
+            >→<span>DO</span>→<span>LEARN</span>→<span>AUTOMATE</span>↺
+          </div>
+        </div>
+      </section>
+      <section class="lp-section">
+        <div class="lp-shell">
+          <header class="lp-heading lp-reveal">
+            <em class="lp-kicker">CALENDAR × DAYLOOP</em>
+            <h2>約束と実行を、<br />今日のひとつの流れへ。</h2>
+          </header>
+          <div class="lp-calendar lp-reveal">
+            <article>
+              <em>Google Calendar</em>
+              <h3>約束を管理</h3>
+              <p><time>10:00</time>営業会議</p>
+              <p><time>13:00</time>商談</p>
+              <p><time>17:00</time>定例</p>
+            </article>
+            <strong>＋</strong>
+            <article class="active">
+              <em>DAYLOOP</em>
+              <h3>実行する仕事を管理</h3>
+              <p><time>09:00</time>商談準備</p>
+              <p><time>11:00</time>資料作成</p>
+              <p><time>14:30</time>メール返信</p>
+              <p><time>15:00</time>企画書作成</p>
+            </article>
+            <footer>
+              ↓<b>今日、何を、いつやるか</b
+              ><small>現在は .ics 書き出しに対応。直接同期は Coming Soon</small>
+            </footer>
+          </div>
+        </div>
+      </section>
+      <section class="lp-section lp-how" id="how">
+        <div class="lp-shell">
+          <header class="lp-heading lp-reveal">
+            <em class="lp-kicker">HOW IT WORKS</em>
+            <h2>書くだけで、<br />今日が動き出す。</h2>
+          </header>
+          <article class="lp-feature lp-reveal">
+            <div class="lp-demo">
+              <em>01 BRAIN DUMP</em>
+              <div class="lp-big-input">
+                思いつくまま、全部書く。<small>順番も時間も考えなくてOK</small>
+              </div>
+              <b class="lp-ui-btn">AIと整理する</b>
+            </div>
+            <div>
+              <em>01</em>
+              <h3>全部書く</h3>
+              <p>
+                頭の中のタスクを、そのまま入力。整理されていなくても大丈夫です。
+              </p>
+            </div>
+          </article>
+          <article class="lp-feature reverse lp-reveal">
+            <div class="lp-demo">
+              <em>02 AI ORGANIZE</em>
+              <p class="lp-organize">
+                <b>01</b>明日の商談準備 <small>45min</small>
+              </p>
+              <p class="lp-organize"><b>02</b>週次資料 <small>60min</small></p>
+              <small>提案するのはAI。決めるのはあなた。</small>
+            </div>
+            <div>
+              <em>02</em>
+              <h3>AIと整理する</h3>
+              <p>
+                タスク、優先度、所要時間の候補へ分解。確認して追加できます。
+              </p>
+            </div>
+          </article>
+          <article class="lp-feature lp-reveal">
+            <div class="lp-demo">
+              <em>03—05 TIMELINE</em>
+              <div class="lp-now">
+                <small>NOW · 10:15</small><b>商談準備</b><span>残り30min</span>
+              </div>
+              <div class="lp-next"><small>NEXT</small><b>週次資料</b></div>
+              <button disabled>残りの1日を組み直す</button>
+            </div>
+            <div>
+              <em>03—05</em>
+              <h3>配置する。実行する。<br />崩れたら組み直す。</h3>
+              <p>
+                空き時間へタスクを配置。今に集中し、変化したら残りだけ再計画します。
+              </p>
+            </div>
+          </article>
+          <div class="lp-mid lp-reveal">
+            <p>まずは、今日やることを書いてみる。</p>
+            <a class="lp-btn" href="/app/">無料で使ってみる</a>
+          </div>
+        </div>
+      </section>
+      <section class="lp-section">
+        <div class="lp-shell">
+          <header class="lp-heading lp-reveal">
+            <em class="lp-kicker">YOUR DAILY LOOP</em>
+            <h2>朝に組み、日中に動き、<br />夜に仕事を残す。</h2>
+          </header>
+          <div class="lp-rhythm lp-reveal">
+            <article>
+              <em>MORNING</em>
+              <h3>今日を組む</h3>
+              <p>Calendar確認 → 全部書く<br />→ AI整理 → Timeline</p>
+            </article>
+            <article>
+              <em>DAYTIME</em>
+              <h3>今を実行する</h3>
+              <p>NOWに集中。予定が変わったら<br />残りの1日を再計画。</p>
+            </article>
+            <article>
+              <em>NIGHT</em>
+              <h3>実行を残す</h3>
+              <p>何をしたか、何分かかったかを<br />次の計画へつなぐ。</p>
+            </article>
+          </div>
+          <div class="lp-loop lp-reveal">
+            <span>PLAN</span
+            >→<span>DO</span>→<span>LEARN</span>→<span>AUTOMATE</span>→<span
+              >NEXT DAY</span
+            >↺
+          </div>
+        </div>
+      </section>
+      <section class="lp-dark" id="automation">
+        <div class="lp-shell">
+          <header class="lp-dark-head lp-reveal">
+            <em>LEARNING / AUTOMATION VISION · COMING SOON</em>
+            <h2>使うほど、<br />自分の仕事が見えてくる。</h2>
+            <p>
+              毎日のタスク・予定・実行時間から、繰り返す仕事と手順を学習。現在利用できる日次計画の先にある構想です。
+            </p>
+          </header>
+          <article class="lp-memory lp-reveal">
+            <div>
+              <em>WORK MEMORY</em>
+              <h3>商談準備</h3>
+              <p class="lp-stats">
+                <span
+                  >平均時間 <b>47<small>min</small></b></span
+                ><span
+                  >頻度 <b>週4.2<small>回</small></b></span
+                >
+              </p>
+            </div>
+            <ol>
+              <li>Google Maps確認</li>
+              <li>HP確認</li>
+              <li>SNS確認</li>
+              <li>情報整理</li>
+            </ol>
+          </article>
+          <article class="lp-auto lp-reveal">
+            <header><em>AUTOMATION FOUND</em><small>COMING SOON</small></header>
+            <h3>毎週同じ商談準備を行っています。</h3>
+            <div class="lp-auto-flow">
+              <span>Maps確認</span>→<span>HP / SNS</span
+              >→<span>情報整理</span>→<span>資料作成</span>
+            </div>
+            <p>この作業は、AIで自動化できる可能性があります。</p>
+            <b class="lp-dark-btn">どう自動化するかを見る</b>
+          </article>
+          <article class="lp-guide lp-reveal">
+            <div>
+              <em>AUTOMATION GUIDE · COMING SOON</em>
+              <h3>自動化の作り方まで、<br />実装指示にする。</h3>
+              <p>現在 <b>47分</b> → 自動化後 <b>12分</b></p>
+            </div>
+            <div>
+              <ol>
+                <li>Google Mapsから店舗情報を取得</li>
+                <li>HP / SNSを確認</li>
+                <li>AIで情報を整理</li>
+                <li>指定フォーマットへ変換</li>
+              </ol>
+              <p>この自動化を作るための<br /><b>AI実装指示を生成</b></p>
+              <footer>
+                <span>ChatGPT</span><span>Claude</span><span>Codex</span
+                ><span>その他AI</span>
+              </footer>
+            </div>
+          </article>
+          <article class="lp-vision lp-reveal">
+            <em>FUTURE VISION · COMING SOON</em>
+            <h3>提案から、承認後の自動実行へ。</h3>
+            <div>
+              <b>DAYLOOP</b> → <span>Gmail</span><span>Calendar</span
+              ><span>Slack</span><span>AI</span><span>Browser</span> →
+              <b>承認して実行</b>
+            </div>
+            <p>
+              未実装の将来構想です。ユーザーの承認なしに処理を実行することはありません。
+            </p>
+          </article>
+        </div>
+      </section>
+      <section class="lp-section">
+        <div class="lp-shell">
+          <header class="lp-heading lp-reveal">
+            <em class="lp-kicker">GET STARTED</em>
+            <h2>4ステップで、今日を始める。</h2>
+          </header>
+          <ol class="lp-start lp-reveal">
+            <li><b>01</b>アカウント作成<br />またはログイン</li>
+            <li><b>02</b>今日やることを<br />全部書く</li>
+            <li><b>03</b>必要なら<br />AIと整理</li>
+            <li><b>04</b>時間割を<br />作成する</li>
+          </ol>
+        </div>
+      </section>
+      <section class="lp-section lp-faq" id="faq">
+        <div class="lp-shell">
+          <header class="lp-heading">
+            <em class="lp-kicker">FAQ</em>
+            <h2>よくある質問</h2>
+          </header>
+          <details>
+            <summary>AIを使わなくても利用できますか？</summary>
+            <p>はい。タスクを自分で追加し、時間割を作成できます。</p>
+          </details>
+          <details>
+            <summary>Google Calendarと直接同期しますか？</summary>
+            <p>
+              現在は .ics 書き出しに対応しています。直接同期は将来提供予定です。
+            </p>
+          </details>
+          <details>
+            <summary>Automation機能は現在使えますか？</summary>
+            <p>いいえ。学習・自動化は今後目指す構想として明示しています。</p>
+          </details>
+        </div>
+      </section>
+      <section class="lp-final">
+        <div class="lp-shell lp-reveal">
+          <img src="/images/dayloop/brand/dayloop-mark-glow.png" alt="" />
+          <h2>今日、何を、いつやるか。</h2>
+          <p>書くところから、始めよう。</p>
+          <a class="lp-btn" href="/app/">無料で使ってみる →</a>
+        </div>
+      </section>
+    </main>
+    <footer class="lp-footer">
+      <div class="lp-shell">
+        <img src="/images/dayloop/brand/dayloop-wordmark.png" alt="DAYLOOP" />
+        <p>
+          <a href="/app/">アプリを開く</a>　<a
+            href="https://github.com/h1maekawa/time-management"
+            >GitHub</a
+          >
+        </p>
+      </div>
     </footer>
-
     <script>
-        (function () {
-            var els = document.querySelectorAll('.lp-reveal');
-            if (!els.length) return;
-            if (!('IntersectionObserver' in window)) {
-                els.forEach(function (el) { el.classList.add('is-visible'); });
-                return;
-            }
-            var io = new IntersectionObserver(function (entries) {
-                entries.forEach(function (entry) {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        io.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
-            els.forEach(function (el) { io.observe(el); });
-        })();
+      !(function () {
+        let e = document.querySelectorAll(".lp-reveal");
+        if (!("IntersectionObserver" in window))
+          return e.forEach((x) => x.classList.add("visible"));
+        let o = new IntersectionObserver(
+          (n) =>
+            n.forEach((x) => {
+              x.isIntersecting &&
+                (x.target.classList.add("visible"), o.unobserve(x.target));
+            }),
+          { threshold: 0.08 },
+        );
+        e.forEach((x) => o.observe(x));
+      })();
     </script>
-</body>
+  </body>
 </html>
