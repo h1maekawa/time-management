@@ -1,9 +1,394 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DAYLOOP | AIで1日の仕事を組み立てる</title><meta name="description" content="予定とタスクから、今日何をいつやるかまで決めるAI 1日実行アプリ、DAYLOOP。"><link rel="canonical" href="https://time-management-cx7.pages.dev/"><meta property="og:title" content="DAYLOOP | AIで1日の仕事を組み立てる"><meta property="og:description" content="予定とタスクから今日の実行順まで決めるAI 1日実行アプリ。"><meta property="og:image" content="https://time-management-cx7.pages.dev/images/dayloop/ogp/dayloop-ogp.png"><meta name="twitter:card" content="summary_large_image"><link rel="icon" href="/favicon.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="assets/css/base.css"><link rel="stylesheet" href="assets/css/landing.css"></head><body class="lp-page"><a class="skip-link" href="#main">本文へ移動</a>
-<header class="lp-header"><div class="lp-shell lp-header-inner"><a href="/" class="lp-logo"><img src="/images/dayloop/brand/dayloop-wordmark.png" alt="DAYLOOP"></a><nav class="lp-nav" aria-label="サイト内リンク"><div><a href="#features">できること</a><a href="#how">使い方</a><a href="#automation">AI自動化</a><a href="#faq">FAQ</a></div><a class="lp-btn small" href="/app/">無料で使ってみる</a></nav></div></header>
-<main id="main"><section class="lp-hero" id="features"><div class="lp-shell lp-hero-grid"><div class="lp-app lp-reveal" aria-label="DAYLOOPの実アプリを再現したプレビュー"><div class="lp-appbar"><span><img src="/images/dayloop/brand/dayloop-mark-glow.png" alt="">DAYLOOP</span><small>TODAY · 08.21</small></div><div class="lp-appgrid"><div class="lp-pane"><em>BRAIN DUMP</em><h3>頭の中を全部書く</h3><div class="lp-input">商談準備<br>週次資料を仕上げる<br>田中さんへ返信<br>企画書の構成を考える</div><b class="lp-ui-btn">AIと整理する</b><em>TODAY'S TASKS</em><p class="lp-task"><i></i>商談準備 <small>45min</small></p><p class="lp-task"><i></i>週次資料 <small>60min</small></p></div><div class="lp-pane"><em>TODAY'S TIMELINE</em><h3>今日の時間割</h3><div class="lp-time"><p><time>09:00</time><b>商談準備 <small>45min</small></b></p><p><time>10:00</time><b>営業会議 <small>Calendar</small></b></p><p><time>11:00</time><b>週次資料 <small>60min</small></b></p><p><time>13:00</time><b>田中さんへ返信 <small>15min</small></b></p></div></div></div></div><div class="lp-hero-copy lp-reveal"><em class="lp-kicker">AI DAILY EXECUTION</em><h1>DAYLOOPで<br>できること</h1><p>予定もタスクも多い、働く人へ。<br>今日の実行順まで、ひとつの画面で。</p><ol><li><b>01</b>今日やることを全部書く</li><li><b>02</b>必要ならAIと整理する</li><li><b>03</b>予定とタスクから時間割をつくる</li><li><b>04</b>崩れたら残りの1日を組み直す</li></ol><a class="lp-btn" href="/app/">無料で使ってみる →</a></div></div></section>
-<section class="lp-about"><div class="lp-shell lp-about-grid lp-reveal"><div><em class="lp-kicker">DAYLOOPって？</em><h2>予定ではなく、<br>実行を管理する。</h2></div><p>「今日、何を、いつやるか」まで決めるAI 1日実行アプリ。計画だけで終わらず、実行と振り返りを次の日へつなげます。</p><div class="lp-loop"><span>PLAN</span>→<span>DO</span>→<span>LEARN</span>→<span>AUTOMATE</span>↺</div></div></section>
-<section class="lp-section"><div class="lp-shell"><header class="lp-heading lp-reveal"><em class="lp-kicker">CALENDAR × DAYLOOP</em><h2>約束と実行を、<br>今日のひとつの流れへ。</h2></header><div class="lp-calendar lp-reveal"><article><em>Google Calendar</em><h3>約束を管理</h3><p><time>10:00</time>営業会議</p><p><time>13:00</time>商談</p><p><time>17:00</time>定例</p></article><strong>＋</strong><article class="active"><em>DAYLOOP</em><h3>実行する仕事を管理</h3><p><time>09:00</time>商談準備</p><p><time>11:00</time>資料作成</p><p><time>14:30</time>メール返信</p><p><time>15:00</time>企画書作成</p></article><footer>↓<b>今日、何を、いつやるか</b><small>現在は .ics 書き出しに対応。直接同期は Coming Soon</small></footer></div></div></section>
-<section class="lp-section lp-how" id="how"><div class="lp-shell"><header class="lp-heading lp-reveal"><em class="lp-kicker">HOW IT WORKS</em><h2>書くだけで、<br>今日が動き出す。</h2></header><article class="lp-feature lp-reveal"><div class="lp-demo"><em>01 BRAIN DUMP</em><div class="lp-big-input">思いつくまま、全部書く。<small>順番も時間も考えなくてOK</small></div><b class="lp-ui-btn">AIと整理する</b></div><div><em>01</em><h3>全部書く</h3><p>頭の中のタスクを、そのまま入力。整理されていなくても大丈夫です。</p></div></article><article class="lp-feature reverse lp-reveal"><div class="lp-demo"><em>02 AI ORGANIZE</em><p class="lp-organize"><b>01</b>明日の商談準備 <small>45min</small></p><p class="lp-organize"><b>02</b>週次資料 <small>60min</small></p><small>提案するのはAI。決めるのはあなた。</small></div><div><em>02</em><h3>AIと整理する</h3><p>タスク、優先度、所要時間の候補へ分解。確認して追加できます。</p></div></article><article class="lp-feature lp-reveal"><div class="lp-demo"><em>03—05 TIMELINE</em><div class="lp-now"><small>NOW · 10:15</small><b>商談準備</b><span>残り30min</span></div><div class="lp-next"><small>NEXT</small><b>週次資料</b></div><button disabled>残りの1日を組み直す</button></div><div><em>03—05</em><h3>配置する。実行する。<br>崩れたら組み直す。</h3><p>空き時間へタスクを配置。今に集中し、変化したら残りだけ再計画します。</p></div></article><div class="lp-mid lp-reveal"><p>まずは、今日やることを書いてみる。</p><a class="lp-btn" href="/app/">無料で使ってみる</a></div></div></section>
-<section class="lp-section"><div class="lp-shell"><header class="lp-heading lp-reveal"><em class="lp-kicker">YOUR DAILY LOOP</em><h2>朝に組み、日中に動き、<br>夜に仕事を残す。</h2></header><div class="lp-rhythm lp-reveal"><article><em>MORNING</em><h3>今日を組む</h3><p>Calendar確認 → 全部書く<br>→ AI整理 → Timeline</p></article><article><em>DAYTIME</em><h3>今を実行する</h3><p>NOWに集中。予定が変わったら<br>残りの1日を再計画。</p></article><article><em>NIGHT</em><h3>実行を残す</h3><p>何をしたか、何分かかったかを<br>次の計画へつなぐ。</p></article></div><div class="lp-loop lp-reveal"><span>PLAN</span>→<span>DO</span>→<span>LEARN</span>→<span>AUTOMATE</span>→<span>NEXT DAY</span>↺</div></div></section>
-<section class="lp-dark" id="automation"><div class="lp-shell"><header class="lp-dark-head lp-reveal"><em>LEARNING / AUTOMATION VISION · COMING SOON</em><h2>使うほど、<br>自分の仕事が見えてくる。</h2><p>毎日のタスク・予定・実行時間から、繰り返す仕事と手順を学習。現在利用できる日次計画の先にある構想です。</p></header><article class="lp-memory lp-reveal"><div><em>WORK MEMORY</em><h3>商談準備</h3><p class="lp-stats"><span>平均時間 <b>47<small>min</small></b></span><span>頻度 <b>週4.2<small>回</small></b></span></p></div><ol><li>Google Maps確認</li><li>HP確認</li><li>SNS確認</li><li>情報整理</li></ol></article><article class="lp-auto lp-reveal"><header><em>AUTOMATION FOUND</em><small>COMING SOON</small></header><h3>毎週同じ商談準備を行っています。</h3><div class="lp-auto-flow"><span>Maps確認</span>→<span>HP / SNS</span>→<span>情報整理</span>→<span>資料作成</span></div><p>この作業は、AIで自動化できる可能性があります。</p><b class="lp-dark-btn">どう自動化するかを見る</b></article><article class="lp-guide lp-reveal"><div><em>AUTOMATION GUIDE · COMING SOON</em><h3>自動化の作り方まで、<br>実装指示にする。</h3><p>現在 <b>47分</b> → 自動化後 <b>12分</b></p></div><div><ol><li>Google Mapsから店舗情報を取得</li><li>HP / SNSを確認</li><li>AIで情報を整理</li><li>指定フォーマットへ変換</li></ol><p>この自動化を作るための<br><b>AI実装指示を生成</b></p><footer><span>ChatGPT</span><span>Claude</span><span>Codex</span><span>その他AI</span></footer></div></article><article class="lp-vision lp-reveal"><em>FUTURE VISION · COMING SOON</em><h3>提案から、承認後の自動実行へ。</h3><div><b>DAYLOOP</b> → <span>Gmail</span><span>Calendar</span><span>Slack</span><span>AI</span><span>Browser</span> → <b>承認して実行</b></div><p>未実装の将来構想です。ユーザーの承認なしに処理を実行することはありません。</p></article></div></section>
-<section class="lp-section"><div class="lp-shell"><header class="lp-heading lp-reveal"><em class="lp-kicker">GET STARTED</em><h2>4ステップで、今日を始める。</h2></header><ol class="lp-start lp-reveal"><li><b>01</b>アカウント作成<br>またはログイン</li><li><b>02</b>今日やることを<br>全部書く</li><li><b>03</b>必要なら<br>AIと整理</li><li><b>04</b>時間割を<br>作成する</li></ol></div></section><section class="lp-section lp-faq" id="faq"><div class="lp-shell"><header class="lp-heading"><em class="lp-kicker">FAQ</em><h2>よくある質問</h2></header><details><summary>AIを使わなくても利用できますか？</summary><p>はい。タスクを自分で追加し、時間割を作成できます。</p></details><details><summary>Google Calendarと直接同期しますか？</summary><p>現在は .ics 書き出しに対応しています。直接同期は将来提供予定です。</p></details><details><summary>Automation機能は現在使えますか？</summary><p>いいえ。学習・自動化は今後目指す構想として明示しています。</p></details></div></section><section class="lp-final"><div class="lp-shell lp-reveal"><img src="/images/dayloop/brand/dayloop-mark-glow.png" alt=""><h2>今日、何を、いつやるか。</h2><p>書くところから、始めよう。</p><a class="lp-btn" href="/app/">無料で使ってみる →</a></div></section></main><footer class="lp-footer"><div class="lp-shell"><img src="/images/dayloop/brand/dayloop-wordmark.png" alt="DAYLOOP"><p><a href="/app/">アプリを開く</a>　<a href="https://github.com/h1maekawa/time-management">GitHub</a></p></div></footer><script>!function(){let e=document.querySelectorAll('.lp-reveal');if(!('IntersectionObserver'in window))return e.forEach(x=>x.classList.add('visible'));let o=new IntersectionObserver(n=>n.forEach(x=>{x.isIntersecting&&(x.target.classList.add('visible'),o.unobserve(x.target))}),{threshold:.08});e.forEach(x=>o.observe(x))}();</script></body></html>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>DAYLOOP | AIで1日の仕事を組み立てる</title>
+    <meta
+      name="description"
+      content="予定とタスクから、今日何をいつやるかまで決めるAI 1日実行アプリ、DAYLOOP。"
+    />
+    <link rel="canonical" href="https://time-management-cx7.pages.dev/" />
+    <meta property="og:title" content="DAYLOOP | AIで1日の仕事を組み立てる" />
+    <meta
+      property="og:description"
+      content="予定とタスクから今日の実行順まで決めるAI 1日実行アプリ。"
+    />
+    <meta
+      property="og:image"
+      content="https://time-management-cx7.pages.dev/images/dayloop/ogp/dayloop-ogp.png"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700;800&family=Syne:wght@700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/css/base.css" />
+    <link rel="stylesheet" href="assets/css/landing.css" />
+  </head>
+  <body class="lp-page">
+    <a class="skip-link" href="#main">本文へ移動</a>
+    <header class="lp-header">
+      <div class="lp-shell lp-header-inner">
+        <a href="/" class="lp-logo"
+          ><img src="/images/dayloop/brand/dayloop-wordmark.png" alt="DAYLOOP"
+        /></a>
+        <nav class="lp-nav" aria-label="サイト内リンク">
+          <div>
+            <a href="#features">できること</a><a href="#how">使い方</a
+            ><a href="#automation">AI自動化</a><a href="#faq">FAQ</a>
+          </div>
+          <a class="lp-btn small" href="/app/">無料で使ってみる</a>
+        </nav>
+      </div>
+    </header>
+    <main id="main">
+      <section class="lp-hero" id="features">
+        <div class="lp-shell lp-hero-grid">
+          <div
+            class="lp-app lp-reveal"
+            aria-label="DAYLOOPの実アプリを再現したプレビュー"
+          >
+            <div class="lp-appbar">
+              <span
+                ><img
+                  src="/images/dayloop/brand/dayloop-mark-glow.png"
+                  alt=""
+                />DAYLOOP</span
+              ><small>TODAY · 08.21</small>
+            </div>
+            <div class="lp-appgrid">
+              <div class="lp-pane">
+                <em>BRAIN DUMP</em>
+                <h3>頭の中を全部書く</h3>
+                <div class="lp-input">
+                  商談準備<br />週次資料を仕上げる<br />田中さんへ返信<br />企画書の構成を考える
+                </div>
+                <b class="lp-ui-btn">AIと整理する</b><em>TODAY'S TASKS</em>
+                <p class="lp-task"><i></i>商談準備 <small>45min</small></p>
+                <p class="lp-task"><i></i>週次資料 <small>60min</small></p>
+              </div>
+              <div class="lp-pane">
+                <em>TODAY'S TIMELINE</em>
+                <h3>今日の時間割</h3>
+                <div class="lp-time">
+                  <p>
+                    <time>09:00</time><b>商談準備 <small>45min</small></b>
+                  </p>
+                  <p>
+                    <time>10:00</time><b>営業会議 <small>Calendar</small></b>
+                  </p>
+                  <p>
+                    <time>11:00</time><b>週次資料 <small>60min</small></b>
+                  </p>
+                  <p>
+                    <time>13:00</time><b>田中さんへ返信 <small>15min</small></b>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="lp-hero-copy lp-reveal">
+            <em class="lp-kicker">AI DAILY EXECUTION</em>
+            <h1>DAYLOOPで<br />できること</h1>
+            <p>
+              予定もタスクも多い、働く人へ。<br />今日の実行順まで、ひとつの画面で。
+            </p>
+            <ol>
+              <li><b>01</b>今日やることを全部書く</li>
+              <li><b>02</b>必要ならAIと整理する</li>
+              <li><b>03</b>予定とタスクから時間割をつくる</li>
+              <li><b>04</b>崩れたら残りの1日を組み直す</li>
+            </ol>
+            <a class="lp-btn" href="/app/">無料で使ってみる →</a>
+          </div>
+        </div>
+      </section>
+      <section class="lp-about">
+        <div class="lp-shell lp-about-grid lp-reveal">
+          <div>
+            <em class="lp-kicker">DAYLOOPって？</em>
+            <h2>予定ではなく、<br />実行を管理する。</h2>
+          </div>
+          <p>
+            「今日、何を、いつやるか」まで決めるAI
+            1日実行アプリ。計画だけで終わらず、実行と振り返りを次の日へつなげます。
+          </p>
+          <div class="lp-loop">
+            <span>PLAN</span
+            >→<span>DO</span>→<span>LEARN</span>→<span>AUTOMATE</span>↺
+          </div>
+        </div>
+      </section>
+      <section class="lp-section">
+        <div class="lp-shell">
+          <header class="lp-heading lp-reveal">
+            <em class="lp-kicker">CALENDAR × DAYLOOP</em>
+            <h2>約束と実行を、<br />今日のひとつの流れへ。</h2>
+          </header>
+          <div class="lp-calendar lp-reveal">
+            <article>
+              <em>Google Calendar</em>
+              <h3>約束を管理</h3>
+              <p><time>10:00</time>営業会議</p>
+              <p><time>13:00</time>商談</p>
+              <p><time>17:00</time>定例</p>
+            </article>
+            <strong>＋</strong>
+            <article class="active">
+              <em>DAYLOOP</em>
+              <h3>実行する仕事を管理</h3>
+              <p><time>09:00</time>商談準備</p>
+              <p><time>11:00</time>資料作成</p>
+              <p><time>14:30</time>メール返信</p>
+              <p><time>15:00</time>企画書作成</p>
+            </article>
+            <footer>
+              ↓<b>今日、何を、いつやるか</b
+              ><small>現在は .ics 書き出しに対応。直接同期は Coming Soon</small>
+            </footer>
+          </div>
+        </div>
+      </section>
+      <section class="lp-section lp-how" id="how">
+        <div class="lp-shell">
+          <header class="lp-heading lp-reveal">
+            <em class="lp-kicker">HOW IT WORKS</em>
+            <h2>書くだけで、<br />今日が動き出す。</h2>
+          </header>
+          <article class="lp-feature lp-reveal">
+            <div class="lp-demo">
+              <em>01 BRAIN DUMP</em>
+              <div class="lp-big-input">
+                思いつくまま、全部書く。<small>順番も時間も考えなくてOK</small>
+              </div>
+              <b class="lp-ui-btn">AIと整理する</b>
+            </div>
+            <div>
+              <em>01</em>
+              <h3>全部書く</h3>
+              <p>
+                頭の中のタスクを、そのまま入力。整理されていなくても大丈夫です。
+              </p>
+            </div>
+          </article>
+          <article class="lp-feature reverse lp-reveal">
+            <div class="lp-demo">
+              <em>02 AI ORGANIZE</em>
+              <p class="lp-organize">
+                <b>01</b>明日の商談準備 <small>45min</small>
+              </p>
+              <p class="lp-organize"><b>02</b>週次資料 <small>60min</small></p>
+              <small>提案するのはAI。決めるのはあなた。</small>
+            </div>
+            <div>
+              <em>02</em>
+              <h3>AIと整理する</h3>
+              <p>
+                タスク、優先度、所要時間の候補へ分解。確認して追加できます。
+              </p>
+            </div>
+          </article>
+          <article class="lp-feature lp-reveal">
+            <div class="lp-demo">
+              <em>03—05 TIMELINE</em>
+              <div class="lp-now">
+                <small>NOW · 10:15</small><b>商談準備</b><span>残り30min</span>
+              </div>
+              <div class="lp-next"><small>NEXT</small><b>週次資料</b></div>
+              <button disabled>残りの1日を組み直す</button>
+            </div>
+            <div>
+              <em>03—05</em>
+              <h3>配置する。実行する。<br />崩れたら組み直す。</h3>
+              <p>
+                空き時間へタスクを配置。今に集中し、変化したら残りだけ再計画します。
+              </p>
+            </div>
+          </article>
+          <div class="lp-mid lp-reveal">
+            <p>まずは、今日やることを書いてみる。</p>
+            <a class="lp-btn" href="/app/">無料で使ってみる</a>
+          </div>
+        </div>
+      </section>
+      <section class="lp-section">
+        <div class="lp-shell">
+          <header class="lp-heading lp-reveal">
+            <em class="lp-kicker">YOUR DAILY LOOP</em>
+            <h2>朝に組み、日中に動き、<br />夜に仕事を残す。</h2>
+          </header>
+          <div class="lp-rhythm lp-reveal">
+            <article>
+              <em>MORNING</em>
+              <h3>今日を組む</h3>
+              <p>Calendar確認 → 全部書く<br />→ AI整理 → Timeline</p>
+            </article>
+            <article>
+              <em>DAYTIME</em>
+              <h3>今を実行する</h3>
+              <p>NOWに集中。予定が変わったら<br />残りの1日を再計画。</p>
+            </article>
+            <article>
+              <em>NIGHT</em>
+              <h3>実行を残す</h3>
+              <p>何をしたか、何分かかったかを<br />次の計画へつなぐ。</p>
+            </article>
+          </div>
+          <div class="lp-loop lp-reveal">
+            <span>PLAN</span
+            >→<span>DO</span>→<span>LEARN</span>→<span>AUTOMATE</span>→<span
+              >NEXT DAY</span
+            >↺
+          </div>
+        </div>
+      </section>
+      <section class="lp-dark" id="automation">
+        <div class="lp-shell">
+          <header class="lp-dark-head lp-reveal">
+            <em>LEARNING / AUTOMATION VISION · COMING SOON</em>
+            <h2>使うほど、<br />自分の仕事が見えてくる。</h2>
+            <p>
+              毎日のタスク・予定・実行時間から、繰り返す仕事と手順を学習。現在利用できる日次計画の先にある構想です。
+            </p>
+          </header>
+          <article class="lp-memory lp-reveal">
+            <div>
+              <em>WORK MEMORY</em>
+              <h3>商談準備</h3>
+              <p class="lp-stats">
+                <span
+                  >平均時間 <b>47<small>min</small></b></span
+                ><span
+                  >頻度 <b>週4.2<small>回</small></b></span
+                >
+              </p>
+            </div>
+            <ol>
+              <li>Google Maps確認</li>
+              <li>HP確認</li>
+              <li>SNS確認</li>
+              <li>情報整理</li>
+            </ol>
+          </article>
+          <article class="lp-auto lp-reveal">
+            <header><em>AUTOMATION FOUND</em><small>COMING SOON</small></header>
+            <h3>毎週同じ商談準備を行っています。</h3>
+            <div class="lp-auto-flow">
+              <span>Maps確認</span>→<span>HP / SNS</span
+              >→<span>情報整理</span>→<span>資料作成</span>
+            </div>
+            <p>この作業は、AIで自動化できる可能性があります。</p>
+            <b class="lp-dark-btn">どう自動化するかを見る</b>
+          </article>
+          <article class="lp-guide lp-reveal">
+            <div>
+              <em>AUTOMATION GUIDE · COMING SOON</em>
+              <h3>自動化の作り方まで、<br />実装指示にする。</h3>
+              <p>現在 <b>47分</b> → 自動化後 <b>12分</b></p>
+            </div>
+            <div>
+              <ol>
+                <li>Google Mapsから店舗情報を取得</li>
+                <li>HP / SNSを確認</li>
+                <li>AIで情報を整理</li>
+                <li>指定フォーマットへ変換</li>
+              </ol>
+              <p>この自動化を作るための<br /><b>AI実装指示を生成</b></p>
+              <footer>
+                <span>ChatGPT</span><span>Claude</span><span>Codex</span
+                ><span>その他AI</span>
+              </footer>
+            </div>
+          </article>
+          <article class="lp-vision lp-reveal">
+            <em>FUTURE VISION · COMING SOON</em>
+            <h3>提案から、承認後の自動実行へ。</h3>
+            <div>
+              <b>DAYLOOP</b> → <span>Gmail</span><span>Calendar</span
+              ><span>Slack</span><span>AI</span><span>Browser</span> →
+              <b>承認して実行</b>
+            </div>
+            <p>
+              未実装の将来構想です。ユーザーの承認なしに処理を実行することはありません。
+            </p>
+          </article>
+        </div>
+      </section>
+      <section class="lp-section">
+        <div class="lp-shell">
+          <header class="lp-heading lp-reveal">
+            <em class="lp-kicker">GET STARTED</em>
+            <h2>4ステップで、今日を始める。</h2>
+          </header>
+          <ol class="lp-start lp-reveal">
+            <li><b>01</b>アカウント作成<br />またはログイン</li>
+            <li><b>02</b>今日やることを<br />全部書く</li>
+            <li><b>03</b>必要なら<br />AIと整理</li>
+            <li><b>04</b>時間割を<br />作成する</li>
+          </ol>
+        </div>
+      </section>
+      <section class="lp-section lp-faq" id="faq">
+        <div class="lp-shell">
+          <header class="lp-heading">
+            <em class="lp-kicker">FAQ</em>
+            <h2>よくある質問</h2>
+          </header>
+          <details>
+            <summary>AIを使わなくても利用できますか？</summary>
+            <p>はい。タスクを自分で追加し、時間割を作成できます。</p>
+          </details>
+          <details>
+            <summary>Google Calendarと直接同期しますか？</summary>
+            <p>
+              現在は .ics 書き出しに対応しています。直接同期は将来提供予定です。
+            </p>
+          </details>
+          <details>
+            <summary>Automation機能は現在使えますか？</summary>
+            <p>いいえ。学習・自動化は今後目指す構想として明示しています。</p>
+          </details>
+        </div>
+      </section>
+      <section class="lp-final">
+        <div class="lp-shell lp-reveal">
+          <img src="/images/dayloop/brand/dayloop-mark-glow.png" alt="" />
+          <h2>今日、何を、いつやるか。</h2>
+          <p>書くところから、始めよう。</p>
+          <a class="lp-btn" href="/app/">無料で使ってみる →</a>
+        </div>
+      </section>
+    </main>
+    <footer class="lp-footer">
+      <div class="lp-shell">
+        <img src="/images/dayloop/brand/dayloop-wordmark.png" alt="DAYLOOP" />
+        <p>
+          <a href="/app/">アプリを開く</a>　<a
+            href="https://github.com/h1maekawa/time-management"
+            >GitHub</a
+          >
+        </p>
+      </div>
+    </footer>
+    <script>
+      !(function () {
+        let e = document.querySelectorAll(".lp-reveal");
+        if (!("IntersectionObserver" in window))
+          return e.forEach((x) => x.classList.add("visible"));
+        let o = new IntersectionObserver(
+          (n) =>
+            n.forEach((x) => {
+              x.isIntersecting &&
+                (x.target.classList.add("visible"), o.unobserve(x.target));
+            }),
+          { threshold: 0.08 },
+        );
+        e.forEach((x) => o.observe(x));
+      })();
+    </script>
+  </body>
+</html>
